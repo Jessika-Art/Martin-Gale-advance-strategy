@@ -1,193 +1,196 @@
-# 📈 MartinGales Trading Bot
+# 📈 MartinGales Trading Bot for Interactive Brokers
 
-Advanced Multi-Strategy Martingale Trading Bot for Interactive Brokers (IBKR)
+A sophisticated multi-strategy trading bot designed for Interactive Brokers (IBKR) that implements various Martingale-based trading strategies with advanced risk management, position sizing, and performance analytics.
 
-## 🚀 Quick Start Guide
+## 🚀 Quick Start
 
 ### Prerequisites
+- Python 3.8+
+- Interactive Brokers TWS (Trader Workstation) or IB Gateway
+- Active IBKR account (Paper Trading or Live)
 
-- Python 3.8 or higher
-- Interactive Brokers account (Paper Trading or Live)
-- IB Gateway or TWS (Trader Workstation)
-
-### 1. Download and Setup IB Gateway
-
-1. **Download IB Gateway**:
-   - Visit [Interactive Brokers Gateway Download](https://www.interactivebrokers.com/en/trading/ib-gateway-download.php)
-   - Download the appropriate version for your operating system
-   - Install following the provided instructions
-
-2. **Configure IB Gateway**:
-   - Launch IB Gateway
-   - Login with your IBKR credentials
-   - Configure API settings:
-     - Enable "Enable ActiveX and Socket Clients"
-     - Set Socket port based on your trading mode:
-       - **Paper Trading (Demo)**: Port `4002`
-       - **Live Trading**: Port `4001`
-     - Add `127.0.0.1` to trusted IP addresses
-     - Disable "Read-Only API"
-
-### 2. Install Dependencies
-
-1. **Clone or download this repository**
-2. **Navigate to the project directory**:
+### Installation
+1. Clone this repository
+2. Install dependencies:
    ```bash
-   cd MartinGales
+   pip install -r app/ui/requirements.txt
    ```
+3. Configure Interactive Brokers connection (see [IBKR Setup](#-interactive-brokers-setup))
 
-3. **Create a virtual environment** (recommended):
-   ```bash
-   python -m venv env
-   ```
+### Launch Application
+```bash
+streamlit run app/ui/app.py
+```
 
-4. **Activate the virtual environment**:
-   - **Windows**:
-     ```bash
-     env\Scripts\activate
-     ```
-   - **macOS/Linux**:
-     ```bash
-     source env/bin/activate
-     ```
+The web interface will open at `http://localhost:8501`
 
-5. **Install required packages**:
-   ```bash
-   pip install -r requirements.txt
-   ```
+## 🔗 Interactive Brokers Setup
 
-### 3. Run the Application
+### Connection Requirements
+- **TWS/IB Gateway**: Must be running and logged in
+- **API Settings**: Enable API connections in TWS/Gateway
+  - Go to File → Global Configuration → API → Settings
+  - Check "Enable ActiveX and Socket Clients"
+  - Add your client ID (default: 1)
+- **Ports**:
+  - Paper Trading: 4002 (default)
+  - Live Trading: 4001 (default)
 
-#### Option 1: Using the Launcher Script (Recommended)
+### Account Configuration
+The bot supports both:
+- **Demo/Paper Trading**: Safe testing environment
+- **Live Trading**: Real money trading (use with caution)
 
-1. **Ensure IB Gateway is running** and connected
-2. **Start the application using the launcher**:
-   - **Windows**: Double-click `start_app.bat` or run:
-     ```bash
-     start_app.bat
-     ```
-   - **macOS/Linux**: Run:
-     ```bash
-     python run_app.py
-     ```
+Switch between accounts in the Configuration Manager within the UI.
 
-3. **Access the application**:
-   - Open your web browser
-   - Navigate to: `http://localhost:8501`
+## 🎯 Core Features
 
-4. **To stop the application**:
-   - Press `Ctrl+C` in the terminal - **the application will stop immediately**
+### Multi-Strategy Trading
+- **CDM (Counter Direction Martingale)**: Trades against the trend
+- **WDM (With Direction Martingale)**: Trades with the trend
+- **ZRM (Zone Recovery Martingale)**: Zone-based recovery strategy
+- **IZRM (Inverse Zone Recovery Martingale)**: Inverse zone recovery
 
-#### Option 2: Direct Streamlit Command
+### Execution Modes
+- **Single Strategy**: Run one strategy at a time
+- **Parallel Execution**: Multiple strategies simultaneously
+- **Sequential Execution**: Strategies run in sequence
 
-1. **Ensure IB Gateway is running** and connected
-2. **Start the Streamlit application**:
-   ```bash
-   streamlit run app/ui/app.py
-   ```
-
-3. **Access the application**:
-   - Open your web browser
-   - Navigate to: `http://localhost:8501`
-
-⚠️ **Note**: With the direct Streamlit command, `Ctrl+C` may not stop the application immediately. Use the launcher script for better control.
-
-## 🔧 Configuration
-
-### Port Configuration
-
-| Trading Mode | Port | Description |
-|--------------|------|-------------|
-| **Paper Trading** | `4002` | IB Gateway demo/paper trading port |
-| **Live Trading** | `4001` | IB Gateway live trading port |
-
-### Account Setup
-
-1. **Paper Trading** (Recommended for testing):
-   - Use your paper trading credentials
-   - Set account type to "Demo" in the application
-   - Port: 4002
-
-2. **Live Trading** (Real money):
-   - Use your live trading credentials
-   - Set account type to "Live" in the application
-   - Port: 4001
-   - ⚠️ **Warning**: Live trading involves real money and risk
-
-## 📊 Features
-
-- **Multiple Martingale Strategies**:
-  - Counter Direction Martingale (CDM)
-  - With Direction Martingale (WDM)
-  - Zone Recovery Martingale (ZRM)
-  - Inverse Zone Recovery Martingale (IZRM)
-
-- **Advanced Configuration**:
-  - Multi-timeframe support (1min to 1month)
-  - Multi-symbol trading
-  - Risk management controls
-  - Position sizing options
-
-- **Real-time Monitoring**:
-  - Live P&L tracking
-  - Performance analytics
-  - Trade history
-  - Account balance monitoring
-
-- **Backtesting System**:
-  - Historical strategy testing
-  - Performance analysis
-  - Risk assessment
-
-## 🛡️ Risk Management
-
-⚠️ **Important Risk Disclaimers**:
-
-- **Martingale strategies involve significant risk** and can lead to substantial losses
-- **Always test with paper trading** before using real money
-- **Never risk more than you can afford to lose**
-- **Past performance does not guarantee future results**
-- **Use appropriate position sizing** and risk controls
+### Advanced Position Management
+- **Multi-Symbol Trading**: Trade multiple symbols with different strategies
+- **Flexible Position Sizing**: Percentage, fixed shares, or USD-based
+- **Dynamic Leg Sizing**: Customizable multipliers for each trading leg
+- **Trailing Stops**: Configurable trailing stop-loss protection
 
 ## 📁 Project Structure
 
-```
-MartinGales/
-├── app/
-│   ├── ui/                 # Streamlit user interface
-│   ├── config.py          # Configuration management
-│   ├── trading_engine.py  # Main trading engine
-│   ├── strategies.py      # Trading strategies
-│   ├── ibkr_api.py       # IBKR API wrapper
-│   └── backtesting_system.py
-├── requirements.txt       # Python dependencies
-└── README.md             # This file
-```
+### Core Application (`app/`)
 
-## 🔍 Troubleshooting
+#### Main Components
+- **`main.py`** - Main application entry point and orchestration
+- **`config.py`** - Configuration classes, enums, and validation logic
+- **`trading_engine.py`** - Core trading engine coordinating all strategies
+- **`strategies.py`** - Implementation of all Martingale trading strategies
+- **`ibkr_api.py`** - Interactive Brokers API wrapper and connection management
+- **`control_panel.py`** - Configuration and control interface for the trading bot
 
-### Common Issues
+#### Risk & Money Management
+- **`risk_manager.py`** - Real-time risk monitoring and position limits
+- **`enhanced_risk_management.py`** - Advanced risk controls and drawdown protection
+- **`advanced_money_management.py`** - Portfolio growth and capital allocation strategies
+- **`financial_metrics.py`** - Financial calculations and performance metrics
 
-1. **Connection Failed**:
-   - Ensure IB Gateway is running
-   - Check port configuration (4001 for live, 4002 for paper)
-   - Verify API settings in IB Gateway
-   - Check firewall settings
-   - The IB Gateway must be running on the same machine and before running the trading bot application.
+#### Analytics & Performance
+- **`performance_monitor.py`** - Real-time performance tracking and reporting
+- **`cycle_analysis.py`** - Trading cycle analysis and optimization
+- **`backtesting_system.py`** - Historical strategy testing and validation
 
-2. **Authentication Error**:
-   - Verify IBKR credentials
-   - Ensure account has API access enabled
-   - Check if account is funded (for live trading)
+#### User Interface (`app/ui/`)
+- **`app.py`** - Main Streamlit web application
+- **`dashboard.py`** - Real-time trading dashboard and status monitoring
+- **`config_manager.py`** - Interactive configuration management interface
+- **`performance.py`** - Performance analytics and visualization
+- **`backtesting_ui.py`** - Backtesting interface and results visualization
+- **`cycle_analysis_ui.py`** - Trading cycle analysis dashboard
+- **`money_management_ui.py`** - Money management configuration interface
+- **`risk_management_ui.py`** - Risk management settings and monitoring
 
-3. **Module Import Errors**:
-   - Ensure virtual environment is activated
-   - Reinstall requirements: `pip install -r requirements.txt`
+#### Testing & Demo
+- **`demo.py`** - Demo scripts and testing utilities
 
+## 🛠️ Key Features Breakdown
 
-## ⚖️ License
+### Strategy Management
+- **Multi-Strategy Coordination**: Run multiple strategies with intelligent coordination
+- **Strategy Alignment**: Parallel or sequential execution modes
+- **Dynamic Entry/Exit**: Market condition-based entry and exit logic
+- **Leg Management**: Progressive position building with customizable multipliers
 
-This software is provided for educational and research purposes. Use at your own risk.
+### Risk Management
+- **Position Limits**: Maximum concurrent positions and order limits
+- **Drawdown Protection**: Portfolio-level drawdown monitoring
+- **Daily Limits**: Configurable daily profit targets and loss limits
+- **Emergency Exits**: Automatic emergency exit conditions
+- **Trailing Stops**: Dynamic trailing stop-loss protection
+
+### Position Sizing
+- **Flexible Units**: Support for SHARES, USD, and PERCENTAGE-based sizing
+- **Fixed Position Size**: Set fixed position sizes with multipliers
+- **Portfolio Percentage**: Risk-based percentage allocation
+- **Dynamic Sizing**: Adaptive position sizing based on market conditions
+- **Capital Allocation**: Intelligent capital distribution across strategies
+
+### Performance Analytics
+- **Real-Time Monitoring**: Live P&L tracking and performance metrics
+- **Cycle Analysis**: Detailed analysis of trading cycles and patterns
+- **Win Rate Tracking**: Success rate monitoring across strategies
+- **Drawdown Analysis**: Maximum drawdown and recovery tracking
+- **Performance Reports**: Comprehensive performance reporting
+
+### Backtesting System
+- **Historical Testing**: Test strategies on historical data
+- **Performance Validation**: Validate strategy performance before live trading
+- **Parameter Optimization**: Optimize strategy parameters
+- **Risk Assessment**: Historical risk analysis and validation
+
+### User Interface Features
+- **Web-Based Dashboard**: Modern, responsive web interface
+- **Real-Time Updates**: Live data updates and status monitoring
+- **Configuration Management**: Easy-to-use configuration interface
+- **Performance Visualization**: Interactive charts and analytics
+- **Multi-Page Navigation**: Organized interface with dedicated sections
+
+## 🔧 Configuration
+
+The bot offers extensive configuration options:
+
+- **Account Settings**: Demo/Live account selection
+- **Strategy Parameters**: Individual strategy configuration
+- **Risk Parameters**: Risk limits and protection settings
+- **Position Sizing**: Flexible position sizing options
+- **Market Data**: Timeframe and data source configuration
+- **Execution Settings**: Order types and execution preferences
+
+## 📊 Monitoring & Analytics
+
+### Real-Time Dashboard
+- Live P&L tracking
+- Active positions monitoring
+- Strategy performance metrics
+- Risk exposure analysis
+
+### Performance Analytics
+- Historical performance charts
+- Win/loss ratio analysis
+- Drawdown tracking
+- Cycle performance analysis
+
+### Risk Monitoring
+- Real-time risk exposure
+- Position limit monitoring
+- Drawdown alerts
+- Emergency exit triggers
+
+## ⚠️ Risk Disclaimer
+
+**IMPORTANT**: This trading bot involves substantial risk of loss. Past performance does not guarantee future results. Only trade with capital you can afford to lose.
+
+- Start with paper trading to familiarize yourself with the system
+- Thoroughly test strategies before live trading
+- Monitor positions actively
+- Use appropriate position sizing
+- Set strict risk limits
+
+## 🤝 Support
+
+For questions, issues, or contributions:
+- Review the documentation in the `app/` folder
+- Check the `BACKTESTING_GUIDE.md` for backtesting instructions
+- Examine example configurations and improvements in the `examples/` folder
+
+## 📄 License
+
+This project is for educational and research purposes. Use at your own risk.
 
 ---
 
