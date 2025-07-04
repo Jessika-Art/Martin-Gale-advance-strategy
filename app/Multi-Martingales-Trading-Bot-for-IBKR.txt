@@ -1,0 +1,827 @@
+                           Multi-Martingales Trading Bot for IBKR
+
+
+
+                                            1. Introduction
+
+Build a fully automated trading bot on the Interactive Brokers (IBKR) API that runs up to four mirrored
+martingale-based strategies:
+
+        Counter Direction Martingale (CDM): Buys more as price falls, exiting on recovery. Or sell as the price
+         increases and exit on rebound.
+        With Direction Martingale (WDM): Buy more as the price rises, exiting on a retrace. Or sell as the
+         price falls, exiting on the price rebound.
+        Zone Recovery Martingale (ZRM): Opens positions within a defined price zone boundary, exiting on
+         zone exit by TP distance fixed.
+        Inverse Zone Recovery Martingale (IZRM): This is similar to ZRM, but it opens the sell orders on the
+         upper side, buys on the lower side, and exits by SL.
+
+All parameter blocks for CDM & WDM are mirrored for ZRM & IZRM, with identical setting names prefixed by
+ZRM_ and IZRM. And there is a shared settings section that includes settings that apply to all strategies.
+
+
+
+
+                                   2. Strategy Modes & SubModes
+
+
+ Mode                                                      Description
+ CDM Only                                                  Run only the CounterDirection martingale.
+ WDM Only                                                  Run only the WithDirection martingale.
+ ZRM Only                                                  Run only the Zone Recovery martingale.
+ IZRM Only                                                 Run only the Inverse Zone Recovery martingale.
+ Multiple                                                  Run any combination of strategies together.
+
+When Multiple is selected:
+
+        Parallel: All selected strategies open their initial trade simultaneously.
+        Sequential: Open the first trade of a primary strategy; subsequent triggers follow individual sub-mode
+         logic to branch among the selected strategies.
+
+
+
+
+                                   3. Configuration Parameters
+
+The Inputs are organised into:
+
+    1.   Shared Settings
+    2.   CDM Settings
+    3.   WDM Settings
+    4.   ZRM Settings
+    5.   IZRM Settings
+
+
+
+
+                                                       1
+3.1 Shared Settings
+
+
+ Setting              input options         Logic & Behaviour/function
+
+                                            If no, the bot stops after one full cycle; if yes, respects repeat settings to run
+ ContinueTrading      Yes/no
+                                            continuously.
+ PreAfterHours        Yes/no                Enable trading in pre-market and after-market sessions.
+ MM (profit                                 Relatively upsize the next cycle's initial trade after reaching the growth
+ reinvestment)        On/off                threshold. For example, after reaching 10k, increase 10% for each 10% capital
+ plan                                       gain.
+
+                                            IF MM ON Account balance increase threshold ($) at which to start reinvesting.
+ Growth threshold     Amount ($)
+                                            To trigger larger initial positions after gains starting from that level of capital.
+
+                      Dollar, shares,       IF MM ON; Increment for next cycle’s initial trade (relative to the previous
+ Increase value
+                      or %                  initial trade during the last cycle): To scale exposure based on performance.
+ Progressive
+                                            IF MM is on, A further % increase is applied to the initial trade after each
+ Reinvestment         %
+                                            profitable cycle. To progressively compound gains.
+ Step Pct
+                                            If yes, Auto-restart each strategy after full close. If not, only apply the settings
+ RepeatOnClose        Yes/no
+                                            once.
+ Backtest
+                                            If yes, enable backtesting and generate summary reports. If no, stay with the
+ performance          On/Off
+                                            platform’s default.
+ report.
+
+ Order filing type    Market /limit         Market vs Limit for all entries. Limit to control price; Market to ensure fill.
+
+
+
+
+3.2 CDM Settings
+
+ Setting                           Input options              Logic & Behavior
+ CDM Strategy                      on/off                     Select the strategy to be run or not.
+                                                              % of account capital allocated to this strategy when it is
+ CDM Capital distribution          % value
+                                                              active.
+                                                              If a buy is selected, the first trade(order) is a long position, but
+ Initial trade type                Buy/sell
+                                                              if it is a sell, a short position is opened.
+                                                              If on use another strategy as an entry index for this strategy. If
+ Other strategies entry index      On/off
+                                                              off, use this strategy entry independent parameter.
+ WDM_ Strategy                     Parallel/sequential When more than one strategy is on, Parallel
+ alignment                                             (simultaneous) or Sequential (one then the other).
+                                                              If on, and the mode is parallel, start with the strategy (options
+ Parallel’s start and mode         On/off                     CDM/ZRM/IZRM) at the specified order number. If off work,
+                                                              this strategy is used independently.
+ Strategy to start with            WDM/ZRM/IZRM               Determine the other strategy that can start with it
+
+                                                              Determine the order number of that strategy if activated to
+ order number to start             (order number)
+                                                              activate this strategy.
+                                                              Apply the first edge touch determines the mode rule: If the
+ sequential mode with                                         first order activates the next main strategy order, follow only
+                                   CDM/ZRM/IZRM
+ strategy mode                                                that strategy; however, if the price goes against it, do not
+                                                              activate the next order of that strategy. Instead, activate this
+
+
+                                                          2
+                                                           strategy when the first distance of this strategy is reached and
+                                                           the alignment strategy is sequential.
+
+                                                           If the parallel sub-mode is on, can each one work on a
+ CDM _Symbol or ticker          Ticker name                different ticker? Select Symbol or ticker for trades using CDM
+                                                           that can support indices, ETF shares.
+
+                                                           Use to enter at custom levels. To override the default entry
+ CDM _PriceTrigger              Price (number)
+                                                           price.
+
+ CDM_MaxOrders                  number                     Max martingale levels permitted for Cap exposure.
+
+                                                           Keep earlier legs open when adding new ones. If off, close the
+ CDM_HoldPrevious               Holding /close at next     previous; if open, open a new one. To compound multi-leg
+                                                           exposure. Or keep only one.
+
+                                50 legs’ different %       % distance from previous leg for each of up to 50 manually
+ CDM_OrderDistances
+                                values to enter            defined legs. To select the Custom distances per last leg.
+
+                                50 legs’ different size    Absolute sizes for each of the 50 legs. For manual control of
+ CDM_OrderSizes
+                                values to enter.           sizing.
+
+                                50 legs’ different size    Take-profit targets (price/% ) for each leg, for a 50-leg. For
+ CDM_OrderTPs
+                                values to enter.           Distinct TP per last leg.
+
+
+                                                           Use trailing stop instead of TP; set custom trailing stops per
+                                                           last leg. For instance, if there's a 1% price movement, lock in
+ CDM_OrderTrailingStops         On/off                     0.9% profit while maintaining a 0.1% distance from the
+                                                           current price. When it increases to 1.10, adjust the trailing by
+                                                           0.1%. If back to touch trailing close at trailing
+
+
+                                50 legs’ % values
+ CDM_ First distance            (Price percentage          When trailing is on, the trailing stop distance is set to take %
+ moved trailing                 movement in profit         of the distance from the current profitable level.
+                                direction)
+                                                           When trailing is on: if the price goes up by the specified
+                                                           amount threshold from the first trailing level, move the
+                                                           trailing (SL) when the price goes up by each specified % the
+ CDM_ Trailing progress         50 legs’ % value
+                                                           price’s movement. To a progressive Price percentage
+                                                           movement in the profit direction after the first profit trailing
+                                                           level.
+
+
+3.3 WDM Settings
+
+ Setting                        Input options               Logic & Behavior
+ Strategy                       on/off                      Select the strategy to be run or not.
+                                                            % of account capital allocated to this strategy when it is
+ WDM _Capital allocation        % value
+                                                            active.
+                                                            If a buy is selected, the first trade(order) is a long position,
+ Initial trade type             Buy/sell
+                                                            but if it is a sell, a short position is opened.
+                                                            If on use another strategy as an entry index for this strategy.
+ Other strategies entry index   On/off
+                                                            If off use this strategy entry independent parameter.
+
+
+                                                       3
+ WDM_ Strategy                   Parallel/sequential        When more than one strategy is on, Parallel
+ alignment                                                  (simultaneous) or Sequential (one then the other).
+                                                            If on, and the mode is parallel, start with the strategy
+ Parallel’s start and mode       On/off                     (options CDM/ZRM/IZRM) at the specified order number. If
+                                                            off work, this strategy is used independently.
+
+ Strategy to start with          CDM/ZRM/IZRM               Determine the other strategy that can start with it
+
+
+                                                            Determine the order number of that strategy if activated to
+ order number to start           (order number)
+                                                            activate this strategy.
+
+                                                            Apply the first edge touch determines the mode rule: If the
+                                                            first order activates the next main strategy order, follow
+ sequential mode with strategy                              only that strategy; however, if the price goes against it, do
+                                 CDM/ZRM/IZRM
+ mode                                                       not activate the next order of that strategy. Instead, activate
+                                                            this strategy when the first distance of this strategy is
+                                                            reached and the alignment strategy is sequential.
+
+                                                            If the parallel sub-mode is on, can each one work on a
+ WDM _Symbol or ticker           Ticker name                different ticker? Select Symbol or ticker for trades using
+                                                            CDM that can support indices, ETF shares.
+
+                                                            Use to enter at custom levels. To override the default entry
+ WDM _PriceTrigger               Price (number)
+                                                            price.
+
+ WDM__MaxOrders                  number                     Max martingale levels permitted for Cap exposure.
+
+                                                            Keep earlier legs open when adding new ones. If off, close
+ WDM__HoldPrevious               Holding /close at next     the previous; if open, open a new one. To compound multi-
+                                                            leg exposure. Or keep only one.
+
+                                 50 legs’ different %       % distance from previous leg for each of up to 50 manually
+ WDM_OrderDistances
+                                 values to enter            defined legs. To select the Custom distances per last leg.
+
+                                 50 legs’ different size    Absolute sizes for each of the 50 legs. For manual control of
+ WDM_OrderSizes
+                                 values to enter.           sizing.
+
+                                 50 legs’ different size    Stop-loss values (price/% ) for each 50 legs for Distinct SL
+ WDM_OrderSLs
+                                 values to enter.           per leg.
+
+
+
+ZRM Settings
+ Setting                         Input options              Logic & Behavior
+ ZRM Strategy                    on/off                     Select the strategy to be run or not.
+                                                            % of account capital allocated to this strategy when it is
+ ZRM Capital distribution        % value
+                                                            active.
+
+                                                            When more than one strategy is on, Parallel (simultaneous)
+ ZRM _Strategy alignment         Parallel/sequential
+                                                            or Sequential (one then the other).
+
+                                                            If a buy is selected, the first trade(order) is a long position,
+ Initial trade type              Buy/sell
+                                                            but if it is a sell, a short position is opened.
+
+
+
+                                                        4
+Other strategies entry      On/off                     If on use another strategy as an entry index for this
+index                                                  strategy. If off, use this strategy entry independent
+                                                       parameter.
+WDM_ Strategy               Parallel/sequential        When more than one strategy is on, Parallel
+alignment                                              (simultaneous) or Sequential (one then the other).
+
+Parallel’s start and mode   On/off                     If on, and the mode is parallel, start with the
+                                                       strategy (options CDM/ZRM/IZRM) at the specified
+                                                       order number. If off work, this strategy is used
+                                                       independently.
+Strategy to start with      CDM/ZRM/IZRM               Determine the other strategy that can start with it
+
+
+order number to start       (order number)             Determine the order number of that strategy if
+                                                       activated to activate this strategy.
+
+sequential mode with        CDM/ZRM/IZRM               Apply the first edge touch determines the mode
+strategy mode                                          rule: If the first order activates the next main
+                                                       strategy order, follow only that strategy; however,
+                                                       if the price goes against it, do not activate the next
+                                                       order of that strategy. Instead, activate this
+                                                       strategy when the first distance of this strategy is
+                                                       reached and the alignment strategy is sequential.
+                                                       If the parallel sub-mode is on, can each one work on a
+ZRM _Symbol or ticker       Ticker name                different ticker? Select Symbol or ticker for trades using
+                                                       CDM that can support indices, ETF shares.
+
+                                                       Use to enter at custom levels. To override the default entry
+ZRM _PriceTrigger           Price (number)
+                                                       price.
+
+ZRM _MaxOrders              number                     Max martingale levels permitted for Cap exposure.
+
+                                                       Keep earlier legs open when adding new ones. If off, close
+ZRM _HoldPrevious           Holding /close at next     the previous; if open, open a new one. To compound multi-
+                                                       leg exposure. Or keep only one.
+
+                            50 legs’ different %       % distance from previous leg for each of up to 50 manually
+ZRM _OrderDistances
+                            values to enter            defined legs. To select the Custom distances per last leg.
+
+                            50 legs’ different size    Absolute sizes for each of the 50 legs. For manual control of
+ZRM _OrderSizes
+                            values to enter.           sizing.
+
+                            50 legs’ different size    Take-profit targets (price/% ) for each leg, for a 50-leg. For
+ZRM OrderTPs
+                            values to enter.           Distinct TP per last leg.
+
+                                                       Use trailing stop instead of TP; set custom trailing stops per
+                                                       last leg. For instance, if there's a 1% price movement, lock in
+ZRM_OrderTrailingStops      On/off                     0.9% profit while maintaining a 0.1% distance from the
+                                                       current price. When it increases to 1.10, adjust the trailing
+                                                       by 0.1%. If back to touch trailing close at trailing
+                                                       When trailing is on, the trailing stop distance is set to take %
+ZRM _ First distance
+                            50 legs’ % values          of the distance from the current profitable level(Price
+moved trailing
+                                                       percentage movement in profit direction).
+
+
+                                                   5
+                                                      When trailing is on: if the price goes up by the specified
+                                                      amount threshold from the first trailing level, move the
+                                                      trailing (SL) when the price goes up by each specified % the
+ ZRM _ Trailing progress     50 legs’ % value
+                                                      price’s movement. To a progressive Price percentage
+                                                      movement in the profit direction after the first profit trailing
+                                                      level.
+
+
+IZRM Settings
+ Setting                     Input options             Logic & Behavior
+ IZRM _Strategy              on/off                    Select the strategy to be run or not.
+                                                       % of account capital allocated to this strategy when it is
+ IZRM _Capital allocation    % value
+                                                       active.
+ Other strategies entry      On/off                    If on use another strategy as an entry index for this
+ index                                                 strategy. If off, use this strategy entry independent
+                                                       parameter.
+ WDM_ Strategy               Parallel/sequential       When more than one strategy is on, Parallel
+ alignment                                             (simultaneous) or Sequential (one then the other).
+
+ Parallel’s start and mode   On/off                    If on, and the mode is parallel, start with the
+                                                       strategy (options CDM/ZRM/IZRM) at the specified
+                                                       order number. If off work, this strategy is used
+                                                       independently.
+ Strategy to start with      CDM/ZRM/IZRM              Determine the other strategy that can start with it
+
+
+ order number to start       (order number)            Determine the order number of that strategy if
+                                                       activated to activate this strategy.
+
+ sequential mode with        CDM/ZRM/IZRM              Apply the first edge touch determines the mode
+ strategy mode                                         rule: If the first order activates the next main
+                                                       strategy order, follow only that strategy; however,
+                                                       if the price goes against it, do not activate the next
+                                                       order of that strategy. Instead, activate this
+                                                       strategy when the first distance of this strategy is
+                                                       reached and the alignment strategy is sequential.
+                                                       If a buy is selected, the first trade(order) is a long position,
+ Initial trade type          Buy/sell
+                                                       but if it is a sell, a short position is opened.
+
+                                                       If the parallel sub-mode is on, can each one work on a
+ IZRM _Symbol or ticker      Ticker name               different ticker? Select Symbol or ticker for trades using
+                                                       CDM that can support indices, ETF shares.
+
+                                                       Use to enter at custom levels. To override the default entry
+ IZRM _PriceTrigger          Price (number)
+                                                       price.
+
+ IZRM __MaxOrders            number                    Max martingale levels permitted for Cap exposure.
+
+                                                       Keep earlier legs open when adding new ones. If off, close
+ IZRM __HoldPrevious         Holding /close at next    the previous; if open, open a new one. To compound multi-
+                                                       leg exposure. Or keep only one.
+
+
+
+
+                                                6
+                                     50 legs’ different %         % distance from previous leg for each of up to 50 manually
+ IZRM _OrderDistances
+                                     values to enter              defined legs. To select the Custom distances per last leg.
+
+                                     50 legs’ different size      Absolute sizes for each of the 50 legs. For manual control of
+ IZRM _OrderSizes
+                                     values to enter.             sizing.
+
+                                     50 legs’ different size      Stop-loss values (price/% ) for each 50 legs for Distinct SL per
+ IZRM _OrderSLs
+                                     values to enter.             leg.
+
+
+
+Important settings notes: the TP and SL, and trailing are always set for the last position, and all previous ones
+are ignored when opening a new position.
+distances and sizes are computed relative to the previous position only not all positions opened previously.
+And each of these is to be et for up to 50 legs separated by a comma in a line input, such as from the first 10
+positions sl is(2,2,2,2,2,2,2,2,2) and all distances sl, tp, trailing can accept entry the full number and partial and
+all these are percentage numbers to be read by the bot exmaple 1.30 is 1.30%.
+When the max order is reached, the bot leaves all open positions open until reaching an exit rule.
+When some settings are colored the same colour, it means they are overlapped and each is to be set if an
+overlap function is on, for example, trailing and using another strategy as entry index.
+
+
+
+
+                                               4. Execution Flow
+
+    1.   Initialise:
+               o Load all shared and per-strategy parameters (CDM, WDM, ZRM, IZRM).
+               o Allocate capital and position sizing to each enabled strategy based on capital allocation and
+                   reinvestment settings.
+    2.   Entry:
+               o Evaluate Strategy combination Mode and Sub Mode (Parallel/Sequential).
+               o For each strategy that is turned on:
+                        CDM: Open the first long position when the price drops to the DM Price Trigger.
+                        WDM: Open the first long position when the price rises to the WDM Price Trigger.
+                        ZRM: Open the first position at ZRM Zone Centre Price, then wait for the
+                           zone-boundary touch to trigger further legs.
+                        IZRM: Open the first position at IZRM Zone Centre Price, then wait for the
+                           zone-boundary touch to trigger further legs.
+               o In Parallel, all initial trades fire at once; in Sequential, only the primary strategy starts, and
+                   others await their triggers.
+    3.   Martingale Legs:
+               o Each enabled strategy monitors its specific trigger to add incremental legs up to Max Orders:
+                        CDM: On each additional price drop by CDM Order Distances, place another buy
+                           leg.
+                        WDM: On each additional price rise by WDM Order Distances, place another buy
+                           leg.
+                        ZRM: On each touch of a zone boundary (upper or lower) as defined by ZRM
+                           SETTINGS, place the next leg at the specified ZRM Order Distances from that
+                           boundary.
+                        IZRM: On each touch of a zone boundary (upper or lower) as defined by IZRM Zone
+                           Width Pct, place the next leg at the specified IZRM Order Distances from that
+                           boundary.
+               o Respect Hold Previous: decide whether to leave existing legs open or closed before placing a
+                   new one.
+    4.   Exit:
+
+
+                                                            7
+             o    Each strategy applies its exit logic independently:
+                       CDM: Close all legs when the price recovers to any leg’s CDM Order TPs.
+                       WDM: Close all legs when price retraces to their WDM Order SLs or hits WDM
+                           Order TPs after meeting Min Legs Before Exit.
+                       ZRM: Close legs when price re-enters the defined zone and hits ZRM Order TPs.
+                       IZRM: Close legs when price re-enters the defined zone and hits ZRM Order TPs.
+
+    o    Exit by trailing stop: apply trailing stops per strategy if trailing stops are enabled and apply to this
+         strategy(ZRM and CDM).
+
+    5.   Repeat/Shutdown:
+            o If Repeat on Close is enabled, once all active strategies have closed positions, loop back to
+                Entry.
+            o Otherwise, cease trading until manually restarted or the show backtest concludes.
+
+
+
+
+                                     5. Usage Scenarios
+
+Below are four common execution scenarios illustrating how the bot behaves under different StrategyMode
+and SubMode settings.
+
+5.1 CDM Only
+
+                 Mode: StrategyMode = CDM (first order buy selected scenario)
+                 Flow:
+                      1. Place an initial buy at the market/limit price.
+                      2. On each price drop ≥ CDM_DropPct, open the next leg sized by CDM_sizes.
+                      3. Keep or close prior legs per CDM_HoldPrevious.
+                      4. When price recovers to CDM_RecoveryTarget(tp), close all legs.
+                      5. If CDM_RepeatOnClose, restart cycle automatically.
+
+
+
+
+5.2 WDM Only
+
+                 Mode: StrategyMode = WDM (first order buy selected scenario)
+
+                 Flow:
+                      1.    Place an initial buy.
+                      2.    On each price rise ≥ WDM_RisePct, open the next leg sized by WDM_sizes.
+                      3.    Keep or close prior legs per WDM_HoldPrevious.
+                      4.    After at least one leg is profitable, if the price retraces by ≥ WDM_StopLossPct from
+                            its peak, close all legs.
+                       5.   If WDM_RepeatOnProfit, restart cycle.
+
+
+                                                          8
+   5.3 Both — Parallel (first order buy selected scenario)
+
+            Mode: StrategyMode = Both, SubMode = Parallel
+            Flow:
+                 1. Simultaneously place CDM and WDM initial buy orders.
+                 2. Each strategy independently monitors its trigger thresholds and opens martingale
+                     legs in parallel.
+                 3. Each strategy exits on its own rule (recovery target or stop-loss retrace).
+                 4. Optionally, closing one side can trigger the other if a global flag is set.
+                 5. Each side may restart independently per its repeat setting if the restart option is set.
+
+
+
+
+   5.4 Both — Sequential(first order buy selected scenario)
+
+            Mode: StrategyMode = Both, SubMode = Sequential
+            Configuration: Define PrimaryStrategy = CDM or WDM. The very first order (always a Buy) is
+             called the Initial Order, and both strategies refer to it as their starting leg.
+            Second-Order Distance: Configure the primary strategy’ second position distance from the
+             first position as a shared percentage distance (e.g. 1%) from the Initial Order at which the bot
+             decides which martingale branch to follow next, which is set within a first order distance, in
+             each strategy distance setting.
+
+             Flow:
+
+        1.   Place the Initial Order (Buy) of size InitialSize.
+        2.   Wait for the price move of ±SecondOrderDistance from the executed price. Here, we have
+             two scenarios:
+
+                 Scenario A: Price ↑ by SecondOrderDistance:
+
+
+
+                                                   9
+                      The first initial trade is in profit.
+                      Trigger WDM: Place the next WDM leg at EntryPrice * (1 + WDM_RisePct) with size
+                       InitialSize * WDM_sizes[1].
+                      Continue opening further WDM legs on each additional rise of WDM_RisePct, per
+                       configuration.
+
+
+
+
+Scenario B: Price ↓ by SecondOrderDistance
+
+             o    The first initial trade is at a loss.
+             o    Trigger CDM: Place the next CDM leg at EntryPrice * (1 - CDM_DropPct) with size InitialSize *
+                  CDM_sizes[1].
+             o    Continue opening further CDM legs on each additional drop of CDM_DropPct, per
+                  configuration.
+
+
+
+
+    3.   Post-Trigger Operations
+
+    o    From the triggered branch onward, follow that strategy’s full martingale logic (additional legs, exit
+         rules, repeat settings).
+    o    The non-triggered strategy remains idle until the next primary reset (if at all).
+
+
+
+
+    4.   Exit & Repeat
+
+    o    Each strategy exiting on its own exit rule (recovery target or stop-loss retrace).
+    o    If repeat flags are set, the bot resets the first Initial Order and repeats the sequential decision process.
+
+
+                                                        10
+This sequential design ensures a single initial buy is leveraged by either the trend-following (WDM) branch
+when profitable or the mean-reversion (CDM) branch when adverse.
+
+
+
+
+        5.5 ZRM Only Workflow(first order sell selected scenario)
+
+    1.   Initialise: Load ZRM zone parameters (ZRM Zone Centre Price, ZRM Zone Width Pct) and allocate
+         capital.
+    2.   Entry: Place the initial order at the first ZRM Zone Price level( when zone mode is started).
+    3.   Legs: On each touch of the lower or upper zone boundary (start ± width), place the next leg at the
+         configured ZRM Order Distances from that touched boundary, up to ZRM Max Orders.
+    4.   Exit: When price re-enters the zone and hits any leg’s ZRM Order TPs, close all ZRM positions, or
+         individually if ZRM Hold Previous is false.
+    5.   Repeat: Restart if Repeat on Close is enabled.
+
+
+
+
+5.6 IZRM Only Workflow (first order buy selected scenario)
+
+    1.   Initialise: Load IZRM zone parameters (IZRM Zone start Price) and allocate capital.
+    2.   Entry: Wait for price to break out beyond the upper or lower zone boundary (start ± width), then
+         open initial leg in direction of breakout.
+    3.   Legs: On each touch of the lower or upper zone boundary (start ± width), place the next leg at the
+         configured IZRM Order Distances from that touched boundary, up to IZRM Max Orders.
+    4.   Exit: When price reverses back into the zone and hits any leg’s IZRM Order SLs, close all IZRM
+         positions, or individually if IZRM Hold Previous is false.
+    5.   Repeat: Restart if Repeat on Close is enabled.
+
+
+
+
+                                                      11
+Cycle-Focused Backtest Report with Trade
+Log and Evaluation Ratios
+1. Cycle Overview
+           Cycle Definition:
+            A cycle begins with the initial order entry and continues with subsequent
+            position additions triggered by price declines until the recovery condition is
+            met and all positions are closed. Each complete cycle is treated as an
+            individual trade for performance analysis.
+           Evaluation Period:
+            Example: January 1, 2023 – December 31, 2023
+           Initial Capital:
+            Example: $100,000 allocated for backtesting
+
+
+
+
+2. Cycle Metrics Summary
+           Total Cycles Executed:
+            Number of complete cycles finished during the backtest period.
+           Cycle Win Rate:
+            Percentage of cycles that closed with a profit.
+           Average Cycle Profit/Loss:
+            Mean profit or loss per cycle (from initial entry to cycle closure).
+           Maximum Cycle Profit / Loss:
+            The highest profit and the worst loss were recorded in a single cycle.
+           Average Cycle Duration:
+            The mean time taken from the start to the closure of a cycle.
+           Cycle Drawdown:
+            Maximum decline observed within a cycle from peak equity to the lowest
+            point before recovery.
+
+
+
+
+3. Evaluation Ratios
+3.1. Risk/Reward Ratio
+
+           Definition:
+            Ratio of the average profit from winning cycles to the average loss from losing
+            cycles.
+
+
+                                           12
+            Purpose:
+             Indicates the expected reward per unit of risk; a higher ratio suggests that
+             winning cycles generate significantly more profit relative to the losses
+             incurred.
+
+3.2. Profit Factor
+
+            Definition:
+             Ratio of the sum of profits from winning cycles to the sum of losses from
+             losing cycles.
+            Purpose:
+             Provides an overall view of profitability across cycles. A value above 1
+             signifies aggregate profitability.
+
+3.3. Sharpe Ratio (Cycle-Based)
+
+            Definition:
+             Average cycle return (more than a risk-free rate) divided by the standard
+             deviation of cycle returns.
+            Purpose:
+             Evaluates risk-adjusted performance. Higher values indicate that returns are
+             efficiently generated relative to the risk taken.
+
+3.4. Sortino Ratio
+
+            Definition:
+             Cycle return above a minimum acceptable return divided by the downside
+             deviation.
+            Purpose:
+             Focuses solely on downside risk and is useful when the primary concern is
+             mitigating losses.
+
+3.5. Calmar Ratio
+
+            Definition:
+             Ratio of average cycle profit to the maximum drawdown within cycles.
+            Purpose:
+             Assesses how effectively the strategy manages drawdowns relative to profit. A
+             higher value is indicative of better drawdown management.
+
+3.6. Maximum Drawdown Ratio
+
+            Definition:
+             Maximum drawdown as a percentage of the cycle’s peak equity.
+            Purpose:
+             Although not a ratio in the traditional sense, it offers a quick evaluation of risk
+             by comparing the worst-case decline to cycle profits.
+      1. Operating Cycle Efficiency (OCE)
+
+
+                                             13
+   Definition: Measures how efficiently each trading cycle converts capital into net
+    profit.
+   Formula (basic version):
+    OCE = Net Cycle Profit / Average Capital Deployed During Cycle
+   Formula (time-adjusted version):
+    OCE = (Net Cycle Profit / Average Capital Deployed During Cycle) × (1
+    / Cycle Duration in Days)
+
+   2. Return on Equity (ROE)
+   Definition: Indicates how much profit is generated from the capital committed at the
+    start of a cycle.
+   Formula:
+    ROE = (Net Cycle Profit / Starting Capital of the Cycle) × 100%
+
+   3. Average Unit Revenue (AUR)
+   Definition: Shows the average profit made per unit traded during a cycle.
+   Formula:
+    AUR = Total Cycle Profit / Total Number of Units Traded in the Cycle
+   🔁 1. Time-Weighted Rate of Return (TWR or TWRR)
+   Definition: Measures performance by isolating the effect of trading decisions from
+    the effect of capital inflows/outflows. Ideal for evaluating strategy, not cash timing.
+   Formula (simplified for each cycle):
+    TWR = [(Ending Value / Beginning Value) ^ (1 / Number of Periods)] -
+    1
+   ✅ Why it’s useful: It gives a pure view of strategy performance, unaffected by
+    when money was added or withdrawn.
+
+   💰 2. Internal Rate of Return (IRR)
+   Definition: The interest rate at which the net present value (NPV) of all cash flows
+    (in/out during the cycle) equals zero.
+   Formula:
+    Solve:
+    NPV = ∑ [Cash Flow_t / (1 + IRR)^t] = 0
+   ✅ Why it’s useful: IRR takes both the timing and amount of cash flows into
+    account. It's powerful for evaluating money usage across long cycles with multiple
+    entries.
+
+   📉 3. Maximum Drawdown (MDD)
+   Definition: Measures the largest peak-to-trough loss in capital during the cycle.
+   Formula:
+    Max Drawdown = (Peak Capital - Lowest Capital) / Peak Capital
+   ✅ Why it’s useful: Shows how much risk was taken to earn returns — key for
+    judging safety and resilience.
+
+   ⏱️ 4. Recovery Factor
+   Definition: Compares total profit to the max drawdown.
+   Formula:
+    Recovery Factor = Net Cycle Profit / Maximum Drawdown
+   ✅ Why it’s useful: Evaluates how effectively losses were recovered.
+
+
+
+                                           14
+         🧮 5. Capital Efficiency Ratio (CER)
+         Definition: Measures how much profit was generated per unit of capital deployed.
+         Formula:
+          CER = Net Profit / Capital Exposure Time
+         Where:
+          Capital Exposure Time = Capital Used × Number of Days in Use
+         ✅ Why it’s useful: Takes the time value of locked capital into account.
+             
+
+
+
+
+4. Detailed Cycle Analysis
+4.1. Cycle Summary
+
+For each cycle, include the following information:
+
+                  Cycle ID: A unique identifier for the cycle.
+                  Start Date/Time: When the first order of the cycle was executed.
+                  End Date/Time: When the recovery condition was met and the cycle closed.
+                  Position Count: Total number of orders executed during the cycle.
+                  Cumulative Cycle Profit/Loss: Net profit or loss for the cycle.
+                  Cycle Duration: Total time elapsed from start to closure.
+                  Cycle Maximum Drawdown: Largest equity decline during the cycle.
+
+4.2. Trade Log (Within Cycle)
+
+For each cycle, provide a detailed log of every trade executed:
+
+ Trade         Order                Order        Execution
+                            Asset                                Timestamp              Notes
+  ID           Type                   Size         Price
+           Market /               100                         YYYY-MM-DD
+1                       SymbolXYZ              $50.00                             Initial entry
+           Limit                  shares                      HH: MM
+           Market /               120                         YYYY-MM-DD          Added on 10%
+2                       SymbolXYZ              $45.00
+           Limit                  shares                      HH: MM              price decline
+           Market /               150                         YYYY-MM-DD
+3                       SymbolXYZ              $40.50                             Second addition
+           Limit                  shares                      HH: MM
+...        ...          ...       ...          ...            ...                 ...
+
+Key Details Recorded:
+
+                  Trade ID: Sequential identifier for each trade in the cycle.
+                  Order Type: Whether the order was market or limit.
+                  Asset: The symbol or name of the instrument.
+                  Order Size: Quantity executed (fractional or full).
+                  Execution Price: The fill price for the order.
+                  Timestamp: Date and time of execution.
+                  Notes: Context (e.g., price decline, recovery trigger).
+
+                                                     15
+4.3. Aggregated Cycle Trade Data
+
+           Average Order Size: Mean size across all trades in the cycle.
+           Average Execution Price: Mean fill price for trades within the cycle.
+           Trade Frequency: Total count of trades executed per cycle.
+
+
+
+
+5. Visualisations
+           Cycle Equity Curve:
+            A chart plotting the cumulative profit/loss for each cycle over time.
+           Cycle Duration Histogram:
+            A visual distribution of cycle durations.
+           Risk/Reward Scatter Plot:
+            A scatter plot mapping each cycle’s total profit against its maximum
+            drawdown.
+           Trade Log Timeline:
+            A timeline view for selected cycles showing individual order executions with
+            sizes and prices.
+
+
+
+
+                                          16
+

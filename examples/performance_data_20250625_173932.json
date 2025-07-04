@@ -1,0 +1,25 @@
+{
+  "engine_stats": {
+    "start_time": "2025-06-25T17:38:21.994318",
+    "end_time": "2025-06-25T17:39:32.081482",
+    "total_trades": 0,
+    "total_pnl": 0.0,
+    "max_drawdown": 0.0,
+    "peak_equity": 0.0
+  },
+  "strategy_stats": {
+    "cdm_AAPL": {
+      "strategy_type": "cdm",
+      "symbol": "AAPL",
+      "total_cycles": 0,
+      "winning_cycles": 0,
+      "win_rate": 0,
+      "total_profit": 0.0,
+      "avg_profit_per_cycle": 0,
+      "max_drawdown": 0.0,
+      "current_positions": 0,
+      "unrealized_pnl": 0
+    }
+  },
+  "completed_cycles": []
+}

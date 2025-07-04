@@ -1,0 +1,473 @@
+2025-06-25 17:02:04,108 - ControlPanel - WARNING - No trading engine to stop
+2025-06-25 17:02:55,608 - ControlPanel - WARNING - No trading engine to stop
+2025-06-25 17:03:01,688 - ControlPanel - WARNING - No trading engine to stop
+2025-06-25 17:03:11,839 - ControlPanel - WARNING - No trading engine to stop
+2025-06-25 17:10:38,124 - ControlPanel - WARNING - No trading engine to stop
+2025-06-25 17:13:58,135 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:16:32,164 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:16:32,164 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:16:32,164 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:16:32,165 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:16:32,167 - ControlPanel - INFO - Configuration saved to test_config.json
+2025-06-25 17:16:32,190 - ControlPanel - INFO - Configuration loaded from test_config.json
+2025-06-25 17:18:52,335 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:18:52,335 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:18:52,335 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:18:52,336 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:18:52,338 - ControlPanel - INFO - Configuration saved to test_config.json
+2025-06-25 17:18:52,340 - ControlPanel - INFO - Configuration loaded from test_config.json
+2025-06-25 17:20:43,498 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:20:43,499 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:20:43,499 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:20:43,499 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:20:43,500 - ControlPanel - INFO - Configuration saved to test_config.json
+2025-06-25 17:20:43,503 - ControlPanel - INFO - Configuration loaded from test_config.json
+2025-06-25 17:21:13,798 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:21:13,798 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:21:13,799 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:21:13,799 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:21:13,799 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:21:13,800 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:21:13,803 - ControlPanel - INFO - Configuration saved to demo_single.json
+2025-06-25 17:21:13,804 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:23:17,400 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:23:17,401 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:23:17,401 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:23:17,402 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:23:17,402 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:23:17,402 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:23:17,403 - ControlPanel - INFO - Configuration saved to demo_single.json
+2025-06-25 17:23:17,415 - ControlPanel - INFO - Configuration loaded from demo_single.json
+2025-06-25 17:23:17,418 - TradingEngine - INFO - Initializing trading engine...
+2025-06-25 17:23:17,418 - IBKRApi - ERROR - Connection failed: 'IBConfig' object has no attribute 'port'
+2025-06-25 17:23:17,418 - TradingEngine - ERROR - Failed to connect to Interactive Brokers
+2025-06-25 17:23:17,419 - ControlPanel - ERROR - Failed to start trading engine
+2025-06-25 17:24:36,298 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:24:36,299 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:24:36,299 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:24:36,299 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:24:36,299 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:24:36,300 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:24:36,301 - ControlPanel - INFO - Configuration saved to demo_single.json
+2025-06-25 17:24:36,304 - ControlPanel - INFO - Configuration loaded from demo_single.json
+2025-06-25 17:24:36,306 - TradingEngine - INFO - Initializing trading engine...
+2025-06-25 17:24:36,307 - IBKRApi - INFO - Connecting to IB at 127.0.0.1:7497
+2025-06-25 17:24:39,346 - IBKRApi - ERROR - Connection error 502: Couldn't connect to TWS. Confirm that "Enable ActiveX and Socket EClients" 
+is enabled and connection port is the same as "Socket Port" on the 
+TWS "Edit->Global Configuration...->API->Settings" menu. Live Trading ports: 
+TWS: 7496; IB Gateway: 4001. Simulated Trading ports for new installations 
+of version 954.1 or newer:  TWS: 7497; IB Gateway: 4002
+2025-06-25 17:24:39,346 - ibapi.client - INFO - could not connect
+2025-06-25 17:24:39,347 - ibapi.client - INFO - disconnecting
+2025-06-25 17:24:39,347 - ibapi.wrapper - INFO - ANSWER connectionClosed {}
+2025-06-25 17:24:49,351 - IBKRApi - ERROR - Connection timeout
+2025-06-25 17:24:49,351 - TradingEngine - ERROR - Failed to connect to Interactive Brokers
+2025-06-25 17:24:49,351 - ControlPanel - ERROR - Failed to start trading engine
+2025-06-25 17:27:13,214 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:27:13,215 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:27:13,215 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:27:13,215 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:27:13,215 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:27:13,215 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:27:13,216 - ControlPanel - INFO - Configuration saved to demo_single.json
+2025-06-25 17:27:13,218 - ControlPanel - INFO - Configuration loaded from demo_single.json
+2025-06-25 17:27:13,220 - TradingEngine - INFO - Initializing trading engine...
+2025-06-25 17:27:13,221 - IBKRApi - INFO - Connecting to IB at 127.0.0.1:7497
+2025-06-25 17:27:16,256 - IBKRApi - ERROR - Connection error 502: Couldn't connect to TWS. Confirm that "Enable ActiveX and Socket EClients" 
+is enabled and connection port is the same as "Socket Port" on the 
+TWS "Edit->Global Configuration...->API->Settings" menu. Live Trading ports: 
+TWS: 7496; IB Gateway: 4001. Simulated Trading ports for new installations 
+of version 954.1 or newer:  TWS: 7497; IB Gateway: 4002
+2025-06-25 17:27:16,256 - ibapi.client - INFO - could not connect
+2025-06-25 17:27:16,256 - ibapi.client - INFO - disconnecting
+2025-06-25 17:27:16,256 - ibapi.wrapper - INFO - ANSWER connectionClosed {}
+2025-06-25 17:27:26,273 - IBKRApi - ERROR - Connection timeout
+2025-06-25 17:27:26,273 - TradingEngine - ERROR - Failed to connect to Interactive Brokers
+2025-06-25 17:27:26,273 - ControlPanel - ERROR - Failed to start trading engine
+2025-06-25 17:28:18,790 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:28:18,791 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:28:18,791 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:28:18,791 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:28:18,791 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:28:18,792 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:28:18,793 - ControlPanel - INFO - Configuration saved to demo_single.json
+2025-06-25 17:28:18,796 - ControlPanel - INFO - Configuration loaded from demo_single.json
+2025-06-25 17:28:18,798 - TradingEngine - INFO - Initializing trading engine...
+2025-06-25 17:28:18,798 - IBKRApi - INFO - Connecting to IB at 127.0.0.1:7497
+2025-06-25 17:28:21,856 - IBKRApi - ERROR - Connection error 502: Couldn't connect to TWS. Confirm that "Enable ActiveX and Socket EClients" 
+is enabled and connection port is the same as "Socket Port" on the 
+TWS "Edit->Global Configuration...->API->Settings" menu. Live Trading ports: 
+TWS: 7496; IB Gateway: 4001. Simulated Trading ports for new installations 
+of version 954.1 or newer:  TWS: 7497; IB Gateway: 4002
+2025-06-25 17:28:21,856 - ibapi.client - INFO - could not connect
+2025-06-25 17:28:21,856 - ibapi.client - INFO - disconnecting
+2025-06-25 17:28:21,857 - ibapi.wrapper - INFO - ANSWER connectionClosed {}
+2025-06-25 17:28:31,860 - IBKRApi - ERROR - Connection timeout
+2025-06-25 17:28:31,861 - TradingEngine - ERROR - Failed to connect to Interactive Brokers
+2025-06-25 17:28:31,862 - ControlPanel - ERROR - Failed to start trading engine
+2025-06-25 17:30:17,086 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:30:17,086 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:30:17,087 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:30:17,087 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:30:17,087 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:30:17,087 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:30:17,089 - ControlPanel - INFO - Configuration saved to demo_single.json
+2025-06-25 17:30:17,090 - ControlPanel - INFO - Configuration loaded from demo_single.json
+2025-06-25 17:30:17,091 - TradingEngine - INFO - Initializing trading engine...
+2025-06-25 17:30:17,091 - IBKRApi - INFO - Connecting to IB at 127.0.0.1:7497
+2025-06-25 17:30:20,137 - IBKRApi - ERROR - Connection error 502: Couldn't connect to TWS. Confirm that "Enable ActiveX and Socket EClients" 
+is enabled and connection port is the same as "Socket Port" on the 
+TWS "Edit->Global Configuration...->API->Settings" menu. Live Trading ports: 
+TWS: 7496; IB Gateway: 4001. Simulated Trading ports for new installations 
+of version 954.1 or newer:  TWS: 7497; IB Gateway: 4002
+2025-06-25 17:30:20,137 - ibapi.client - INFO - could not connect
+2025-06-25 17:30:20,138 - ibapi.client - INFO - disconnecting
+2025-06-25 17:30:20,138 - ibapi.wrapper - INFO - ANSWER connectionClosed {}
+2025-06-25 17:30:30,140 - IBKRApi - ERROR - Connection timeout
+2025-06-25 17:30:30,140 - TradingEngine - ERROR - Failed to connect to Interactive Brokers
+2025-06-25 17:30:30,140 - ControlPanel - ERROR - Failed to start trading engine
+2025-06-25 17:31:16,838 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:31:16,839 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:31:16,839 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:31:16,839 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:31:16,839 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:31:16,840 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:31:16,841 - ControlPanel - INFO - Configuration saved to demo_single.json
+2025-06-25 17:31:16,861 - ControlPanel - INFO - Configuration loaded from demo_single.json
+2025-06-25 17:31:16,863 - TradingEngine - INFO - Initializing trading engine...
+2025-06-25 17:31:16,863 - IBKRApi - INFO - Connecting to IB at 127.0.0.1:4002
+2025-06-25 17:31:16,874 - ibapi.client - INFO - sent startApi
+2025-06-25 17:31:16,874 - ibapi.client - INFO - REQUEST startApi {}
+2025-06-25 17:31:16,875 - ibapi.client - INFO - SENDING startApi b'\x00\x00\x00\x0871\x002\x001\x00\x00'
+2025-06-25 17:31:16,875 - IBKRApi - INFO - Connection acknowledged
+2025-06-25 17:31:16,880 - ibapi.wrapper - INFO - ANSWER managedAccounts {'accountsList': 'DUM970744'}
+2025-06-25 17:31:16,882 - IBKRApi - INFO - Next valid order ID: 1
+2025-06-25 17:31:16,883 - IBKRApi - INFO - Successfully connected to IB
+2025-06-25 17:31:16,883 - IBKRApi - INFO - Info 2104: Market data farm connection is OK:usfarm
+2025-06-25 17:31:16,884 - TradingEngine - ERROR - API initialization failed: 'IBConfig' object has no attribute 'account_type'
+2025-06-25 17:31:16,884 - IBKRApi - WARNING - Error 2107: HMDS data farm connection is inactive but should be available upon demand.ushmds
+2025-06-25 17:31:16,885 - ControlPanel - ERROR - Failed to start trading engine
+2025-06-25 17:31:16,886 - IBKRApi - INFO - Info 2158: Sec-def data farm connection is OK:secdefil
+2025-06-25 17:35:49,233 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:35:49,233 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:35:49,234 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:35:49,234 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:35:49,234 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:35:49,234 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:35:49,235 - ControlPanel - INFO - Configuration saved to demo_single.json
+2025-06-25 17:35:49,238 - ControlPanel - INFO - Configuration loaded from demo_single.json
+2025-06-25 17:35:49,240 - TradingEngine - INFO - Initializing trading engine...
+2025-06-25 17:35:49,241 - IBKRApi - INFO - Connecting to IB at 127.0.0.1:4002
+2025-06-25 17:35:49,247 - ibapi.client - INFO - sent startApi
+2025-06-25 17:35:49,247 - ibapi.client - INFO - REQUEST startApi {}
+2025-06-25 17:35:49,247 - ibapi.client - INFO - SENDING startApi b'\x00\x00\x00\x0871\x002\x001\x00\x00'
+2025-06-25 17:35:49,248 - IBKRApi - INFO - Connection acknowledged
+2025-06-25 17:35:49,251 - ibapi.wrapper - INFO - ANSWER managedAccounts {'accountsList': 'DUM970744'}
+2025-06-25 17:35:49,251 - IBKRApi - INFO - Next valid order ID: 1
+2025-06-25 17:35:49,251 - IBKRApi - INFO - Successfully connected to IB
+2025-06-25 17:35:49,252 - IBKRApi - INFO - Info 2104: Market data farm connection is OK:usfarm
+2025-06-25 17:35:49,252 - TradingEngine - INFO - Connected to IB (demo account)
+2025-06-25 17:35:49,252 - IBKRApi - WARNING - Error 2107: HMDS data farm connection is inactive but should be available upon demand.ushmds
+2025-06-25 17:35:49,253 - TradingEngine - ERROR - Strategy initialization failed: 'TradingConfig' object has no attribute 'symbols'
+2025-06-25 17:35:49,253 - IBKRApi - INFO - Info 2158: Sec-def data farm connection is OK:secdefil
+2025-06-25 17:35:49,253 - ControlPanel - ERROR - Failed to start trading engine
+2025-06-25 17:36:46,089 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:36:46,090 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:36:46,090 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:36:46,090 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:36:46,090 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:36:46,091 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:36:46,092 - ControlPanel - INFO - Configuration saved to demo_single.json
+2025-06-25 17:36:46,095 - ControlPanel - INFO - Configuration loaded from demo_single.json
+2025-06-25 17:36:46,097 - TradingEngine - INFO - Initializing trading engine...
+2025-06-25 17:36:46,097 - IBKRApi - INFO - Connecting to IB at 127.0.0.1:4002
+2025-06-25 17:36:46,103 - ibapi.client - INFO - sent startApi
+2025-06-25 17:36:46,103 - ibapi.client - INFO - REQUEST startApi {}
+2025-06-25 17:36:46,103 - ibapi.client - INFO - SENDING startApi b'\x00\x00\x00\x0871\x002\x001\x00\x00'
+2025-06-25 17:36:46,103 - IBKRApi - INFO - Connection acknowledged
+2025-06-25 17:36:46,106 - ibapi.wrapper - INFO - ANSWER managedAccounts {'accountsList': 'DUM970744'}
+2025-06-25 17:36:46,107 - IBKRApi - INFO - Next valid order ID: 1
+2025-06-25 17:36:46,107 - IBKRApi - INFO - Successfully connected to IB
+2025-06-25 17:36:46,107 - IBKRApi - INFO - Info 2104: Market data farm connection is OK:usfarm
+2025-06-25 17:36:46,108 - TradingEngine - INFO - Connected to IB (demo account)
+2025-06-25 17:36:46,108 - IBKRApi - WARNING - Error 2107: HMDS data farm connection is inactive but should be available upon demand.ushmds
+2025-06-25 17:36:46,108 - TradingEngine - ERROR - Strategy initialization failed: TradingConfig.get_strategy_settings() takes 2 positional arguments but 3 were given
+2025-06-25 17:36:46,108 - IBKRApi - INFO - Info 2158: Sec-def data farm connection is OK:secdefil
+2025-06-25 17:36:46,108 - ControlPanel - ERROR - Failed to start trading engine
+2025-06-25 17:37:42,315 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:37:42,315 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:37:42,315 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:37:42,315 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:37:42,315 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:37:42,316 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:37:42,317 - ControlPanel - INFO - Configuration saved to demo_single.json
+2025-06-25 17:37:42,319 - ControlPanel - INFO - Configuration loaded from demo_single.json
+2025-06-25 17:37:42,321 - TradingEngine - INFO - Initializing trading engine...
+2025-06-25 17:37:42,321 - IBKRApi - INFO - Connecting to IB at 127.0.0.1:4002
+2025-06-25 17:37:42,328 - ibapi.client - INFO - sent startApi
+2025-06-25 17:37:42,329 - ibapi.client - INFO - REQUEST startApi {}
+2025-06-25 17:37:42,329 - ibapi.client - INFO - SENDING startApi b'\x00\x00\x00\x0871\x002\x001\x00\x00'
+2025-06-25 17:37:42,330 - IBKRApi - INFO - Connection acknowledged
+2025-06-25 17:37:42,333 - ibapi.wrapper - INFO - ANSWER managedAccounts {'accountsList': 'DUM970744'}
+2025-06-25 17:37:42,334 - IBKRApi - INFO - Next valid order ID: 1
+2025-06-25 17:37:42,334 - IBKRApi - INFO - Successfully connected to IB
+2025-06-25 17:37:42,334 - IBKRApi - INFO - Info 2104: Market data farm connection is OK:usfarm
+2025-06-25 17:37:42,334 - TradingEngine - INFO - Connected to IB (demo account)
+2025-06-25 17:37:42,335 - IBKRApi - WARNING - Error 2107: HMDS data farm connection is inactive but should be available upon demand.ushmds
+2025-06-25 17:37:42,335 - TradingEngine - INFO - Initialized cdm strategy for AAPL
+2025-06-25 17:37:42,335 - IBKRApi - INFO - Info 2158: Sec-def data farm connection is OK:secdefil
+2025-06-25 17:37:42,335 - TradingEngine - INFO - Initialized 1 strategies
+2025-06-25 17:37:42,336 - TradingEngine - ERROR - Market data subscription failed: 'TradingConfig' object has no attribute 'symbols'
+2025-06-25 17:37:42,336 - ControlPanel - ERROR - Failed to start trading engine
+2025-06-25 17:38:19,965 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:38:19,965 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:38:19,965 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:38:19,965 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:38:19,965 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:38:19,966 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:38:19,966 - ControlPanel - INFO - Configuration saved to demo_single.json
+2025-06-25 17:38:19,969 - ControlPanel - INFO - Configuration loaded from demo_single.json
+2025-06-25 17:38:19,971 - TradingEngine - INFO - Initializing trading engine...
+2025-06-25 17:38:19,971 - IBKRApi - INFO - Connecting to IB at 127.0.0.1:4002
+2025-06-25 17:38:19,978 - ibapi.client - INFO - sent startApi
+2025-06-25 17:38:19,978 - ibapi.client - INFO - REQUEST startApi {}
+2025-06-25 17:38:19,978 - ibapi.client - INFO - SENDING startApi b'\x00\x00\x00\x0871\x002\x001\x00\x00'
+2025-06-25 17:38:19,978 - IBKRApi - INFO - Connection acknowledged
+2025-06-25 17:38:19,983 - ibapi.wrapper - INFO - ANSWER managedAccounts {'accountsList': 'DUM970744'}
+2025-06-25 17:38:19,984 - IBKRApi - INFO - Next valid order ID: 1
+2025-06-25 17:38:19,984 - IBKRApi - INFO - Successfully connected to IB
+2025-06-25 17:38:19,984 - IBKRApi - INFO - Info 2104: Market data farm connection is OK:usfarm
+2025-06-25 17:38:19,984 - TradingEngine - INFO - Connected to IB (demo account)
+2025-06-25 17:38:19,985 - IBKRApi - WARNING - Error 2107: HMDS data farm connection is inactive but should be available upon demand.ushmds
+2025-06-25 17:38:19,985 - TradingEngine - INFO - Initialized cdm strategy for AAPL
+2025-06-25 17:38:19,985 - IBKRApi - INFO - Info 2158: Sec-def data farm connection is OK:secdefil
+2025-06-25 17:38:19,985 - TradingEngine - INFO - Initialized 1 strategies
+2025-06-25 17:38:19,986 - ibapi.client - INFO - REQUEST reqMktData {'reqId': 1000, 'contract': 2118651576816: 0,AAPL,STK,,0.0,,,SMART,,USD,,,False,,combo:, 'genericTickList': '', 'snapshot': False, 'regulatorySnapshot': False, 'mktDataOptions': []}
+2025-06-25 17:38:19,986 - ibapi.client - INFO - SENDING reqMktData b'\x00\x00\x0011\x0011\x001000\x000\x00AAPL\x00STK\x00\x000.0\x00\x00\x00SMART\x00\x00USD\x00\x00\x000\x00\x000\x000\x00\x00'
+2025-06-25 17:38:19,986 - IBKRApi - INFO - Subscribed to market data for AAPL
+2025-06-25 17:38:19,986 - TradingEngine - INFO - Subscribed to market data for 1 symbols
+2025-06-25 17:38:19,987 - ibapi.client - INFO - REQUEST reqAccountSummary {'reqId': 9001, 'groupName': 'All', 'tags': 'TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower'}
+2025-06-25 17:38:19,987 - ibapi.client - INFO - SENDING reqAccountSummary b'\x00\x00\x00G62\x001\x009001\x00All\x00TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower\x00'
+2025-06-25 17:38:19,987 - ibapi.client - INFO - REQUEST reqPositions {}
+2025-06-25 17:38:19,987 - ibapi.client - INFO - SENDING reqPositions b'\x00\x00\x00\x0561\x001\x00'
+2025-06-25 17:38:20,194 - IBKRApi - INFO - Received 0 positions
+2025-06-25 17:38:20,248 - IBKRApi - INFO - Account summary received
+2025-06-25 17:38:20,248 - IBKRApi - INFO - Account summary received
+2025-06-25 17:38:20,446 - IBKRApi - WARNING - Error 10089: Requested market data requires additional subscription for API. See link in 'Market Data Connections' dialog for more details.Delayed market data is available.AAPL NASDAQ.NMS/TOP/ALL
+2025-06-25 17:38:21,994 - TradingEngine - INFO - Trading engine initialized successfully
+2025-06-25 17:38:21,994 - TradingEngine - INFO - Engine main loop started
+2025-06-25 17:38:21,995 - TradingEngine - INFO - Trading engine started
+2025-06-25 17:38:21,995 - ControlPanel - INFO - Trading engine started successfully
+2025-06-25 17:39:22,071 - TradingEngine - INFO - Stopping trading engine...
+2025-06-25 17:39:32,079 - ibapi.client - INFO - REQUEST cancelMktData {'reqId': 1000}
+2025-06-25 17:39:32,079 - ibapi.client - INFO - SENDING cancelMktData b'\x00\x00\x00\t2\x002\x001000\x00'
+2025-06-25 17:39:32,080 - IBKRApi - INFO - Unsubscribed from market data for AAPL
+2025-06-25 17:39:32,080 - ibapi.client - INFO - disconnecting
+2025-06-25 17:39:32,080 - ibapi.wrapper - INFO - ANSWER connectionClosed {}
+2025-06-25 17:39:32,081 - IBKRApi - INFO - Disconnected from IB
+2025-06-25 17:39:32,085 - TradingEngine - INFO - Performance data saved to performance_data_20250625_173932.json
+2025-06-25 17:39:32,086 - TradingEngine - INFO - Trading engine stopped
+2025-06-25 17:39:32,086 - ControlPanel - INFO - Trading engine stopped
+2025-06-25 17:40:06,851 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:40:06,851 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:40:06,851 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:40:06,851 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:40:06,851 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:40:06,851 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:40:06,853 - ControlPanel - INFO - Configuration saved to demo_multiple.json
+2025-06-25 17:40:06,854 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:42:24,220 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:42:24,221 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:42:24,221 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:42:24,221 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:42:24,221 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:42:24,221 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:42:24,223 - ControlPanel - INFO - Configuration saved to demo_multiple.json
+2025-06-25 17:42:24,226 - ControlPanel - INFO - Configuration loaded from demo_multiple.json
+2025-06-25 17:42:24,228 - TradingEngine - INFO - Initializing trading engine...
+2025-06-25 17:42:24,228 - IBKRApi - INFO - Connecting to IB at 127.0.0.1:4002
+2025-06-25 17:42:24,235 - ibapi.client - INFO - sent startApi
+2025-06-25 17:42:24,236 - ibapi.client - INFO - REQUEST startApi {}
+2025-06-25 17:42:24,236 - ibapi.client - INFO - SENDING startApi b'\x00\x00\x00\x0871\x002\x001\x00\x00'
+2025-06-25 17:42:24,236 - IBKRApi - INFO - Connection acknowledged
+2025-06-25 17:42:24,240 - ibapi.wrapper - INFO - ANSWER managedAccounts {'accountsList': 'DUM970744'}
+2025-06-25 17:42:24,241 - IBKRApi - INFO - Next valid order ID: 1
+2025-06-25 17:42:24,241 - IBKRApi - INFO - Successfully connected to IB
+2025-06-25 17:42:24,242 - IBKRApi - INFO - Info 2104: Market data farm connection is OK:usfarm
+2025-06-25 17:42:24,242 - TradingEngine - INFO - Connected to IB (demo account)
+2025-06-25 17:42:24,242 - IBKRApi - WARNING - Error 2107: HMDS data farm connection is inactive but should be available upon demand.ushmds
+2025-06-25 17:42:24,242 - TradingEngine - INFO - Initialized cdm strategy for AAPL
+2025-06-25 17:42:24,243 - IBKRApi - INFO - Info 2158: Sec-def data farm connection is OK:secdefil
+2025-06-25 17:42:24,243 - TradingEngine - INFO - Initialized 1 strategies
+2025-06-25 17:42:24,244 - ibapi.client - INFO - REQUEST reqMktData {'reqId': 1000, 'contract': 1627383526448: 0,AAPL,STK,,0.0,,,SMART,,USD,,,False,,combo:, 'genericTickList': '', 'snapshot': False, 'regulatorySnapshot': False, 'mktDataOptions': []}
+2025-06-25 17:42:24,244 - ibapi.client - INFO - SENDING reqMktData b'\x00\x00\x0011\x0011\x001000\x000\x00AAPL\x00STK\x00\x000.0\x00\x00\x00SMART\x00\x00USD\x00\x00\x000\x00\x000\x000\x00\x00'
+2025-06-25 17:42:24,245 - IBKRApi - INFO - Subscribed to market data for AAPL
+2025-06-25 17:42:24,245 - TradingEngine - INFO - Subscribed to market data for 1 symbols
+2025-06-25 17:42:24,245 - ibapi.client - INFO - REQUEST reqAccountSummary {'reqId': 9001, 'groupName': 'All', 'tags': 'TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower'}
+2025-06-25 17:42:24,246 - ibapi.client - INFO - SENDING reqAccountSummary b'\x00\x00\x00G62\x001\x009001\x00All\x00TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower\x00'
+2025-06-25 17:42:24,246 - ibapi.client - INFO - REQUEST reqPositions {}
+2025-06-25 17:42:24,247 - ibapi.client - INFO - SENDING reqPositions b'\x00\x00\x00\x0561\x001\x00'
+2025-06-25 17:42:24,447 - IBKRApi - INFO - Received 0 positions
+2025-06-25 17:42:24,492 - IBKRApi - INFO - Account summary received
+2025-06-25 17:42:24,493 - IBKRApi - INFO - Account summary received
+2025-06-25 17:42:24,671 - IBKRApi - WARNING - Error 10089: Requested market data requires additional subscription for API. See link in 'Market Data Connections' dialog for more details.Delayed market data is available.AAPL NASDAQ.NMS/TOP/ALL
+2025-06-25 17:42:26,262 - TradingEngine - INFO - Trading engine initialized successfully
+2025-06-25 17:42:26,263 - TradingEngine - INFO - Engine main loop started
+2025-06-25 17:42:26,263 - TradingEngine - INFO - Trading engine started
+2025-06-25 17:42:26,264 - ControlPanel - INFO - Trading engine started successfully
+2025-06-25 17:43:56,453 - TradingEngine - INFO - Stopping trading engine...
+2025-06-25 17:44:06,462 - ibapi.client - INFO - REQUEST cancelMktData {'reqId': 1000}
+2025-06-25 17:44:06,462 - ibapi.client - INFO - SENDING cancelMktData b'\x00\x00\x00\t2\x002\x001000\x00'
+2025-06-25 17:44:06,463 - IBKRApi - INFO - Unsubscribed from market data for AAPL
+2025-06-25 17:44:06,463 - ibapi.client - INFO - disconnecting
+2025-06-25 17:44:06,464 - ibapi.wrapper - INFO - ANSWER connectionClosed {}
+2025-06-25 17:44:06,465 - IBKRApi - INFO - Disconnected from IB
+2025-06-25 17:44:06,466 - TradingEngine - INFO - Performance data saved to performance_data_20250625_174406.json
+2025-06-25 17:44:06,468 - TradingEngine - INFO - Trading engine stopped
+2025-06-25 17:44:06,468 - ControlPanel - INFO - Trading engine stopped
+2025-06-25 17:44:26,272 - TradingEngine - INFO - Engine main loop ended
+2025-06-25 17:46:33,377 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:46:33,377 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:46:33,377 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:46:33,377 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:46:33,378 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:46:33,378 - ControlPanel - ERROR - No configuration loaded
+2025-06-25 17:46:33,379 - ControlPanel - INFO - Configuration saved to demo_multiple.json
+2025-06-25 17:46:33,381 - ControlPanel - INFO - Configuration loaded from demo_multiple.json
+2025-06-25 17:46:33,382 - TradingEngine - INFO - Initializing trading engine...
+2025-06-25 17:46:33,383 - IBKRApi - INFO - Connecting to IB at 127.0.0.1:4002
+2025-06-25 17:46:33,390 - ibapi.client - INFO - sent startApi
+2025-06-25 17:46:33,390 - ibapi.client - INFO - REQUEST startApi {}
+2025-06-25 17:46:33,390 - ibapi.client - INFO - SENDING startApi b'\x00\x00\x00\x0871\x002\x001\x00\x00'
+2025-06-25 17:46:33,390 - IBKRApi - INFO - Connection acknowledged
+2025-06-25 17:46:33,393 - ibapi.wrapper - INFO - ANSWER managedAccounts {'accountsList': 'DUM970744'}
+2025-06-25 17:46:33,394 - IBKRApi - INFO - Next valid order ID: 1
+2025-06-25 17:46:33,394 - IBKRApi - INFO - Successfully connected to IB
+2025-06-25 17:46:33,394 - IBKRApi - INFO - Info 2104: Market data farm connection is OK:usfarm
+2025-06-25 17:46:33,394 - TradingEngine - INFO - Connected to IB (demo account)
+2025-06-25 17:46:33,394 - IBKRApi - WARNING - Error 2107: HMDS data farm connection is inactive but should be available upon demand.ushmds
+2025-06-25 17:46:33,395 - TradingEngine - INFO - Initialized cdm strategy for AAPL
+2025-06-25 17:46:33,395 - IBKRApi - INFO - Info 2158: Sec-def data farm connection is OK:secdefil
+2025-06-25 17:46:33,395 - TradingEngine - INFO - Initialized 1 strategies
+2025-06-25 17:46:33,395 - ibapi.client - INFO - REQUEST reqMktData {'reqId': 1000, 'contract': 2524377379648: 0,AAPL,STK,,0.0,,,SMART,,USD,,,False,,combo:, 'genericTickList': '', 'snapshot': False, 'regulatorySnapshot': False, 'mktDataOptions': []}
+2025-06-25 17:46:33,395 - ibapi.client - INFO - SENDING reqMktData b'\x00\x00\x0011\x0011\x001000\x000\x00AAPL\x00STK\x00\x000.0\x00\x00\x00SMART\x00\x00USD\x00\x00\x000\x00\x000\x000\x00\x00'
+2025-06-25 17:46:33,396 - IBKRApi - INFO - Subscribed to market data for AAPL
+2025-06-25 17:46:33,396 - TradingEngine - INFO - Subscribed to market data for 1 symbols
+2025-06-25 17:46:33,396 - ibapi.client - INFO - REQUEST reqAccountSummary {'reqId': 9001, 'groupName': 'All', 'tags': 'TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower'}
+2025-06-25 17:46:33,396 - ibapi.client - INFO - SENDING reqAccountSummary b'\x00\x00\x00G62\x001\x009001\x00All\x00TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower\x00'
+2025-06-25 17:46:33,397 - ibapi.client - INFO - REQUEST reqPositions {}
+2025-06-25 17:46:33,397 - ibapi.client - INFO - SENDING reqPositions b'\x00\x00\x00\x0561\x001\x00'
+2025-06-25 17:46:33,598 - IBKRApi - INFO - Received 0 positions
+2025-06-25 17:46:33,646 - IBKRApi - INFO - Account summary received
+2025-06-25 17:46:33,646 - IBKRApi - INFO - Account summary received
+2025-06-25 17:46:33,957 - IBKRApi - WARNING - Error 10089: Requested market data requires additional subscription for API. See link in 'Market Data Connections' dialog for more details.Delayed market data is available.AAPL NASDAQ.NMS/TOP/ALL
+2025-06-25 17:46:35,398 - TradingEngine - INFO - Trading engine initialized successfully
+2025-06-25 17:46:35,399 - TradingEngine - INFO - Engine main loop started
+2025-06-25 17:46:35,399 - TradingEngine - INFO - Trading engine started
+2025-06-25 17:46:35,399 - ControlPanel - INFO - Trading engine started successfully
+2025-06-25 17:48:02,943 - ControlPanel - INFO - Symbols updated to: ['TSLA']
+2025-06-25 17:48:02,943 - ControlPanel - ERROR - Failed to update strategy status: 'CDM' is not a valid StrategyType
+2025-06-25 17:48:02,943 - ControlPanel - ERROR - Failed to update strategy status: 'WDM' is not a valid StrategyType
+2025-06-25 17:48:02,943 - ControlPanel - ERROR - Failed to update strategy status: 'ZRM' is not a valid StrategyType
+2025-06-25 17:48:02,943 - ControlPanel - ERROR - Failed to update strategy status: 'IZRM' is not a valid StrategyType
+2025-06-25 17:48:02,943 - ControlPanel - INFO - Position sizing updated: percentage = 3.0
+2025-06-25 17:48:02,944 - ControlPanel - INFO - Configuration saved to demo_multiple.json
+2025-06-25 17:48:02,962 - ControlPanel - INFO - Configuration loaded from demo_multiple.json
+2025-06-25 17:48:02,964 - TradingEngine - INFO - Initializing trading engine...
+2025-06-25 17:48:02,964 - IBKRApi - INFO - Connecting to IB at 127.0.0.1:4002
+2025-06-25 17:48:02,968 - ibapi.client - INFO - sent startApi
+2025-06-25 17:48:02,968 - ibapi.client - INFO - REQUEST startApi {}
+2025-06-25 17:48:02,969 - ibapi.client - INFO - SENDING startApi b'\x00\x00\x00\x0871\x002\x001\x00\x00'
+2025-06-25 17:48:02,969 - IBKRApi - INFO - Connection acknowledged
+2025-06-25 17:48:02,973 - ibapi.wrapper - INFO - ANSWER managedAccounts {'accountsList': 'DUM970744'}
+2025-06-25 17:48:02,973 - IBKRApi - INFO - Next valid order ID: 1
+2025-06-25 17:48:02,974 - IBKRApi - INFO - Successfully connected to IB
+2025-06-25 17:48:02,974 - IBKRApi - INFO - Info 2104: Market data farm connection is OK:usfarm
+2025-06-25 17:48:02,974 - TradingEngine - INFO - Connected to IB (demo account)
+2025-06-25 17:48:02,974 - IBKRApi - WARNING - Error 2107: HMDS data farm connection is inactive but should be available upon demand.ushmds
+2025-06-25 17:48:02,975 - TradingEngine - INFO - Initialized cdm strategy for TSLA
+2025-06-25 17:48:02,975 - IBKRApi - INFO - Info 2158: Sec-def data farm connection is OK:secdefil
+2025-06-25 17:48:02,975 - TradingEngine - INFO - Initialized 1 strategies
+2025-06-25 17:48:02,976 - ibapi.client - INFO - REQUEST reqMktData {'reqId': 1000, 'contract': 2223401664368: 0,TSLA,STK,,0.0,,,SMART,,USD,,,False,,combo:, 'genericTickList': '', 'snapshot': False, 'regulatorySnapshot': False, 'mktDataOptions': []}
+2025-06-25 17:48:02,976 - ibapi.client - INFO - SENDING reqMktData b'\x00\x00\x0011\x0011\x001000\x000\x00TSLA\x00STK\x00\x000.0\x00\x00\x00SMART\x00\x00USD\x00\x00\x000\x00\x000\x000\x00\x00'
+2025-06-25 17:48:02,976 - IBKRApi - INFO - Subscribed to market data for TSLA
+2025-06-25 17:48:02,977 - TradingEngine - INFO - Subscribed to market data for 1 symbols
+2025-06-25 17:48:02,977 - ibapi.client - INFO - REQUEST reqAccountSummary {'reqId': 9001, 'groupName': 'All', 'tags': 'TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower'}
+2025-06-25 17:48:02,977 - ibapi.client - INFO - SENDING reqAccountSummary b'\x00\x00\x00G62\x001\x009001\x00All\x00TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower\x00'
+2025-06-25 17:48:02,977 - ibapi.client - INFO - REQUEST reqPositions {}
+2025-06-25 17:48:02,977 - ibapi.client - INFO - SENDING reqPositions b'\x00\x00\x00\x0561\x001\x00'
+2025-06-25 17:48:03,178 - IBKRApi - INFO - Received 0 positions
+2025-06-25 17:48:03,229 - IBKRApi - INFO - Account summary received
+2025-06-25 17:48:03,229 - IBKRApi - INFO - Account summary received
+2025-06-25 17:48:03,587 - IBKRApi - WARNING - Error 10089: Requested market data requires additional subscription for API. See link in 'Market Data Connections' dialog for more details.Delayed market data is available.TSLA NASDAQ.NMS/TOP/ALL
+2025-06-25 17:48:04,984 - TradingEngine - INFO - Trading engine initialized successfully
+2025-06-25 17:48:04,985 - TradingEngine - INFO - Engine main loop started
+2025-06-25 17:48:04,985 - TradingEngine - INFO - Trading engine started
+2025-06-25 17:48:04,985 - ControlPanel - INFO - Trading engine started successfully
+2025-06-25 17:49:35,170 - TradingEngine - INFO - Stopping trading engine...
+2025-06-25 17:49:45,177 - ibapi.client - INFO - REQUEST cancelMktData {'reqId': 1000}
+2025-06-25 17:49:45,177 - ibapi.client - INFO - SENDING cancelMktData b'\x00\x00\x00\t2\x002\x001000\x00'
+2025-06-25 17:49:45,178 - IBKRApi - INFO - Unsubscribed from market data for TSLA
+2025-06-25 17:49:45,178 - ibapi.client - INFO - disconnecting
+2025-06-25 17:49:45,178 - ibapi.wrapper - INFO - ANSWER connectionClosed {}
+2025-06-25 17:49:45,178 - IBKRApi - INFO - Disconnected from IB
+2025-06-25 17:49:45,180 - TradingEngine - INFO - Performance data saved to performance_data_20250625_174945.json
+2025-06-25 17:49:45,180 - TradingEngine - INFO - Trading engine stopped
+2025-06-25 17:49:45,180 - ControlPanel - INFO - Trading engine stopped
+2025-06-25 17:54:43,278 - ControlPanel - INFO - Symbols updated to: ['AAPL', 'MSFT', 'GOOGL']
+2025-06-25 17:54:43,278 - ControlPanel - INFO - Strategy CDM enabled
+2025-06-25 17:54:43,278 - ControlPanel - INFO - Strategy WDM disabled
+2025-06-25 17:54:43,278 - ControlPanel - INFO - Strategy ZRM disabled
+2025-06-25 17:54:43,278 - ControlPanel - INFO - Strategy IZRM disabled
+2025-06-25 17:54:43,279 - ControlPanel - INFO - Strategy CDM enabled
+2025-06-25 17:54:43,279 - ControlPanel - INFO - Strategy WDM disabled
+2025-06-25 17:54:43,279 - ControlPanel - INFO - Strategy ZRM disabled
+2025-06-25 17:54:43,279 - ControlPanel - INFO - Strategy IZRM disabled
+2025-06-25 17:54:43,279 - ControlPanel - INFO - Strategy CDM enabled
+2025-06-25 17:54:43,279 - ControlPanel - INFO - Strategy WDM disabled
+2025-06-25 17:54:43,280 - ControlPanel - INFO - Strategy ZRM disabled
+2025-06-25 17:54:43,280 - ControlPanel - INFO - Strategy IZRM disabled
+2025-06-25 17:54:43,280 - ControlPanel - INFO - Position sizing updated: percentage = 2.0
+2025-06-25 17:54:43,282 - ControlPanel - INFO - Configuration saved to demo_multi_symbols.json
+2025-06-25 17:54:43,302 - ControlPanel - INFO - Configuration loaded from demo_multi_symbols.json
+2025-06-25 17:54:43,305 - TradingEngine - INFO - Initializing trading engine...
+2025-06-25 17:54:43,305 - IBKRApi - INFO - Connecting to IB at 127.0.0.1:4002
+2025-06-25 17:54:43,317 - ibapi.client - INFO - sent startApi
+2025-06-25 17:54:43,318 - ibapi.client - INFO - REQUEST startApi {}
+2025-06-25 17:54:43,318 - ibapi.client - INFO - SENDING startApi b'\x00\x00\x00\x0871\x002\x001\x00\x00'
+2025-06-25 17:54:43,318 - IBKRApi - INFO - Connection acknowledged
+2025-06-25 17:54:43,322 - ibapi.wrapper - INFO - ANSWER managedAccounts {'accountsList': 'DUM970744'}
+2025-06-25 17:54:43,322 - IBKRApi - INFO - Next valid order ID: 1
+2025-06-25 17:54:43,322 - IBKRApi - INFO - Successfully connected to IB
+2025-06-25 17:54:43,323 - IBKRApi - INFO - Info 2104: Market data farm connection is OK:usfarm
+2025-06-25 17:54:43,323 - TradingEngine - INFO - Connected to IB (demo account)
+2025-06-25 17:54:43,323 - IBKRApi - WARNING - Error 2107: HMDS data farm connection is inactive but should be available upon demand.ushmds
+2025-06-25 17:54:43,324 - TradingEngine - INFO - Initialized cdm strategy for AAPL
+2025-06-25 17:54:43,324 - IBKRApi - INFO - Info 2158: Sec-def data farm connection is OK:secdefil
+2025-06-25 17:54:43,324 - TradingEngine - INFO - Initialized cdm strategy for MSFT
+2025-06-25 17:54:43,324 - TradingEngine - INFO - Initialized cdm strategy for GOOGL
+2025-06-25 17:54:43,325 - TradingEngine - INFO - Initialized 3 strategies
+2025-06-25 17:54:43,325 - ibapi.client - INFO - REQUEST reqMktData {'reqId': 1000, 'contract': 2409676207152: 0,AAPL,STK,,0.0,,,SMART,,USD,,,False,,combo:, 'genericTickList': '', 'snapshot': False, 'regulatorySnapshot': False, 'mktDataOptions': []}
+2025-06-25 17:54:43,325 - ibapi.client - INFO - SENDING reqMktData b'\x00\x00\x0011\x0011\x001000\x000\x00AAPL\x00STK\x00\x000.0\x00\x00\x00SMART\x00\x00USD\x00\x00\x000\x00\x000\x000\x00\x00'
+2025-06-25 17:54:43,326 - IBKRApi - INFO - Subscribed to market data for AAPL
+2025-06-25 17:54:43,326 - ibapi.client - INFO - REQUEST reqMktData {'reqId': 1001, 'contract': 2409676207152: 0,MSFT,STK,,0.0,,,SMART,,USD,,,False,,combo:, 'genericTickList': '', 'snapshot': False, 'regulatorySnapshot': False, 'mktDataOptions': []}
+2025-06-25 17:54:43,326 - ibapi.client - INFO - SENDING reqMktData b'\x00\x00\x0011\x0011\x001001\x000\x00MSFT\x00STK\x00\x000.0\x00\x00\x00SMART\x00\x00USD\x00\x00\x000\x00\x000\x000\x00\x00'
+2025-06-25 17:54:43,327 - IBKRApi - INFO - Subscribed to market data for MSFT
+2025-06-25 17:54:43,328 - ibapi.client - INFO - REQUEST reqMktData {'reqId': 1002, 'contract': 2409676207152: 0,GOOGL,STK,,0.0,,,SMART,,USD,,,False,,combo:, 'genericTickList': '', 'snapshot': False, 'regulatorySnapshot': False, 'mktDataOptions': []}
+2025-06-25 17:54:43,329 - ibapi.client - INFO - SENDING reqMktData b'\x00\x00\x0021\x0011\x001002\x000\x00GOOGL\x00STK\x00\x000.0\x00\x00\x00SMART\x00\x00USD\x00\x00\x000\x00\x000\x000\x00\x00'
+2025-06-25 17:54:43,330 - IBKRApi - INFO - Subscribed to market data for GOOGL
+2025-06-25 17:54:43,330 - TradingEngine - INFO - Subscribed to market data for 3 symbols
+2025-06-25 17:54:43,330 - ibapi.client - INFO - REQUEST reqAccountSummary {'reqId': 9001, 'groupName': 'All', 'tags': 'TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower'}
+2025-06-25 17:54:43,331 - ibapi.client - INFO - SENDING reqAccountSummary b'\x00\x00\x00G62\x001\x009001\x00All\x00TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower\x00'
+2025-06-25 17:54:43,331 - ibapi.client - INFO - REQUEST reqPositions {}
+2025-06-25 17:54:43,332 - ibapi.client - INFO - SENDING reqPositions b'\x00\x00\x00\x0561\x001\x00'
+2025-06-25 17:54:43,727 - IBKRApi - INFO - Received 0 positions
+2025-06-25 17:54:43,821 - IBKRApi - INFO - Account summary received
+2025-06-25 17:54:43,822 - IBKRApi - INFO - Account summary received
+2025-06-25 17:54:43,852 - IBKRApi - WARNING - Error 10089: Requested market data requires additional subscription for API. See link in 'Market Data Connections' dialog for more details.Delayed market data is available.AAPL NASDAQ.NMS/TOP/ALL
+2025-06-25 17:54:43,981 - IBKRApi - WARNING - Error 10089: Requested market data requires additional subscription for API. See link in 'Market Data Connections' dialog for more details.Delayed market data is available.MSFT NASDAQ.NMS/TOP/ALL
+2025-06-25 17:54:43,982 - IBKRApi - WARNING - Error 10089: Requested market data requires additional subscription for API. See link in 'Market Data Connections' dialog for more details.Delayed market data is available.GOOGL NASDAQ.NMS/TOP/ALL
+2025-06-25 17:54:45,337 - TradingEngine - INFO - Trading engine initialized successfully
+2025-06-25 17:54:45,338 - TradingEngine - INFO - Engine main loop started
+2025-06-25 17:54:45,338 - TradingEngine - INFO - Trading engine started
+2025-06-25 17:54:45,339 - ControlPanel - INFO - Trading engine started successfully

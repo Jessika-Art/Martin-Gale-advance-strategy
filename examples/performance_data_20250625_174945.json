@@ -1,0 +1,25 @@
+{
+  "engine_stats": {
+    "start_time": "2025-06-25T17:48:04.984421",
+    "end_time": "2025-06-25T17:49:45.178150",
+    "total_trades": 0,
+    "total_pnl": 0.0,
+    "max_drawdown": 0.0,
+    "peak_equity": 0.0
+  },
+  "strategy_stats": {
+    "cdm_TSLA": {
+      "strategy_type": "cdm",
+      "symbol": "TSLA",
+      "total_cycles": 0,
+      "winning_cycles": 0,
+      "win_rate": 0,
+      "total_profit": 0.0,
+      "avg_profit_per_cycle": 0,
+      "max_drawdown": 0.0,
+      "current_positions": 0,
+      "unrealized_pnl": 0
+    }
+  },
+  "completed_cycles": []
+}

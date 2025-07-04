@@ -1,0 +1,188 @@
+{
+  "account_type": "demo",
+  "execution_mode": "parallel",
+  "active_strategies": [
+    "cdm"
+  ],
+  "tickers": [
+    "AAPL"
+  ],
+  "timeframe": "1min",
+  "duration": "30 D",
+  "data_type": "TRADES",
+  "position_size_type": "PERCENTAGE",
+  "position_size_value": 5.0,
+  "ib_config": {
+    "host": "127.0.0.1",
+    "demo_port": 4002,
+    "live_port": 4001,
+    "client_id": 1,
+    "timeout": 30
+  },
+  "shared_settings": {
+    "continue_trading": true,
+    "pre_after_hours": false,
+    "money_management": true,
+    "growth_threshold": 10000.0,
+    "increase_value": 0.1,
+    "progressive_reinvestment_step": 0.05,
+    "repeat_on_close": true,
+    "backtest_performance_report": true,
+    "order_type": "MARKET",
+    "initial_balance": 50000.0
+  },
+  "cdm_settings": {
+    "enabled": false,
+    "capital_allocation": 0.25,
+    "initial_trade_type": "BUY",
+    "symbol": "AAPL",
+    "price_trigger": null,
+    "max_orders": 5,
+    "hold_previous": true,
+    "order_distances": [
+      1.0,
+      1.5,
+      2.0,
+      2.5,
+      3.0
+    ],
+    "order_sizes": [
+      1.0,
+      1.5,
+      2.0,
+      2.5,
+      3.0
+    ],
+    "order_tps": [
+      2.0,
+      2.0,
+      2.0,
+      2.0,
+      2.0
+    ],
+    "trailing_stops": false,
+    "first_distance_trailing": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "trailing_progress": [
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.5
+    ]
+  },
+  "wdm_settings": {
+    "enabled": false,
+    "capital_allocation": 0.25,
+    "initial_trade_type": "BUY",
+    "symbol": "AAPL",
+    "price_trigger": null,
+    "max_orders": 5,
+    "hold_previous": true,
+    "order_distances": [
+      1.0,
+      1.5,
+      2.0,
+      2.5,
+      3.0
+    ],
+    "order_sizes": [
+      1.0,
+      1.5,
+      2.0,
+      2.5,
+      3.0
+    ],
+    "order_sls": [
+      2.0,
+      2.0,
+      2.0,
+      2.0,
+      2.0
+    ]
+  },
+  "zrm_settings": {
+    "enabled": false,
+    "capital_allocation": 0.25,
+    "initial_trade_type": "BUY",
+    "symbol": "AAPL",
+    "price_trigger": null,
+    "max_orders": 5,
+    "hold_previous": true,
+    "order_distances": [
+      1.0,
+      1.5,
+      2.0,
+      2.5,
+      3.0
+    ],
+    "order_sizes": [
+      1.0,
+      1.5,
+      2.0,
+      2.5,
+      3.0
+    ],
+    "zone_center_price": null,
+    "zone_width_pct": 5.0,
+    "order_tps": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "trailing_stops": false,
+    "first_distance_trailing": [
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.5
+    ],
+    "trailing_progress": [
+      0.3,
+      0.3,
+      0.3,
+      0.3,
+      0.3
+    ]
+  },
+  "izrm_settings": {
+    "enabled": false,
+    "capital_allocation": 0.25,
+    "initial_trade_type": "BUY",
+    "symbol": "AAPL",
+    "price_trigger": null,
+    "max_orders": 5,
+    "hold_previous": true,
+    "order_distances": [
+      1.0,
+      1.5,
+      2.0,
+      2.5,
+      3.0
+    ],
+    "order_sizes": [
+      1.0,
+      1.5,
+      2.0,
+      2.5,
+      3.0
+    ],
+    "zone_center_price": null,
+    "zone_width_pct": 5.0,
+    "order_sls": [
+      2.0,
+      2.0,
+      2.0,
+      2.0,
+      2.0
+    ]
+  }
+}

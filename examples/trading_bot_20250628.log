@@ -1,0 +1,445 @@
+2025-06-28 00:56:53,473 - TradingEngine - INFO - Initializing trading engine...
+2025-06-28 00:56:53,474 - IBKRApi - INFO - Connecting to IB at 127.0.0.1:4002
+2025-06-28 00:56:53,480 - ibapi.client - INFO - sent startApi
+2025-06-28 00:56:53,480 - ibapi.client - INFO - REQUEST startApi {}
+2025-06-28 00:56:53,481 - ibapi.client - INFO - SENDING startApi b'\x00\x00\x00\x0871\x002\x001\x00\x00'
+2025-06-28 00:56:53,481 - IBKRApi - INFO - Connection acknowledged
+2025-06-28 00:56:53,484 - ibapi.wrapper - INFO - ANSWER managedAccounts {'accountsList': 'DUM970744'}
+2025-06-28 00:56:53,484 - IBKRApi - INFO - Next valid order ID: 473
+2025-06-28 00:56:53,486 - IBKRApi - INFO - Info 2104: Market data farm connection is OK:usfarm
+2025-06-28 00:56:53,485 - ibapi.client - INFO - REQUEST reqMarketDataType {'marketDataType': 3}
+2025-06-28 00:56:53,487 - IBKRApi - WARNING - Error 2107: HMDS data farm connection is inactive but should be available upon demand.ushmds
+2025-06-28 00:56:53,487 - ibapi.client - INFO - SENDING reqMarketDataType b'\x00\x00\x00\x0759\x001\x003\x00'
+2025-06-28 00:56:53,487 - IBKRApi - INFO - Info 2158: Sec-def data farm connection is OK:secdefil
+2025-06-28 00:56:53,488 - IBKRApi - INFO - Successfully connected to IB with delayed market data
+2025-06-28 00:56:53,488 - TradingEngine - INFO - Connected to IB (demo account)
+2025-06-28 00:56:53,489 - TradingEngine - INFO - Initialized cdm strategy for AAPL
+2025-06-28 00:56:53,489 - TradingEngine - INFO - Initialized 1 strategies
+2025-06-28 00:56:53,489 - ibapi.client - INFO - REQUEST reqMktData {'reqId': 1000, 'contract': 2158620932272: 0,AAPL,STK,,0.0,,,SMART,,USD,,,False,,combo:, 'genericTickList': '', 'snapshot': False, 'regulatorySnapshot': False, 'mktDataOptions': []}
+2025-06-28 00:56:53,490 - ibapi.client - INFO - SENDING reqMktData b'\x00\x00\x0011\x0011\x001000\x000\x00AAPL\x00STK\x00\x000.0\x00\x00\x00SMART\x00\x00USD\x00\x00\x000\x00\x000\x000\x00\x00'
+2025-06-28 00:56:53,490 - IBKRApi - INFO - Subscribed to market data for AAPL
+2025-06-28 00:56:53,490 - TradingEngine - INFO - Subscribed to market data for 1 symbols
+2025-06-28 00:56:53,490 - ibapi.client - INFO - REQUEST reqAccountSummary {'reqId': 9001, 'groupName': 'All', 'tags': 'TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower'}
+2025-06-28 00:56:53,490 - ibapi.client - INFO - SENDING reqAccountSummary b'\x00\x00\x00G62\x001\x009001\x00All\x00TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower\x00'
+2025-06-28 00:56:53,490 - ibapi.client - INFO - REQUEST reqPositions {}
+2025-06-28 00:56:53,490 - ibapi.client - INFO - SENDING reqPositions b'\x00\x00\x00\x0561\x001\x00'
+2025-06-28 00:56:53,592 - IBKRApi - INFO - Received 7 positions
+2025-06-28 00:56:53,765 - IBKRApi - INFO - Account summary received
+2025-06-28 00:56:54,040 - ibapi.wrapper - INFO - ANSWER tickReqParams {'tickerId': 1000, 'minTick': 0.01, 'bboExchange': '', 'snapshotPermissions': 0}
+2025-06-28 00:56:54,041 - ibapi.wrapper - INFO - ANSWER marketDataType {'reqId': 1000, 'marketDataType': 3}
+2025-06-28 00:56:54,047 - IBKRApi - WARNING - Error 10167: Requested market data is not subscribed. Displaying delayed market data.
+2025-06-28 00:56:54,468 - ibapi.wrapper - INFO - ANSWER tickString {'reqId': 1000, 'tickType': 88, 'value': '1751067647'}
+2025-06-28 00:56:55,505 - TradingEngine - INFO - Trading engine initialized successfully
+2025-06-28 00:56:55,507 - TradingEngine - INFO - Engine main loop started
+2025-06-28 00:56:55,507 - TradingEngine - INFO - Trading engine started
+2025-06-28 00:56:55,509 - CDMStrategy_AAPL - INFO - Starting new cycle at price 201.87
+2025-06-28 00:56:55,512 - CDMStrategy_AAPL - INFO - Position sizing: Account=$269,713.25, Base Allocation=2.5%, Multiplier=1.00, Dollar Amount=$6,742.83, Price=$201.87, Shares=33
+2025-06-28 00:56:55,512 - ibapi.client - INFO - REQUEST placeOrder {'orderId': 473, 'contract': 2160316310160: 0,AAPL,STK,,0.0,,,SMART,,USD,,,False,,combo:, 'order': 2160316312800: 0,0,0: MARKET BUY 33@179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368.000000 }
+2025-06-28 00:56:55,515 - ibapi.client - INFO - SENDING placeOrder b'\x00\x00\x01<3\x00473\x000\x00AAPL\x00STK\x00\x000.0\x00\x00\x00SMART\x00\x00USD\x00\x00\x00\x00\x00BUY\x0033.0\x00MARKET\x00\x00\x00\x00\x00\x00\x000\x00\x001\x000\x000\x000\x000\x000\x000\x000\x00\x000\x00\x00\x00\x00\x00\x00\x00\x000\x00\x00-1\x000\x00\x00\x000\x00\x00\x000\x000\x00\x000\x00\x00\x00\x00\x00\x000\x00\x00\x00\x00\x000\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x000\x00\x00\x000\x000\x00\x00\x000\x00\x000\x000\x000\x000\x00\x001.7976931348623157e+308\x001.7976931348623157e+308\x001.7976931348623157e+308\x001.7976931348623157e+308\x001.7976931348623157e+308\x000\x00\x00\x00\x001.7976931348623157e+308\x00\x00\x00\x00\x000\x000\x000\x00\x00'
+2025-06-28 00:56:55,519 - IBKRApi - INFO - Placed order 473: BUY 33.0 AAPL
+2025-06-28 00:56:55,521 - TradingEngine - INFO - Entry order placed for cdm on AAPL
+2025-06-28 00:56:55,522 - ibapi.client - INFO - REQUEST reqCurrentTime {}
+2025-06-28 00:56:55,523 - ibapi.client - INFO - SENDING reqCurrentTime b'\x00\x00\x00\x0549\x001\x00'
+2025-06-28 00:56:55,524 - ibapi.wrapper - INFO - ANSWER currentTime {'time': 1751068615}
+2025-06-28 00:56:55,971 - IBKRApi - INFO - Open order: 473 AAPL BUY 33.0
+2025-06-28 00:56:55,972 - IBKRApi - INFO - Order 473 status: Submitted, filled: 0.0
+2025-06-28 00:56:55,977 - ibapi.wrapper - INFO - ANSWER execDetails {'reqId': -1, 'contract': 2160316310640: 265598,AAPL,STK,,0.0,,,NYSENAT,,USD,AAPL,NMS,False,,combo:, 'execution': 2160316309104: ExecId: 00012ec5.685ee17c.01.01, Time: 20250628  00:56:56, Account: DUM970744, Exchange: NYSENAT, Side: BOT, Shares: 33.000000, Price: 201.200000, PermId: 530514176, ClientId: 1, OrderId: 473, Liquidation: 0, CumQty: 33.000000, AvgPrice: 201.200000, OrderRef: , EvRule: , EvMultiplier: 0.000000, ModelCode: , LastLiquidity: 2}
+2025-06-28 00:56:55,979 - IBKRApi - INFO - Order 473 status: Filled, filled: 33.0
+2025-06-28 00:56:55,979 - CDMStrategy_AAPL - INFO - Added position: 33.0 shares at 201.2
+2025-06-28 00:56:55,979 - TradingEngine - INFO - Order 473 filled at 201.2
+2025-06-28 00:56:55,982 - ibapi.wrapper - INFO - ANSWER commissionReport {'commissionReport': 2160315945104: ExecId: 00012ec5.685ee17c.01.01, Commission: 1.001155, Currency: USD, RealizedPnL: , Yield: , YieldRedemptionDate: 0}
+2025-06-28 00:56:56,036 - ibapi.client - INFO - REQUEST reqAccountSummary {'reqId': 9001, 'groupName': 'All', 'tags': 'TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower'}
+2025-06-28 00:56:56,036 - ibapi.client - INFO - SENDING reqAccountSummary b'\x00\x00\x00G62\x001\x009001\x00All\x00TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower\x00'
+2025-06-28 00:56:56,299 - IBKRApi - INFO - Account summary received
+2025-06-28 00:56:56,551 - ibapi.client - INFO - REQUEST reqPositions {}
+2025-06-28 00:56:56,552 - ibapi.client - INFO - SENDING reqPositions b'\x00\x00\x00\x0561\x001\x00'
+2025-06-28 00:56:56,555 - IBKRApi - INFO - Received 7 positions
+2025-06-28 00:56:56,872 - ibapi.client - INFO - REQUEST reqCurrentTime {}
+2025-06-28 00:56:56,873 - ibapi.client - INFO - SENDING reqCurrentTime b'\x00\x00\x00\x0549\x001\x00'
+2025-06-28 00:56:56,875 - ibapi.wrapper - INFO - ANSWER currentTime {'time': 1751068616}
+2025-06-28 00:56:57,378 - ibapi.client - INFO - REQUEST reqAccountSummary {'reqId': 9001, 'groupName': 'All', 'tags': 'TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower'}
+2025-06-28 00:56:57,378 - ibapi.client - INFO - SENDING reqAccountSummary b'\x00\x00\x00G62\x001\x009001\x00All\x00TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower\x00'
+2025-06-28 00:56:57,633 - IBKRApi - INFO - Account summary received
+2025-06-28 00:56:57,888 - ibapi.client - INFO - REQUEST reqPositions {}
+2025-06-28 00:56:57,889 - ibapi.client - INFO - SENDING reqPositions b'\x00\x00\x00\x0561\x001\x00'
+2025-06-28 00:56:57,892 - IBKRApi - INFO - Received 7 positions
+2025-06-28 00:56:58,217 - ibapi.client - INFO - REQUEST reqAccountSummary {'reqId': 9001, 'groupName': 'All', 'tags': 'TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower'}
+2025-06-28 00:56:58,218 - ibapi.client - INFO - SENDING reqAccountSummary b'\x00\x00\x00G62\x001\x009001\x00All\x00TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower\x00'
+2025-06-28 00:56:58,219 - ibapi.client - INFO - REQUEST reqPositions {}
+2025-06-28 00:56:58,219 - ibapi.client - INFO - SENDING reqPositions b'\x00\x00\x00\x0561\x001\x00'
+2025-06-28 00:56:58,320 - IBKRApi - INFO - Received 7 positions
+2025-06-28 00:56:58,472 - IBKRApi - INFO - Account summary received
+2025-06-28 00:57:13,325 - ibapi.client - INFO - REQUEST reqCurrentTime {}
+2025-06-28 00:57:13,326 - ibapi.client - INFO - SENDING reqCurrentTime b'\x00\x00\x00\x0549\x001\x00'
+2025-06-28 00:57:13,328 - ibapi.wrapper - INFO - ANSWER currentTime {'time': 1751068632}
+2025-06-28 00:57:13,831 - ibapi.client - INFO - REQUEST reqAccountSummary {'reqId': 9001, 'groupName': 'All', 'tags': 'TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower'}
+2025-06-28 00:57:13,833 - ibapi.client - INFO - SENDING reqAccountSummary b'\x00\x00\x00G62\x001\x009001\x00All\x00TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower\x00'
+2025-06-28 00:57:14,132 - IBKRApi - INFO - Account summary received
+2025-06-28 00:57:14,344 - ibapi.client - INFO - REQUEST reqPositions {}
+2025-06-28 00:57:14,344 - ibapi.client - INFO - SENDING reqPositions b'\x00\x00\x00\x0561\x001\x00'
+2025-06-28 00:57:14,347 - IBKRApi - INFO - Received 7 positions
+2025-06-28 00:57:14,663 - ibapi.client - INFO - REQUEST reqCurrentTime {}
+2025-06-28 00:57:14,663 - ibapi.client - INFO - SENDING reqCurrentTime b'\x00\x00\x00\x0549\x001\x00'
+2025-06-28 00:57:14,665 - ibapi.wrapper - INFO - ANSWER currentTime {'time': 1751068634}
+2025-06-28 00:57:15,166 - ibapi.client - INFO - REQUEST reqAccountSummary {'reqId': 9001, 'groupName': 'All', 'tags': 'TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower'}
+2025-06-28 00:57:15,166 - ibapi.client - INFO - SENDING reqAccountSummary b'\x00\x00\x00G62\x001\x009001\x00All\x00TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower\x00'
+2025-06-28 00:57:15,434 - IBKRApi - INFO - Account summary received
+2025-06-28 00:57:15,679 - ibapi.client - INFO - REQUEST reqPositions {}
+2025-06-28 00:57:15,680 - ibapi.client - INFO - SENDING reqPositions b'\x00\x00\x00\x0561\x001\x00'
+2025-06-28 00:57:15,684 - IBKRApi - INFO - Received 7 positions
+2025-06-28 00:57:16,015 - ibapi.client - INFO - REQUEST reqAccountSummary {'reqId': 9001, 'groupName': 'All', 'tags': 'TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower'}
+2025-06-28 00:57:16,015 - ibapi.client - INFO - SENDING reqAccountSummary b'\x00\x00\x00G62\x001\x009001\x00All\x00TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower\x00'
+2025-06-28 00:57:16,016 - ibapi.client - INFO - REQUEST reqPositions {}
+2025-06-28 00:57:16,016 - ibapi.client - INFO - SENDING reqPositions b'\x00\x00\x00\x0561\x001\x00'
+2025-06-28 00:57:16,117 - IBKRApi - INFO - Received 7 positions
+2025-06-28 00:57:16,279 - IBKRApi - INFO - Account summary received
+2025-06-28 00:57:16,522 - ibapi.client - INFO - REQUEST reqAccountSummary {'reqId': 9001, 'groupName': 'All', 'tags': 'TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower'}
+2025-06-28 00:57:16,523 - ibapi.client - INFO - SENDING reqAccountSummary b'\x00\x00\x00G62\x001\x009001\x00All\x00TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower\x00'
+2025-06-28 00:57:16,778 - IBKRApi - INFO - Account summary received
+2025-06-28 00:57:17,067 - ibapi.client - INFO - REQUEST reqPositions {}
+2025-06-28 00:57:17,067 - ibapi.client - INFO - SENDING reqPositions b'\x00\x00\x00\x0561\x001\x00'
+2025-06-28 00:57:17,070 - IBKRApi - INFO - Received 7 positions
+2025-06-28 00:58:00,141 - ibapi.wrapper - INFO - ANSWER tickString {'reqId': 1000, 'tickType': 88, 'value': '1751067780'}
+2025-06-28 00:58:17,128 - ibapi.wrapper - INFO - ANSWER tickString {'reqId': 1000, 'tickType': 88, 'value': '1751067797'}
+2025-06-28 00:59:06,177 - ibapi.wrapper - INFO - ANSWER tickString {'reqId': 1000, 'tickType': 88, 'value': '1751067846'}
+2025-06-28 00:59:54,978 - ibapi.wrapper - INFO - ANSWER tickString {'reqId': 1000, 'tickType': 88, 'value': '1751067895'}
+2025-06-28 01:01:15,064 - ibapi.wrapper - INFO - ANSWER tickString {'reqId': 1000, 'tickType': 88, 'value': '1751067975'}
+2025-06-28 01:02:34,154 - ibapi.wrapper - INFO - ANSWER tickString {'reqId': 1000, 'tickType': 88, 'value': '1751068054'}
+2025-06-28 01:03:44,977 - ibapi.wrapper - INFO - ANSWER tickString {'reqId': 1000, 'tickType': 88, 'value': '1751068125'}
+2025-06-28 01:04:03,005 - ibapi.wrapper - INFO - ANSWER tickString {'reqId': 1000, 'tickType': 88, 'value': '1751068143'}
+2025-06-28 01:05:37,092 - ibapi.wrapper - INFO - ANSWER tickString {'reqId': 1000, 'tickType': 88, 'value': '1751068237'}
+2025-06-28 01:05:58,114 - ibapi.wrapper - INFO - ANSWER tickString {'reqId': 1000, 'tickType': 88, 'value': '1751068258'}
+2025-06-28 01:08:38,053 - ibapi.wrapper - INFO - ANSWER tickString {'reqId': 1000, 'tickType': 88, 'value': '1751068418'}
+2025-06-28 01:09:42,120 - ibapi.wrapper - INFO - ANSWER tickString {'reqId': 1000, 'tickType': 88, 'value': '1751068482'}
+2025-06-28 01:31:33,383 - TradingEngine - INFO - Initializing trading engine...
+2025-06-28 01:31:33,388 - IBKRApi - INFO - Connecting to IB at 127.0.0.1:4002
+2025-06-28 01:31:33,401 - ibapi.client - INFO - sent startApi
+2025-06-28 01:31:33,402 - ibapi.client - INFO - REQUEST startApi {}
+2025-06-28 01:31:33,402 - ibapi.client - INFO - SENDING startApi b'\x00\x00\x00\x0871\x002\x001\x00\x00'
+2025-06-28 01:31:33,406 - IBKRApi - INFO - Connection acknowledged
+2025-06-28 01:31:33,413 - ibapi.wrapper - INFO - ANSWER managedAccounts {'accountsList': 'DUM970744'}
+2025-06-28 01:31:33,414 - IBKRApi - INFO - Next valid order ID: 474
+2025-06-28 01:31:33,414 - ibapi.client - INFO - REQUEST reqMarketDataType {'marketDataType': 3}
+2025-06-28 01:31:33,415 - IBKRApi - INFO - Info 2104: Market data farm connection is OK:usfarm
+2025-06-28 01:31:33,415 - ibapi.client - INFO - SENDING reqMarketDataType b'\x00\x00\x00\x0759\x001\x003\x00'
+2025-06-28 01:31:33,416 - IBKRApi - WARNING - Error 2107: HMDS data farm connection is inactive but should be available upon demand.ushmds
+2025-06-28 01:31:33,417 - IBKRApi - INFO - Info 2158: Sec-def data farm connection is OK:secdefil
+2025-06-28 01:31:33,418 - IBKRApi - INFO - Successfully connected to IB with delayed market data
+2025-06-28 01:31:33,419 - TradingEngine - INFO - Connected to IB (demo account)
+2025-06-28 01:31:33,420 - TradingEngine - INFO - Initialized cdm strategy for AAPL
+2025-06-28 01:31:33,421 - TradingEngine - INFO - Initialized 1 strategies
+2025-06-28 01:31:33,422 - ibapi.client - INFO - REQUEST reqMktData {'reqId': 1000, 'contract': 2609553492336: 0,AAPL,STK,,0.0,,,SMART,,USD,,,False,,combo:, 'genericTickList': '', 'snapshot': False, 'regulatorySnapshot': False, 'mktDataOptions': []}
+2025-06-28 01:31:33,424 - ibapi.client - INFO - SENDING reqMktData b'\x00\x00\x0011\x0011\x001000\x000\x00AAPL\x00STK\x00\x000.0\x00\x00\x00SMART\x00\x00USD\x00\x00\x000\x00\x000\x000\x00\x00'
+2025-06-28 01:31:33,426 - IBKRApi - INFO - Subscribed to market data for AAPL
+2025-06-28 01:31:33,428 - TradingEngine - INFO - Subscribed to market data for 1 symbols
+2025-06-28 01:31:33,428 - ibapi.client - INFO - REQUEST reqAccountSummary {'reqId': 9001, 'groupName': 'All', 'tags': 'TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower'}
+2025-06-28 01:31:33,429 - ibapi.client - INFO - SENDING reqAccountSummary b'\x00\x00\x00G62\x001\x009001\x00All\x00TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower\x00'
+2025-06-28 01:31:33,431 - ibapi.client - INFO - REQUEST reqPositions {}
+2025-06-28 01:31:33,432 - ibapi.client - INFO - SENDING reqPositions b'\x00\x00\x00\x0561\x001\x00'
+2025-06-28 01:31:33,440 - IBKRApi - INFO - Received 7 positions
+2025-06-28 01:31:33,670 - IBKRApi - INFO - Account summary received
+2025-06-28 01:31:34,059 - ibapi.wrapper - INFO - ANSWER tickReqParams {'tickerId': 1000, 'minTick': 0.01, 'bboExchange': '', 'snapshotPermissions': 0}
+2025-06-28 01:31:34,061 - ibapi.wrapper - INFO - ANSWER marketDataType {'reqId': 1000, 'marketDataType': 3}
+2025-06-28 01:31:34,064 - IBKRApi - WARNING - Error 10167: Requested market data is not subscribed. Displaying delayed market data.
+2025-06-28 01:31:34,699 - ibapi.wrapper - INFO - ANSWER tickString {'reqId': 1000, 'tickType': 88, 'value': '1751068783'}
+2025-06-28 01:31:35,449 - TradingEngine - INFO - Trading engine initialized successfully
+2025-06-28 01:31:35,451 - TradingEngine - INFO - Engine main loop started
+2025-06-28 01:31:35,451 - TradingEngine - INFO - Trading engine started
+2025-06-28 01:31:35,453 - CDMStrategy_AAPL - INFO - Starting new cycle at price 201.19
+2025-06-28 01:31:35,463 - CDMStrategy_AAPL - INFO - Position sizing: Account=$270,178.69, Base Allocation=2.5%, Multiplier=1.00, Dollar Amount=$6,754.47, Price=$201.19, Shares=33
+2025-06-28 01:31:35,480 - ibapi.client - INFO - REQUEST placeOrder {'orderId': 474, 'contract': 2609551798768: 0,AAPL,STK,,0.0,,,SMART,,USD,,,False,,combo:, 'order': 2609547627056: 0,0,0: MARKET BUY 33@179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368.000000 }
+2025-06-28 01:31:35,485 - ibapi.client - INFO - SENDING placeOrder b'\x00\x00\x01<3\x00474\x000\x00AAPL\x00STK\x00\x000.0\x00\x00\x00SMART\x00\x00USD\x00\x00\x00\x00\x00BUY\x0033.0\x00MARKET\x00\x00\x00\x00\x00\x00\x000\x00\x001\x000\x000\x000\x000\x000\x000\x000\x00\x000\x00\x00\x00\x00\x00\x00\x00\x000\x00\x00-1\x000\x00\x00\x000\x00\x00\x000\x000\x00\x000\x00\x00\x00\x00\x00\x000\x00\x00\x00\x00\x000\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x000\x00\x00\x000\x000\x00\x00\x000\x00\x000\x000\x000\x000\x00\x001.7976931348623157e+308\x001.7976931348623157e+308\x001.7976931348623157e+308\x001.7976931348623157e+308\x001.7976931348623157e+308\x000\x00\x00\x00\x001.7976931348623157e+308\x00\x00\x00\x00\x000\x000\x000\x00\x00'
+2025-06-28 01:31:35,492 - IBKRApi - INFO - Placed order 474: BUY 33.0 AAPL
+2025-06-28 01:31:35,498 - TradingEngine - INFO - Entry order placed for cdm on AAPL
+2025-06-28 01:31:35,507 - ibapi.client - INFO - REQUEST reqCurrentTime {}
+2025-06-28 01:31:35,508 - ibapi.client - INFO - SENDING reqCurrentTime b'\x00\x00\x00\x0549\x001\x00'
+2025-06-28 01:31:35,511 - ibapi.wrapper - INFO - ANSWER currentTime {'time': 1751070695}
+2025-06-28 01:31:35,843 - IBKRApi - INFO - Open order: 474 AAPL BUY 33.0
+2025-06-28 01:31:35,845 - IBKRApi - INFO - Order 474 status: Submitted, filled: 0.0
+2025-06-28 01:31:35,861 - IBKRApi - INFO - Execution: 00012ec5.685ee1f8.01.01 AAPL BOT 33.0@201.18
+2025-06-28 01:31:35,865 - IBKRApi - INFO - Order 474 status: Filled, filled: 33.0
+2025-06-28 01:31:35,867 - CDMStrategy_AAPL - INFO - Added position: 33.0 shares at 201.18
+2025-06-28 01:31:35,867 - TradingEngine - INFO - Order 474 filled at 201.18
+2025-06-28 01:31:35,871 - ibapi.wrapper - INFO - ANSWER commissionReport {'commissionReport': 2611244442640: ExecId: 00012ec5.685ee1f8.01.01, Commission: 1.001155, Currency: USD, RealizedPnL: , Yield: , YieldRedemptionDate: 0}
+2025-06-28 01:31:36,014 - ibapi.client - INFO - REQUEST reqAccountSummary {'reqId': 9001, 'groupName': 'All', 'tags': 'TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower'}
+2025-06-28 01:31:36,016 - ibapi.client - INFO - SENDING reqAccountSummary b'\x00\x00\x00G62\x001\x009001\x00All\x00TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower\x00'
+2025-06-28 01:31:36,522 - IBKRApi - INFO - Account summary received
+2025-06-28 01:31:36,528 - ibapi.client - INFO - REQUEST reqPositions {}
+2025-06-28 01:31:36,530 - ibapi.client - INFO - SENDING reqPositions b'\x00\x00\x00\x0561\x001\x00'
+2025-06-28 01:31:36,537 - IBKRApi - INFO - Received 7 positions
+2025-06-28 01:31:36,886 - ibapi.client - INFO - REQUEST reqCurrentTime {}
+2025-06-28 01:31:36,889 - ibapi.client - INFO - SENDING reqCurrentTime b'\x00\x00\x00\x0549\x001\x00'
+2025-06-28 01:31:36,891 - ibapi.wrapper - INFO - ANSWER currentTime {'time': 1751070696}
+2025-06-28 01:31:37,394 - ibapi.client - INFO - REQUEST reqAccountSummary {'reqId': 9001, 'groupName': 'All', 'tags': 'TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower'}
+2025-06-28 01:31:37,394 - ibapi.client - INFO - SENDING reqAccountSummary b'\x00\x00\x00G62\x001\x009001\x00All\x00TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower\x00'
+2025-06-28 01:31:37,821 - IBKRApi - INFO - Account summary received
+2025-06-28 01:31:37,910 - ibapi.client - INFO - REQUEST reqPositions {}
+2025-06-28 01:31:37,912 - ibapi.client - INFO - SENDING reqPositions b'\x00\x00\x00\x0561\x001\x00'
+2025-06-28 01:31:37,919 - IBKRApi - INFO - Received 7 positions
+2025-06-28 01:31:38,294 - ibapi.client - INFO - REQUEST reqExecutions {'reqId': 9002, 'execFilter': 2609553503280: Object}
+2025-06-28 01:31:38,295 - ibapi.client - INFO - SENDING reqExecutions b'\x00\x00\x00\x197\x003\x009002\x000\x00\x0020250529\x00\x00\x00\x00\x00'
+2025-06-28 01:31:38,296 - IBKRApi - INFO - Requested executions from 20250529
+2025-06-28 01:31:38,312 - IBKRApi - WARNING - Error 10314: Time: The date, time, or time-zone entered is invalid. The correct format is yyyymmdd hh:mm:ss xx/xxxx where yyyymmdd and xx/xxxx are optional. E.g.: 20031126 15:59:00 US/Eastern  Note that there is a space between the date and time, and between the time and time-zone.  If no date is specified, current date is assumed. If no time-zone is specified, local time-zone is assumed(deprecated).  You can also provide yyyymmddd-hh:mm:ss time is in UTC. Note that there is a dash between the date and time in UTC notation.
+2025-06-28 01:31:40,307 - ibapi.client - INFO - REQUEST reqAccountSummary {'reqId': 9001, 'groupName': 'All', 'tags': 'TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower'}
+2025-06-28 01:31:40,308 - ibapi.client - INFO - SENDING reqAccountSummary b'\x00\x00\x00G62\x001\x009001\x00All\x00TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower\x00'
+2025-06-28 01:31:40,805 - IBKRApi - INFO - Account summary received
+2025-06-28 01:31:41,433 - ibapi.client - INFO - REQUEST reqPositions {}
+2025-06-28 01:31:41,437 - ibapi.client - INFO - SENDING reqPositions b'\x00\x00\x00\x0561\x001\x00'
+2025-06-28 01:31:41,445 - IBKRApi - INFO - Received 7 positions
+2025-06-28 01:31:42,406 - ibapi.client - INFO - REQUEST reqExecutions {'reqId': 9002, 'execFilter': 2609553494880: Object}
+2025-06-28 01:31:42,408 - ibapi.client - INFO - SENDING reqExecutions b'\x00\x00\x00\x197\x003\x009002\x000\x00\x0020250621\x00\x00\x00\x00\x00'
+2025-06-28 01:31:42,409 - IBKRApi - INFO - Requested executions from 20250621
+2025-06-28 01:31:42,413 - IBKRApi - WARNING - Error 10314: Time: The date, time, or time-zone entered is invalid. The correct format is yyyymmdd hh:mm:ss xx/xxxx where yyyymmdd and xx/xxxx are optional. E.g.: 20031126 15:59:00 US/Eastern  Note that there is a space between the date and time, and between the time and time-zone.  If no date is specified, current date is assumed. If no time-zone is specified, local time-zone is assumed(deprecated).  You can also provide yyyymmddd-hh:mm:ss time is in UTC. Note that there is a dash between the date and time in UTC notation.
+2025-06-28 01:31:44,430 - ibapi.client - INFO - REQUEST reqPositions {}
+2025-06-28 01:31:44,438 - ibapi.client - INFO - SENDING reqPositions b'\x00\x00\x00\x0561\x001\x00'
+2025-06-28 01:31:44,450 - IBKRApi - INFO - Received 7 positions
+2025-06-28 01:35:26,813 - TradingEngine - INFO - Initializing trading engine...
+2025-06-28 01:35:26,814 - IBKRApi - INFO - Connecting to IB at 127.0.0.1:4002
+2025-06-28 01:35:26,835 - ibapi.client - INFO - sent startApi
+2025-06-28 01:35:26,836 - ibapi.client - INFO - REQUEST startApi {}
+2025-06-28 01:35:26,838 - ibapi.client - INFO - SENDING startApi b'\x00\x00\x00\x0871\x002\x001\x00\x00'
+2025-06-28 01:35:26,841 - IBKRApi - INFO - Connection acknowledged
+2025-06-28 01:35:26,846 - ibapi.wrapper - INFO - ANSWER managedAccounts {'accountsList': 'DUM970744'}
+2025-06-28 01:35:26,848 - IBKRApi - INFO - Next valid order ID: 475
+2025-06-28 01:35:26,849 - ibapi.client - INFO - REQUEST reqMarketDataType {'marketDataType': 3}
+2025-06-28 01:35:26,849 - IBKRApi - INFO - Info 2104: Market data farm connection is OK:usfarm
+2025-06-28 01:35:26,850 - ibapi.client - INFO - SENDING reqMarketDataType b'\x00\x00\x00\x0759\x001\x003\x00'
+2025-06-28 01:35:26,851 - IBKRApi - WARNING - Error 2107: HMDS data farm connection is inactive but should be available upon demand.ushmds
+2025-06-28 01:35:26,853 - IBKRApi - INFO - Successfully connected to IB with delayed market data
+2025-06-28 01:35:26,854 - IBKRApi - INFO - Info 2158: Sec-def data farm connection is OK:secdefil
+2025-06-28 01:35:26,855 - TradingEngine - INFO - Connected to IB (demo account)
+2025-06-28 01:35:26,858 - TradingEngine - INFO - Initialized cdm strategy for AAPL
+2025-06-28 01:35:26,860 - TradingEngine - INFO - Initialized 1 strategies
+2025-06-28 01:35:26,861 - ibapi.client - INFO - REQUEST reqMktData {'reqId': 1000, 'contract': 2445240123008: 0,AAPL,STK,,0.0,,,SMART,,USD,,,False,,combo:, 'genericTickList': '', 'snapshot': False, 'regulatorySnapshot': False, 'mktDataOptions': []}
+2025-06-28 01:35:26,861 - ibapi.client - INFO - SENDING reqMktData b'\x00\x00\x0011\x0011\x001000\x000\x00AAPL\x00STK\x00\x000.0\x00\x00\x00SMART\x00\x00USD\x00\x00\x000\x00\x000\x000\x00\x00'
+2025-06-28 01:35:26,862 - IBKRApi - INFO - Subscribed to market data for AAPL
+2025-06-28 01:35:26,863 - TradingEngine - INFO - Subscribed to market data for 1 symbols
+2025-06-28 01:35:26,864 - ibapi.client - INFO - REQUEST reqAccountSummary {'reqId': 9001, 'groupName': 'All', 'tags': 'TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower'}
+2025-06-28 01:35:26,865 - ibapi.client - INFO - SENDING reqAccountSummary b'\x00\x00\x00G62\x001\x009001\x00All\x00TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower\x00'
+2025-06-28 01:35:26,866 - ibapi.client - INFO - REQUEST reqPositions {}
+2025-06-28 01:35:26,868 - ibapi.client - INFO - SENDING reqPositions b'\x00\x00\x00\x0561\x001\x00'
+2025-06-28 01:35:26,874 - IBKRApi - INFO - Received 7 positions
+2025-06-28 01:35:27,088 - IBKRApi - INFO - Account summary received
+2025-06-28 01:35:27,315 - ibapi.wrapper - INFO - ANSWER tickReqParams {'tickerId': 1000, 'minTick': 0.01, 'bboExchange': '', 'snapshotPermissions': 0}
+2025-06-28 01:35:27,316 - ibapi.wrapper - INFO - ANSWER marketDataType {'reqId': 1000, 'marketDataType': 3}
+2025-06-28 01:35:27,319 - IBKRApi - WARNING - Error 10167: Requested market data is not subscribed. Displaying delayed market data.
+2025-06-28 01:35:27,744 - ibapi.wrapper - INFO - ANSWER tickString {'reqId': 1000, 'tickType': 88, 'value': '1751068783'}
+2025-06-28 01:35:28,873 - TradingEngine - INFO - Trading engine initialized successfully
+2025-06-28 01:35:28,880 - TradingEngine - INFO - Engine main loop started
+2025-06-28 01:35:28,881 - TradingEngine - INFO - Trading engine started
+2025-06-28 01:35:28,882 - CDMStrategy_AAPL - INFO - Starting new cycle at price 201.87
+2025-06-28 01:35:28,902 - CDMStrategy_AAPL - INFO - Position sizing: Account=$270,177.96, Base Allocation=2.5%, Multiplier=1.00, Dollar Amount=$6,754.45, Price=$201.87, Shares=33
+2025-06-28 01:35:28,906 - ibapi.client - INFO - REQUEST placeOrder {'orderId': 475, 'contract': 2445247682816: 0,AAPL,STK,,0.0,,,SMART,,USD,,,False,,combo:, 'order': 2445247683776: 0,0,0: MARKET BUY 33@179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368.000000 }
+2025-06-28 01:35:28,917 - ibapi.client - INFO - SENDING placeOrder b'\x00\x00\x01<3\x00475\x000\x00AAPL\x00STK\x00\x000.0\x00\x00\x00SMART\x00\x00USD\x00\x00\x00\x00\x00BUY\x0033.0\x00MARKET\x00\x00\x00\x00\x00\x00\x000\x00\x001\x000\x000\x000\x000\x000\x000\x000\x00\x000\x00\x00\x00\x00\x00\x00\x00\x000\x00\x00-1\x000\x00\x00\x000\x00\x00\x000\x000\x00\x000\x00\x00\x00\x00\x00\x000\x00\x00\x00\x00\x000\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x000\x00\x00\x000\x000\x00\x00\x000\x00\x000\x000\x000\x000\x00\x001.7976931348623157e+308\x001.7976931348623157e+308\x001.7976931348623157e+308\x001.7976931348623157e+308\x001.7976931348623157e+308\x000\x00\x00\x00\x001.7976931348623157e+308\x00\x00\x00\x00\x000\x000\x000\x00\x00'
+2025-06-28 01:35:28,925 - IBKRApi - INFO - Placed order 475: BUY 33.0 AAPL
+2025-06-28 01:35:28,930 - TradingEngine - INFO - Entry order placed for cdm on AAPL
+2025-06-28 01:35:28,944 - ibapi.client - INFO - REQUEST reqCurrentTime {}
+2025-06-28 01:35:28,946 - ibapi.client - INFO - SENDING reqCurrentTime b'\x00\x00\x00\x0549\x001\x00'
+2025-06-28 01:35:28,951 - ibapi.wrapper - INFO - ANSWER currentTime {'time': 1751070928}
+2025-06-28 01:35:29,271 - IBKRApi - INFO - Open order: 475 AAPL BUY 33.0
+2025-06-28 01:35:29,272 - IBKRApi - INFO - Order 475 status: Submitted, filled: 0.0
+2025-06-28 01:35:29,287 - IBKRApi - INFO - Execution: 00012ec5.685ee1ff.01.01 AAPL BOT 33.0@201.18
+2025-06-28 01:35:29,291 - IBKRApi - INFO - Order 475 status: Filled, filled: 33.0
+2025-06-28 01:35:29,292 - CDMStrategy_AAPL - INFO - Added position: 33.0 shares at 201.18
+2025-06-28 01:35:29,294 - TradingEngine - INFO - Order 475 filled at 201.18
+2025-06-28 01:35:29,298 - ibapi.wrapper - INFO - ANSWER commissionReport {'commissionReport': 2445240114992: ExecId: 00012ec5.685ee1ff.01.01, Commission: 1.001155, Currency: USD, RealizedPnL: , Yield: , YieldRedemptionDate: 0}
+2025-06-28 01:35:29,463 - ibapi.client - INFO - REQUEST reqAccountSummary {'reqId': 9001, 'groupName': 'All', 'tags': 'TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower'}
+2025-06-28 01:35:29,465 - ibapi.client - INFO - SENDING reqAccountSummary b'\x00\x00\x00G62\x001\x009001\x00All\x00TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower\x00'
+2025-06-28 01:35:29,903 - IBKRApi - INFO - Account summary received
+2025-06-28 01:35:29,975 - ibapi.client - INFO - REQUEST reqPositions {}
+2025-06-28 01:35:29,977 - ibapi.client - INFO - SENDING reqPositions b'\x00\x00\x00\x0561\x001\x00'
+2025-06-28 01:35:29,987 - IBKRApi - INFO - Received 7 positions
+2025-06-28 01:35:30,342 - ibapi.client - INFO - REQUEST reqCurrentTime {}
+2025-06-28 01:35:30,347 - ibapi.client - INFO - SENDING reqCurrentTime b'\x00\x00\x00\x0549\x001\x00'
+2025-06-28 01:35:30,352 - ibapi.wrapper - INFO - ANSWER currentTime {'time': 1751070929}
+2025-06-28 01:35:30,853 - ibapi.client - INFO - REQUEST reqAccountSummary {'reqId': 9001, 'groupName': 'All', 'tags': 'TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower'}
+2025-06-28 01:35:30,854 - ibapi.client - INFO - SENDING reqAccountSummary b'\x00\x00\x00G62\x001\x009001\x00All\x00TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower\x00'
+2025-06-28 01:35:31,110 - IBKRApi - INFO - Account summary received
+2025-06-28 01:35:31,364 - ibapi.client - INFO - REQUEST reqPositions {}
+2025-06-28 01:35:31,365 - ibapi.client - INFO - SENDING reqPositions b'\x00\x00\x00\x0561\x001\x00'
+2025-06-28 01:35:31,370 - IBKRApi - INFO - Received 7 positions
+2025-06-28 01:35:31,764 - ibapi.client - INFO - REQUEST reqExecutions {'reqId': 9002, 'execFilter': 2445246577536: Object}
+2025-06-28 01:35:31,766 - ibapi.client - INFO - SENDING reqExecutions b'\x00\x00\x00\x197\x003\x009002\x000\x00\x0020250529\x00\x00\x00\x00\x00'
+2025-06-28 01:35:31,767 - IBKRApi - INFO - Requested executions from 20250529
+2025-06-28 01:35:31,771 - IBKRApi - WARNING - Error 10314: Time: The date, time, or time-zone entered is invalid. The correct format is yyyymmdd hh:mm:ss xx/xxxx where yyyymmdd and xx/xxxx are optional. E.g.: 20031126 15:59:00 US/Eastern  Note that there is a space between the date and time, and between the time and time-zone.  If no date is specified, current date is assumed. If no time-zone is specified, local time-zone is assumed(deprecated).  You can also provide yyyymmddd-hh:mm:ss time is in UTC. Note that there is a dash between the date and time in UTC notation.
+2025-06-28 01:35:33,772 - ibapi.client - INFO - REQUEST reqAccountSummary {'reqId': 9001, 'groupName': 'All', 'tags': 'TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower'}
+2025-06-28 01:35:33,776 - ibapi.client - INFO - SENDING reqAccountSummary b'\x00\x00\x00G62\x001\x009001\x00All\x00TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower\x00'
+2025-06-28 01:35:34,043 - IBKRApi - INFO - Account summary received
+2025-06-28 01:35:34,885 - ibapi.client - INFO - REQUEST reqPositions {}
+2025-06-28 01:35:34,891 - ibapi.client - INFO - SENDING reqPositions b'\x00\x00\x00\x0561\x001\x00'
+2025-06-28 01:35:34,900 - IBKRApi - INFO - Received 7 positions
+2025-06-28 01:35:35,901 - ibapi.client - INFO - REQUEST reqExecutions {'reqId': 9002, 'execFilter': 2445247679024: Object}
+2025-06-28 01:35:35,902 - ibapi.client - INFO - SENDING reqExecutions b'\x00\x00\x00\x197\x003\x009002\x000\x00\x0020250621\x00\x00\x00\x00\x00'
+2025-06-28 01:35:35,904 - IBKRApi - INFO - Requested executions from 20250621
+2025-06-28 01:35:35,906 - IBKRApi - WARNING - Error 10314: Time: The date, time, or time-zone entered is invalid. The correct format is yyyymmdd hh:mm:ss xx/xxxx where yyyymmdd and xx/xxxx are optional. E.g.: 20031126 15:59:00 US/Eastern  Note that there is a space between the date and time, and between the time and time-zone.  If no date is specified, current date is assumed. If no time-zone is specified, local time-zone is assumed(deprecated).  You can also provide yyyymmddd-hh:mm:ss time is in UTC. Note that there is a dash between the date and time in UTC notation.
+2025-06-28 01:35:37,919 - ibapi.client - INFO - REQUEST reqPositions {}
+2025-06-28 01:35:37,920 - ibapi.client - INFO - SENDING reqPositions b'\x00\x00\x00\x0561\x001\x00'
+2025-06-28 01:35:37,928 - IBKRApi - INFO - Received 7 positions
+2025-06-28 01:36:13,770 - ibapi.client - INFO - REQUEST reqCurrentTime {}
+2025-06-28 01:36:13,771 - ibapi.client - INFO - SENDING reqCurrentTime b'\x00\x00\x00\x0549\x001\x00'
+2025-06-28 01:36:13,773 - ibapi.wrapper - INFO - ANSWER currentTime {'time': 1751070973}
+2025-06-28 01:36:14,286 - ibapi.client - INFO - REQUEST reqAccountSummary {'reqId': 9001, 'groupName': 'All', 'tags': 'TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower'}
+2025-06-28 01:36:14,289 - ibapi.client - INFO - SENDING reqAccountSummary b'\x00\x00\x00G62\x001\x009001\x00All\x00TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower\x00'
+2025-06-28 01:36:14,443 - IBKRApi - INFO - Account summary received
+2025-06-28 01:36:14,801 - ibapi.client - INFO - REQUEST reqPositions {}
+2025-06-28 01:36:14,803 - ibapi.client - INFO - SENDING reqPositions b'\x00\x00\x00\x0561\x001\x00'
+2025-06-28 01:36:14,810 - IBKRApi - INFO - Received 7 positions
+2025-06-28 01:36:15,168 - ibapi.client - INFO - REQUEST reqCurrentTime {}
+2025-06-28 01:36:15,170 - ibapi.client - INFO - SENDING reqCurrentTime b'\x00\x00\x00\x0549\x001\x00'
+2025-06-28 01:36:15,172 - ibapi.wrapper - INFO - ANSWER currentTime {'time': 1751070975}
+2025-06-28 01:36:15,536 - ibapi.client - INFO - REQUEST reqCurrentTime {}
+2025-06-28 01:36:15,537 - ibapi.client - INFO - SENDING reqCurrentTime b'\x00\x00\x00\x0549\x001\x00'
+2025-06-28 01:36:15,683 - ibapi.client - INFO - REQUEST reqAccountSummary {'reqId': 9001, 'groupName': 'All', 'tags': 'TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower'}
+2025-06-28 01:36:15,684 - ibapi.client - INFO - SENDING reqAccountSummary b'\x00\x00\x00G62\x001\x009001\x00All\x00TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower\x00'
+2025-06-28 01:36:15,953 - IBKRApi - INFO - Account summary received
+2025-06-28 01:36:16,054 - ibapi.client - INFO - REQUEST reqAccountSummary {'reqId': 9001, 'groupName': 'All', 'tags': 'TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower'}
+2025-06-28 01:36:16,056 - ibapi.client - INFO - SENDING reqAccountSummary b'\x00\x00\x00G62\x001\x009001\x00All\x00TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower\x00'
+2025-06-28 01:36:16,194 - ibapi.client - INFO - REQUEST reqPositions {}
+2025-06-28 01:36:16,195 - ibapi.client - INFO - SENDING reqPositions b'\x00\x00\x00\x0561\x001\x00'
+2025-06-28 01:36:16,199 - IBKRApi - INFO - Received 7 positions
+2025-06-28 01:36:16,316 - IBKRApi - INFO - Account summary received
+2025-06-28 01:36:16,620 - ibapi.client - INFO - REQUEST reqPositions {}
+2025-06-28 01:36:16,623 - ibapi.client - INFO - SENDING reqPositions b'\x00\x00\x00\x0561\x001\x00'
+2025-06-28 01:36:16,633 - IBKRApi - INFO - Received 7 positions
+2025-06-28 01:36:16,789 - ibapi.client - INFO - REQUEST reqCurrentTime {}
+2025-06-28 01:36:16,791 - ibapi.client - INFO - SENDING reqCurrentTime b'\x00\x00\x00\x0549\x001\x00'
+2025-06-28 01:36:16,794 - ibapi.wrapper - INFO - ANSWER currentTime {'time': 1751070976}
+2025-06-28 01:36:17,298 - ibapi.client - INFO - REQUEST reqAccountSummary {'reqId': 9001, 'groupName': 'All', 'tags': 'TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower'}
+2025-06-28 01:36:17,300 - ibapi.client - INFO - SENDING reqAccountSummary b'\x00\x00\x00G62\x001\x009001\x00All\x00TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower\x00'
+2025-06-28 01:36:17,783 - IBKRApi - INFO - Account summary received
+2025-06-28 01:36:17,809 - ibapi.client - INFO - REQUEST reqPositions {}
+2025-06-28 01:36:17,810 - ibapi.client - INFO - SENDING reqPositions b'\x00\x00\x00\x0561\x001\x00'
+2025-06-28 01:36:17,817 - IBKRApi - INFO - Received 7 positions
+2025-06-28 01:36:18,153 - ibapi.client - INFO - REQUEST reqCurrentTime {}
+2025-06-28 01:36:18,158 - ibapi.client - INFO - SENDING reqCurrentTime b'\x00\x00\x00\x0549\x001\x00'
+2025-06-28 01:36:18,162 - ibapi.wrapper - INFO - ANSWER currentTime {'time': 1751070978}
+2025-06-28 01:36:18,667 - ibapi.client - INFO - REQUEST reqAccountSummary {'reqId': 9001, 'groupName': 'All', 'tags': 'TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower'}
+2025-06-28 01:36:18,669 - ibapi.client - INFO - SENDING reqAccountSummary b'\x00\x00\x00G62\x001\x009001\x00All\x00TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower\x00'
+2025-06-28 01:36:19,007 - IBKRApi - INFO - Account summary received
+2025-06-28 01:36:19,183 - ibapi.client - INFO - REQUEST reqPositions {}
+2025-06-28 01:36:19,184 - ibapi.client - INFO - SENDING reqPositions b'\x00\x00\x00\x0561\x001\x00'
+2025-06-28 01:36:19,190 - IBKRApi - INFO - Received 7 positions
+2025-06-28 01:36:19,589 - ibapi.client - INFO - REQUEST reqExecutions {'reqId': 9002, 'execFilter': 2444792564608: Object}
+2025-06-28 01:36:19,591 - ibapi.client - INFO - SENDING reqExecutions b'\x00\x00\x00\x197\x003\x009002\x000\x00\x0020250529\x00\x00\x00\x00\x00'
+2025-06-28 01:36:19,594 - IBKRApi - INFO - Requested executions from 20250529
+2025-06-28 01:36:19,596 - IBKRApi - WARNING - Error 10314: Time: The date, time, or time-zone entered is invalid. The correct format is yyyymmdd hh:mm:ss xx/xxxx where yyyymmdd and xx/xxxx are optional. E.g.: 20031126 15:59:00 US/Eastern  Note that there is a space between the date and time, and between the time and time-zone.  If no date is specified, current date is assumed. If no time-zone is specified, local time-zone is assumed(deprecated).  You can also provide yyyymmddd-hh:mm:ss time is in UTC. Note that there is a dash between the date and time in UTC notation.
+2025-06-28 01:36:21,601 - ibapi.client - INFO - REQUEST reqAccountSummary {'reqId': 9001, 'groupName': 'All', 'tags': 'TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower'}
+2025-06-28 01:36:21,602 - ibapi.client - INFO - SENDING reqAccountSummary b'\x00\x00\x00G62\x001\x009001\x00All\x00TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower\x00'
+2025-06-28 01:36:21,887 - IBKRApi - INFO - Account summary received
+2025-06-28 01:36:22,715 - ibapi.client - INFO - REQUEST reqPositions {}
+2025-06-28 01:36:22,716 - ibapi.client - INFO - SENDING reqPositions b'\x00\x00\x00\x0561\x001\x00'
+2025-06-28 01:36:22,722 - IBKRApi - INFO - Received 7 positions
+2025-06-28 01:36:23,686 - ibapi.client - INFO - REQUEST reqExecutions {'reqId': 9002, 'execFilter': 2445210067600: Object}
+2025-06-28 01:36:23,688 - ibapi.client - INFO - SENDING reqExecutions b'\x00\x00\x00\x197\x003\x009002\x000\x00\x0020250621\x00\x00\x00\x00\x00'
+2025-06-28 01:36:23,692 - IBKRApi - INFO - Requested executions from 20250621
+2025-06-28 01:36:23,695 - IBKRApi - WARNING - Error 10314: Time: The date, time, or time-zone entered is invalid. The correct format is yyyymmdd hh:mm:ss xx/xxxx where yyyymmdd and xx/xxxx are optional. E.g.: 20031126 15:59:00 US/Eastern  Note that there is a space between the date and time, and between the time and time-zone.  If no date is specified, current date is assumed. If no time-zone is specified, local time-zone is assumed(deprecated).  You can also provide yyyymmddd-hh:mm:ss time is in UTC. Note that there is a dash between the date and time in UTC notation.
+2025-06-28 01:36:25,705 - ibapi.client - INFO - REQUEST reqPositions {}
+2025-06-28 01:36:25,709 - ibapi.client - INFO - SENDING reqPositions b'\x00\x00\x00\x0561\x001\x00'
+2025-06-28 01:36:25,719 - IBKRApi - INFO - Received 7 positions
+2025-06-28 01:37:32,290 - ibapi.client - INFO - REQUEST reqCurrentTime {}
+2025-06-28 01:37:32,291 - ibapi.client - INFO - SENDING reqCurrentTime b'\x00\x00\x00\x0549\x001\x00'
+2025-06-28 01:37:32,294 - ibapi.wrapper - INFO - ANSWER currentTime {'time': 1751071052}
+2025-06-28 01:37:32,801 - ibapi.client - INFO - REQUEST reqAccountSummary {'reqId': 9001, 'groupName': 'All', 'tags': 'TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower'}
+2025-06-28 01:37:32,803 - ibapi.client - INFO - SENDING reqAccountSummary b'\x00\x00\x00G62\x001\x009001\x00All\x00TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower\x00'
+2025-06-28 01:37:33,168 - IBKRApi - INFO - Account summary received
+2025-06-28 01:37:33,314 - ibapi.client - INFO - REQUEST reqPositions {}
+2025-06-28 01:37:33,315 - ibapi.client - INFO - SENDING reqPositions b'\x00\x00\x00\x0561\x001\x00'
+2025-06-28 01:37:33,326 - IBKRApi - INFO - Received 7 positions
+2025-06-28 01:37:33,678 - ibapi.client - INFO - REQUEST reqCurrentTime {}
+2025-06-28 01:37:33,679 - ibapi.client - INFO - SENDING reqCurrentTime b'\x00\x00\x00\x0549\x001\x00'
+2025-06-28 01:37:33,682 - ibapi.wrapper - INFO - ANSWER currentTime {'time': 1751071053}
+2025-06-28 01:37:34,190 - ibapi.client - INFO - REQUEST reqAccountSummary {'reqId': 9001, 'groupName': 'All', 'tags': 'TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower'}
+2025-06-28 01:37:34,193 - ibapi.client - INFO - SENDING reqAccountSummary b'\x00\x00\x00G62\x001\x009001\x00All\x00TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower\x00'
+2025-06-28 01:37:34,462 - IBKRApi - INFO - Account summary received
+2025-06-28 01:37:34,703 - ibapi.client - INFO - REQUEST reqPositions {}
+2025-06-28 01:37:34,707 - ibapi.client - INFO - SENDING reqPositions b'\x00\x00\x00\x0561\x001\x00'
+2025-06-28 01:37:34,716 - IBKRApi - INFO - Received 7 positions
+2025-06-28 01:37:35,082 - ibapi.client - INFO - REQUEST reqExecutions {'reqId': 9002, 'execFilter': 2445247681376: Object}
+2025-06-28 01:37:35,084 - ibapi.client - INFO - SENDING reqExecutions b'\x00\x00\x00\x197\x003\x009002\x000\x00\x0020250529\x00\x00\x00\x00\x00'
+2025-06-28 01:37:35,090 - IBKRApi - INFO - Requested executions from 20250529
+2025-06-28 01:37:35,096 - IBKRApi - WARNING - Error 10314: Time: The date, time, or time-zone entered is invalid. The correct format is yyyymmdd hh:mm:ss xx/xxxx where yyyymmdd and xx/xxxx are optional. E.g.: 20031126 15:59:00 US/Eastern  Note that there is a space between the date and time, and between the time and time-zone.  If no date is specified, current date is assumed. If no time-zone is specified, local time-zone is assumed(deprecated).  You can also provide yyyymmddd-hh:mm:ss time is in UTC. Note that there is a dash between the date and time in UTC notation.
+2025-06-28 01:37:37,107 - ibapi.client - INFO - REQUEST reqAccountSummary {'reqId': 9001, 'groupName': 'All', 'tags': 'TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower'}
+2025-06-28 01:37:37,108 - ibapi.client - INFO - SENDING reqAccountSummary b'\x00\x00\x00G62\x001\x009001\x00All\x00TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower\x00'
+2025-06-28 01:37:37,468 - IBKRApi - INFO - Account summary received
+2025-06-28 01:37:38,234 - ibapi.client - INFO - REQUEST reqPositions {}
+2025-06-28 01:37:38,236 - ibapi.client - INFO - SENDING reqPositions b'\x00\x00\x00\x0561\x001\x00'
+2025-06-28 01:37:38,244 - IBKRApi - INFO - Received 7 positions
+2025-06-28 01:37:46,429 - ibapi.client - INFO - REQUEST reqCurrentTime {}
+2025-06-28 01:37:46,430 - ibapi.client - INFO - SENDING reqCurrentTime b'\x00\x00\x00\x0549\x001\x00'
+2025-06-28 01:37:46,433 - ibapi.wrapper - INFO - ANSWER currentTime {'time': 1751071066}
+2025-06-28 01:37:46,934 - ibapi.client - INFO - REQUEST reqAccountSummary {'reqId': 9001, 'groupName': 'All', 'tags': 'TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower'}
+2025-06-28 01:37:46,936 - ibapi.client - INFO - SENDING reqAccountSummary b'\x00\x00\x00G62\x001\x009001\x00All\x00TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower\x00'
+2025-06-28 01:37:47,208 - IBKRApi - INFO - Account summary received
+2025-06-28 01:37:47,443 - ibapi.client - INFO - REQUEST reqPositions {}
+2025-06-28 01:37:47,444 - ibapi.client - INFO - SENDING reqPositions b'\x00\x00\x00\x0561\x001\x00'
+2025-06-28 01:37:47,451 - IBKRApi - INFO - Received 7 positions
+2025-06-28 01:37:47,809 - ibapi.client - INFO - REQUEST reqCurrentTime {}
+2025-06-28 01:37:47,811 - ibapi.client - INFO - SENDING reqCurrentTime b'\x00\x00\x00\x0549\x001\x00'
+2025-06-28 01:37:47,813 - ibapi.wrapper - INFO - ANSWER currentTime {'time': 1751071067}
+2025-06-28 01:37:48,319 - ibapi.client - INFO - REQUEST reqAccountSummary {'reqId': 9001, 'groupName': 'All', 'tags': 'TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower'}
+2025-06-28 01:37:48,321 - ibapi.client - INFO - SENDING reqAccountSummary b'\x00\x00\x00G62\x001\x009001\x00All\x00TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower\x00'
+2025-06-28 01:37:48,622 - IBKRApi - INFO - Account summary received
+2025-06-28 01:37:48,837 - ibapi.client - INFO - REQUEST reqPositions {}
+2025-06-28 01:37:48,838 - ibapi.client - INFO - SENDING reqPositions b'\x00\x00\x00\x0561\x001\x00'
+2025-06-28 01:37:48,850 - IBKRApi - INFO - Received 7 positions
+2025-06-28 01:37:49,204 - ibapi.client - INFO - REQUEST reqExecutions {'reqId': 9002, 'execFilter': 2444792564752: Object}
+2025-06-28 01:37:49,209 - ibapi.client - INFO - SENDING reqExecutions b'\x00\x00\x00\x197\x003\x009002\x000\x00\x0020250529\x00\x00\x00\x00\x00'
+2025-06-28 01:37:49,211 - IBKRApi - INFO - Requested executions from 20250529
+2025-06-28 01:37:49,216 - IBKRApi - WARNING - Error 10314: Time: The date, time, or time-zone entered is invalid. The correct format is yyyymmdd hh:mm:ss xx/xxxx where yyyymmdd and xx/xxxx are optional. E.g.: 20031126 15:59:00 US/Eastern  Note that there is a space between the date and time, and between the time and time-zone.  If no date is specified, current date is assumed. If no time-zone is specified, local time-zone is assumed(deprecated).  You can also provide yyyymmddd-hh:mm:ss time is in UTC. Note that there is a dash between the date and time in UTC notation.
+2025-06-28 01:37:51,223 - ibapi.client - INFO - REQUEST reqAccountSummary {'reqId': 9001, 'groupName': 'All', 'tags': 'TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower'}
+2025-06-28 01:37:51,225 - ibapi.client - INFO - SENDING reqAccountSummary b'\x00\x00\x00G62\x001\x009001\x00All\x00TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower\x00'
+2025-06-28 01:37:51,499 - IBKRApi - INFO - Account summary received
+2025-06-28 01:37:52,326 - ibapi.client - INFO - REQUEST reqPositions {}
+2025-06-28 01:37:52,328 - ibapi.client - INFO - SENDING reqPositions b'\x00\x00\x00\x0561\x001\x00'
+2025-06-28 01:37:52,334 - IBKRApi - INFO - Received 7 positions
+2025-06-28 01:37:53,328 - ibapi.client - INFO - REQUEST reqExecutions {'reqId': 9002, 'execFilter': 2445245169232: Object}
+2025-06-28 01:37:53,330 - ibapi.client - INFO - SENDING reqExecutions b'\x00\x00\x00\x197\x003\x009002\x000\x00\x0020250621\x00\x00\x00\x00\x00'
+2025-06-28 01:37:53,332 - IBKRApi - INFO - Requested executions from 20250621
+2025-06-28 01:37:53,334 - IBKRApi - WARNING - Error 10314: Time: The date, time, or time-zone entered is invalid. The correct format is yyyymmdd hh:mm:ss xx/xxxx where yyyymmdd and xx/xxxx are optional. E.g.: 20031126 15:59:00 US/Eastern  Note that there is a space between the date and time, and between the time and time-zone.  If no date is specified, current date is assumed. If no time-zone is specified, local time-zone is assumed(deprecated).  You can also provide yyyymmddd-hh:mm:ss time is in UTC. Note that there is a dash between the date and time in UTC notation.
+2025-06-28 01:37:55,348 - ibapi.client - INFO - REQUEST reqPositions {}
+2025-06-28 01:37:55,350 - ibapi.client - INFO - SENDING reqPositions b'\x00\x00\x00\x0561\x001\x00'
+2025-06-28 01:37:55,357 - IBKRApi - INFO - Received 7 positions
+2025-06-28 01:38:46,352 - ibapi.client - INFO - REQUEST reqCurrentTime {}
+2025-06-28 01:38:46,352 - ibapi.client - INFO - SENDING reqCurrentTime b'\x00\x00\x00\x0549\x001\x00'
+2025-06-28 01:38:46,354 - ibapi.wrapper - INFO - ANSWER currentTime {'time': 1751071125}
+2025-06-28 01:38:46,856 - ibapi.client - INFO - REQUEST reqAccountSummary {'reqId': 9001, 'groupName': 'All', 'tags': 'TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower'}
+2025-06-28 01:38:46,857 - ibapi.client - INFO - SENDING reqAccountSummary b'\x00\x00\x00G62\x001\x009001\x00All\x00TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower\x00'
+2025-06-28 01:38:47,312 - IBKRApi - INFO - Account summary received
+2025-06-28 01:38:47,374 - ibapi.client - INFO - REQUEST reqPositions {}
+2025-06-28 01:38:47,375 - ibapi.client - INFO - SENDING reqPositions b'\x00\x00\x00\x0561\x001\x00'
+2025-06-28 01:38:47,381 - IBKRApi - INFO - Received 7 positions
+2025-06-28 01:38:47,726 - ibapi.client - INFO - REQUEST reqCurrentTime {}
+2025-06-28 01:38:47,728 - ibapi.client - INFO - SENDING reqCurrentTime b'\x00\x00\x00\x0549\x001\x00'
+2025-06-28 01:38:47,731 - ibapi.wrapper - INFO - ANSWER currentTime {'time': 1751071126}
+2025-06-28 01:38:48,238 - ibapi.client - INFO - REQUEST reqAccountSummary {'reqId': 9001, 'groupName': 'All', 'tags': 'TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower'}
+2025-06-28 01:38:48,239 - ibapi.client - INFO - SENDING reqAccountSummary b'\x00\x00\x00G62\x001\x009001\x00All\x00TotalCashValue,NetLiquidation,AvailableFunds,BuyingPower\x00'
+2025-06-28 01:38:48,524 - IBKRApi - INFO - Account summary received
+2025-06-28 01:38:48,754 - ibapi.client - INFO - REQUEST reqPositions {}
+2025-06-28 01:38:48,754 - ibapi.client - INFO - SENDING reqPositions b'\x00\x00\x00\x0561\x001\x00'
+2025-06-28 01:38:48,760 - IBKRApi - INFO - Received 7 positions
+2025-06-28 01:45:35,665 - IBKRApi - INFO - Connecting to IB at 127.0.0.1:4002
+2025-06-28 01:45:35,686 - ibapi.client - INFO - sent startApi
+2025-06-28 01:45:35,687 - ibapi.client - INFO - REQUEST startApi {}
+2025-06-28 01:45:35,687 - ibapi.client - INFO - SENDING startApi b'\x00\x00\x00\n71\x002\x00999\x00\x00'
+2025-06-28 01:45:35,688 - IBKRApi - INFO - Connection acknowledged
+2025-06-28 01:45:36,309 - ibapi.client - INFO - disconnecting
+2025-06-28 01:45:36,311 - ibapi.wrapper - INFO - ANSWER connectionClosed {}
+2025-06-28 01:45:50,696 - IBKRApi - ERROR - Connection timeout - could not connect to IB within 15 seconds
+2025-06-28 01:45:53,712 - IBKRApi - WARNING - Connection lost, attempting to reconnect...
+2025-06-28 01:45:53,713 - IBKRApi - INFO - Connecting to IB at 127.0.0.1:4002
+2025-06-28 01:45:53,727 - ibapi.client - INFO - sent startApi
+2025-06-28 01:45:53,728 - ibapi.client - INFO - REQUEST startApi {}
+2025-06-28 01:45:53,729 - ibapi.client - INFO - SENDING startApi b'\x00\x00\x00\n71\x002\x00999\x00\x00'
+2025-06-28 01:45:53,730 - IBKRApi - INFO - Connection acknowledged
+2025-06-28 01:45:54,359 - ibapi.client - INFO - disconnecting
+2025-06-28 01:45:54,360 - ibapi.wrapper - INFO - ANSWER connectionClosed {}
+2025-06-28 01:46:13,747 - IBKRApi - ERROR - Connection timeout - could not connect to IB within 20 seconds
+2025-06-28 01:46:13,750 - IBKRApi - INFO - Disconnected from IB and cleaned up resources
+2025-06-28 01:46:13,755 - IBKRApi - INFO - Connecting to IB at 127.0.0.1:4002
+2025-06-28 01:46:13,776 - ibapi.client - INFO - sent startApi
+2025-06-28 01:46:13,778 - ibapi.client - INFO - REQUEST startApi {}
+2025-06-28 01:46:13,780 - ibapi.client - INFO - SENDING startApi b'\x00\x00\x00\n71\x002\x00999\x00\x00'
+2025-06-28 01:46:13,782 - IBKRApi - INFO - Connection acknowledged
+2025-06-28 01:46:14,425 - ibapi.client - INFO - disconnecting
+2025-06-28 01:46:14,429 - ibapi.wrapper - INFO - ANSWER connectionClosed {}
+2025-06-28 01:46:28,785 - IBKRApi - ERROR - Connection timeout - could not connect to IB within 15 seconds
