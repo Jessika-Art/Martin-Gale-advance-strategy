@@ -78,7 +78,7 @@ class SharedSettings:
     enable_daily_limits: bool = False
     
     # Drawdown protection
-    max_portfolio_drawdown_pct: float = 100.0  # 10% max drawdown
+    max_portfolio_drawdown_pct: float = 100.0  # 100% max drawdown
     enable_drawdown_protection: bool = False
     
     # === GLOBAL TRADING SETTINGS ===
@@ -166,8 +166,8 @@ class SharedSettings:
         if self.max_concurrent_symbols <= 0:
             errors.append("max_concurrent_symbols must be positive")
         
-        if self.max_orders_per_symbol <= 0 or self.max_orders_per_symbol > 50:
-            errors.append("max_orders_per_symbol must be between 1 and 50")
+        if self.max_orders_per_symbol <= 0 or self.max_orders_per_symbol > 50000:
+            errors.append("max_orders_per_symbol must be between 1 and 50000")
         
         # Validate daily limits
         if self.global_daily_loss_limit <= 0:

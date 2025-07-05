@@ -171,11 +171,16 @@ class BaseStrategy(ABC):
     
     def calculate_position_size(self, leg_number: int, account_balance: float, current_price: float = None) -> float:
         """Calculate position size for a given leg (returns number of shares)"""
+        # Debug logging for input parameters
+        self.logger.info(f"calculate_position_size called with leg_number={leg_number}, account_balance={account_balance}, current_price={current_price}")
+        
         if leg_number >= len(self.settings.order_sizes):
             # Use last size if we exceed defined sizes
             size_multiplier = self.settings.order_sizes[-1]
         else:
             size_multiplier = self.settings.order_sizes[leg_number]
+        
+        self.logger.info(f"Using size_multiplier={size_multiplier} for leg {leg_number}")
         
         # Check if using fixed position sizing
         if hasattr(self.settings, 'position_size_unit') and self.settings.position_size_unit == 'FIXED':
@@ -199,15 +204,27 @@ class BaseStrategy(ABC):
         # Convert to shares if current price is available
         if current_price and current_price > 0:
             shares = dollar_amount / current_price
-            # Allow fractional shares and apply reasonable safety limits
+            
+            # Apply reasonable safety limits
             shares = max(0.001, min(shares, 100000))  # Min 0.001 shares, max 100000 shares
             
             self.logger.info(f"Percentage position sizing: Account=${account_balance:,.2f}, Base Allocation={base_allocation:.1%}, Multiplier={size_multiplier:.2f}, Dollar Amount=${dollar_amount:,.2f}, Price=${current_price:.2f}, Shares={shares:.6f}")
-            return float(shares)
+            
+            # backtesting.py requires either a fraction (0 < size < 1) or a whole number (>= 1)
+            if shares < 1.0:
+                # If less than 1, treat as percentage of equity
+                final_result = float(shares)
+            else:
+                # If >= 1, must be a whole number of shares
+                shares = round(shares)
+                final_result = float(shares)
+            
+            return final_result
         else:
             # Fallback: return a conservative number of shares
             fallback_shares = min(100.0, dollar_amount / 100.0)
             self.logger.warning(f"No current price available. Using fallback: {fallback_shares} shares (assuming $100/share)")
+            self.logger.info(f"DEBUG: Returning fallback shares={fallback_shares}")
             return fallback_shares
     
     def get_distance_threshold(self, leg_number: int) -> float:

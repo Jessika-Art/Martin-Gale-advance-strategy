@@ -1090,7 +1090,7 @@ def render_shared_settings_config(control_panel: ControlPanel):
                  min_value=0.0,
                  max_value=100.0,
                  value=shared.max_portfolio_drawdown_pct,
-                 step=1.0,
+                 step=0.01,
                  key="max_portfolio_drawdown_pct",
                  help="Maximum drawdown percentage before emergency stop"
              )
@@ -1107,18 +1107,18 @@ def render_shared_settings_config(control_panel: ControlPanel):
                 shared.global_trailing_distance_pct = st.number_input(
                      "Trailing Stop (%)",
                      min_value=0.0,
-                     max_value=50.0,
+                     max_value=100.0,
                      value=shared.global_trailing_distance_pct,
-                     step=0.5,
+                     step=0.01,
                      key="global_trailing_distance_pct",
                      help="Trailing stop percentage")
                  
                 shared.global_trailing_trigger_pct = st.number_input(
                      "Trailing Activation (%)",
                      min_value=0.0,
-                     max_value=50.0,
+                     max_value=100.0,
                      value=shared.global_trailing_trigger_pct,
-                     step=0.5,
+                     step=0.01,
                      key="global_trailing_trigger_pct",
                      help="Profit percentage to activate trailing stops"
                  )

@@ -16,7 +16,7 @@ from ui.config_manager import dict_to_config
 def test_backtest():
     try:
         # Load configuration from JSON file
-        config_file = 'C:\\Users\\amari\\Desktop\\MartinGales\\config_my_config_test_1.json'
+        config_file = 'C:\\Users\\amari\\Desktop\\MartinGales\\config_my_64.json'
         with open(config_file, 'r') as f:
             config_dict = json.load(f)
         config = dict_to_config(config_dict)
