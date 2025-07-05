@@ -7,3 +7,5 @@
 2025-07-05 21:39:49,825 - ControlPanel - WARNING - Configuration file trading_config.json not found, creating default
 2025-07-05 21:39:49,835 - ControlPanel - INFO - Configuration saved to trading_config.json
 2025-07-05 21:40:18,913 - ControlPanel - WARNING - No trading engine to stop
+2025-07-05 22:35:16,090 - ControlPanel - INFO - Configuration loaded from trading_config.json
+2025-07-05 22:35:45,614 - ControlPanel - WARNING - No trading engine to stop

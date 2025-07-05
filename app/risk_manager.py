@@ -31,7 +31,8 @@ class GlobalRiskManager:
                  daily_loss_limit: float = 1000.0, 
                  daily_profit_target: float = 2000.0,
                  enable_daily_limits: bool = True,
-                 max_cycles_per_day: int = 100):
+                 max_cycles_per_day: int = 100,
+                 initial_date: Optional[date] = None):
         self.max_concurrent_cycles = max_concurrent_cycles
         self.daily_loss_limit = daily_loss_limit
         self.daily_profit_target = daily_profit_target
@@ -40,7 +41,8 @@ class GlobalRiskManager:
         
         # Daily tracking
         self.daily_metrics: Dict[date, DailyRiskMetrics] = {}
-        self.current_date = date.today()
+        # Use provided initial_date for backtesting, otherwise use today for live trading
+        self.current_date = initial_date if initial_date is not None else date.today()
         
         # Active cycle tracking
         self.active_cycles: Dict[str, str] = {}  # cycle_id -> strategy_type

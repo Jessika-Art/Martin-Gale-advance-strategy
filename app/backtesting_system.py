@@ -327,6 +327,7 @@ class BacktestingAdapter:
                         # Execute buy order
                         cost = position_size * current_price
                         self.strategy_cash[strategy_type] -= cost
+                        self.logger.info(f"ENTRY TRADE: {strategy_type.value} - Cost: ${cost:.2f}, Remaining cash: ${self.strategy_cash[strategy_type]:.2f}")
                         
                         # Create trade record
                         trade = Trade(
@@ -362,6 +363,10 @@ class BacktestingAdapter:
                         
                         # Place order in backtesting framework
                         self.buy(size=position_size)
+                    elif position_size > 0:
+                        required_cash = position_size * current_price
+                        self.logger.warning(f"ENTRY SKIPPED: {strategy_type.value} - Need: ${required_cash:.2f}, Available: ${available_cash:.2f}, Shortfall: ${required_cash - available_cash:.2f}")
+                        return  # Skip the rest of the entry logic
                 
                 # Add leg logic
                 elif strategy.should_add_leg(market_data) and strategy.is_active:
@@ -380,12 +385,14 @@ class BacktestingAdapter:
                     if position_size > 0 and available_cash >= position_size * current_price:
                         cost = position_size * current_price
                         self.strategy_cash[strategy_type] -= cost
+                        self.logger.info(f"LEG TRADE: {strategy_type.value} - Cost: ${cost:.2f}, Remaining cash: ${self.strategy_cash[strategy_type]:.2f}")
                         
                         # Create trade record for additional leg
                         cycle_id = self.active_cycles[strategy_type]
                         
                         # Register trade with risk manager
                         self.risk_manager.register_trade(cost, cost * 0.002)
+                        
                         if cycle_id:
                             trade = Trade(
                                 trade_id=f"{cycle_id}_trade_{len(strategy.positions) + 1}",
@@ -417,6 +424,10 @@ class BacktestingAdapter:
                         
                         # Place order in backtesting framework
                         self.buy(size=position_size)
+                    elif position_size > 0:
+                        required_cash = position_size * current_price
+                        self.logger.warning(f"LEG SKIPPED: {strategy_type.value} - Need: ${required_cash:.2f}, Available: ${available_cash:.2f}, Shortfall: ${required_cash - available_cash:.2f}")
+                        return  # Skip the rest of the leg logic
                 
                 # Exit logic
                 elif strategy.should_exit(market_data) and strategy.is_active:
@@ -455,6 +466,7 @@ class BacktestingAdapter:
                         
                         # Update strategy cash
                         self.strategy_cash[strategy_type] += total_value
+                        self.logger.info(f"EXIT TRADE: {strategy_type.value} - Received: ${total_value:.2f}, New cash: ${self.strategy_cash[strategy_type]:.2f}, Profit: ${profit:.2f}")
                         
                         # Update strategy statistics
                         strategy.total_cycles += 1
@@ -489,6 +501,12 @@ class BacktestingAdapter:
         try:
             # Reset cycle analyzer for new backtest
             self.cycle_analyzer.reset_analysis()
+            
+            # Update risk manager with backtest start date to avoid using today's date
+            from datetime import datetime
+            backtest_start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+            self.risk_manager.current_date = backtest_start_date
+            self.risk_manager._ensure_daily_metrics(backtest_start_date)
             
             # Fetch data
             data = self.fetch_data(symbol, start_date, end_date, interval)

@@ -13,7 +13,7 @@
   "position_size_type": "PERCENTAGE",
   "position_size_value": 5.0,
   "cdm_settings": {
-    "enabled": false,
+    "enabled": true,
     "capital_allocation": 0.25,
     "initial_trade_type": "BUY",
     "symbol": "AAPL",

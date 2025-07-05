@@ -16,7 +16,7 @@
     "enabled": true,
     "capital_allocation": 0.25,
     "initial_trade_type": "BUY",
-    "symbol": "AAPL",
+    "symbol": "spyy",
     "price_trigger": null,
     "max_orders": 5,
     "hold_previous": true,
@@ -28,11 +28,11 @@
       1.0
     ],
     "order_sizes": [
-      0.1,
-      0.1,
-      0.1,
-      0.1,
-      0.1
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
     ],
     "order_tps": [
       1.0,
@@ -790,7 +790,7 @@
     "progressive_reinvestment_step": 0.05,
     "global_position_size_unit": "SHARES",
     "global_fixed_position_size": 20.0,
-    "global_percentage_of_portfolio": 5.0,
+    "global_percentage_of_portfolio": 100.0,
     "enable_strategy_coordination": false,
     "global_strategy_alignment": "PARALLEL",
     "global_strategy_to_start_with": "CDM",

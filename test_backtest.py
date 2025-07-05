@@ -2,11 +2,21 @@
 
 import sys
 import os
+import logging
 sys.path.append('C:\\Users\\amari\\Desktop\\MartinGales')
 sys.path.append('C:\\Users\\amari\\Desktop\\MartinGales\\app')
 
 # Change to the app directory to make relative imports work
 os.chdir('C:\\Users\\amari\\Desktop\\MartinGales\\app')
+
+# Setup logging to see cash flow and backtest dates
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler()
+    ]
+)
 
 from backtesting_system import BacktestingAdapter
 from config import TradingConfig
@@ -26,8 +36,24 @@ def test_backtest():
         selected_strategies = [StrategyType.CDM]  # Only CDM is enabled
         bt_adapter = BacktestingAdapter(config, selected_strategies)
         
-        # Run backtest (using recent dates for 1h data)
-        bt, metrics, cycle_report = bt_adapter.run_backtest('AAPL', '2024-01-01', '2024-12-01', '1h', 100000)
+        # Add custom logging to track backtest dates
+        original_next = None
+        
+        def log_backtest_date(self):
+            current_time = self.data.index[-1]
+            if hasattr(self, '_last_logged_date'):
+                if current_time.date() != self._last_logged_date:
+                    print(f"\n=== BACKTEST DATE: {current_time.date()} ===")
+                    self._last_logged_date = current_time.date()
+            else:
+                print(f"\n=== BACKTEST DATE: {current_time.date()} ===")
+                self._last_logged_date = current_time.date()
+            
+            # Call original next method
+            return original_next(self)
+        
+        # Run backtest (using the same date range as user reported)
+        bt, metrics, cycle_report = bt_adapter.run_backtest('AAPL', '2024-04-06', '2025-07-05', '1h', 100000)
         
         # Print results
         print(f"\n=== BACKTEST RESULTS ===")
