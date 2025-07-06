@@ -153,8 +153,7 @@ class ControlPanel:
                     "order_distances": [2.0, 3.0, 4.0, 5.0, 6.0],
                     "order_sizes": [1.0, 1.5, 2.0, 2.5, 3.0],
                     "order_tps": [1.0, 1.5, 2.0, 2.5, 3.0],
-                    "zone_center_price": None,
-                    "zone_width_pct": 5.0
+                    "zone_center_price": None
                 },
                 "IZRM": {
                     "enabled": False,
@@ -165,8 +164,7 @@ class ControlPanel:
                     "order_distances": [2.0, 3.0, 4.0, 5.0, 6.0],
                     "order_sizes": [1.0, 1.5, 2.0, 2.5, 3.0],
                     "order_sls": [2.0, 3.0, 4.0, 5.0, 6.0],
-                    "zone_center_price": None,
-                    "zone_width_pct": 5.0
+                    "zone_center_price": None
                 }
             },
             "trading_parameters": {
@@ -263,8 +261,7 @@ class ControlPanel:
                 order_distances=zrm_data["order_distances"],
                 order_sizes=zrm_data["order_sizes"],
                 order_tps=zrm_data["order_tps"],
-                zone_center_price=zrm_data["zone_center_price"],
-                zone_width_pct=zrm_data["zone_width_pct"]
+                zone_center_price=zrm_data["zone_center_price"]
             )
             
             # IZRM Settings
@@ -279,8 +276,7 @@ class ControlPanel:
                 order_distances=izrm_data["order_distances"],
                 order_sizes=izrm_data["order_sizes"],
                 order_sls=izrm_data["order_sls"],
-                zone_center_price=izrm_data["zone_center_price"],
-                zone_width_pct=izrm_data["zone_width_pct"]
+                zone_center_price=izrm_data["zone_center_price"]
             )
         
         # Trading Configuration

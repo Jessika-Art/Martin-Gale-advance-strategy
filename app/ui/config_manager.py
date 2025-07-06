@@ -554,14 +554,7 @@ def render_zrm_settings(config: TradingConfig, key_suffix: int = 0):
             zrm_settings.zone_center_price = None
     
     with col2:
-        zrm_settings.zone_width_pct = st.number_input(
-            "Zone Width %",
-            min_value=0.1,
-            max_value=50.0,
-            value=zrm_settings.zone_width_pct,
-            step=0.1,
-            key=f"zrm_zone_width_pct_{key_suffix}"
-        )
+        st.info("Zone width functionality has been removed from ZRM strategy")
     
     with col3:
         zrm_settings.trailing_stops = st.checkbox(
@@ -742,14 +735,7 @@ def render_izrm_settings(config: TradingConfig, key_suffix: int = 0):
             izrm_settings.zone_center_price = None
     
     with col2:
-        izrm_settings.zone_width_pct = st.number_input(
-            "Zone Width %",
-            min_value=0.1,
-            max_value=50.0,
-            value=izrm_settings.zone_width_pct,
-            step=0.1,
-            key=f"izrm_zone_width_pct_{key_suffix}"
-        )
+        st.info("Zone width functionality has been removed from IZRM strategy")
     
     # Order Configuration
     st.subheader("Order Configuration")
@@ -1291,7 +1277,7 @@ def load_preset_config(control_panel: ControlPanel, strategy_type: str):
         config.zrm_settings.enabled = True
         config.zrm_settings.capital_allocation = 1.0
         config.zrm_settings.max_orders = 5
-        config.zrm_settings.zone_width_pct = 5.0
+
         config.zrm_settings.order_distances = [1.0, 1.5, 2.0, 2.5, 3.0]
         config.zrm_settings.order_sizes = [1.0, 1.5, 2.0, 2.5, 3.0]
         config.zrm_settings.order_tps = [1.0, 1.0, 1.0, 1.0, 1.0]
@@ -1302,7 +1288,7 @@ def load_preset_config(control_panel: ControlPanel, strategy_type: str):
         config.izrm_settings.enabled = True
         config.izrm_settings.capital_allocation = 1.0
         config.izrm_settings.max_orders = 5
-        config.izrm_settings.zone_width_pct = 5.0
+
         config.izrm_settings.order_distances = [1.0, 1.5, 2.0, 2.5, 3.0]
         config.izrm_settings.order_sizes = [1.0, 1.5, 2.0, 2.5, 3.0]
         config.izrm_settings.order_sls = [2.0, 2.0, 2.0, 2.0, 2.0]
@@ -1350,7 +1336,6 @@ def config_to_dict(config: TradingConfig) -> Dict[str, Any]:
         'zrm_settings': {
             **settings_to_dict(config.zrm_settings),
             'zone_center_price': config.zrm_settings.zone_center_price,
-            'zone_width_pct': config.zrm_settings.zone_width_pct,
             'order_tps': config.zrm_settings.order_tps,
             'trailing_stops': config.zrm_settings.trailing_stops,
             'trailing_trigger_pct': getattr(config.zrm_settings, 'trailing_trigger_pct', [3.0] * 5),
@@ -1361,7 +1346,6 @@ def config_to_dict(config: TradingConfig) -> Dict[str, Any]:
         'izrm_settings': {
             **settings_to_dict(config.izrm_settings),
             'zone_center_price': config.izrm_settings.zone_center_price,
-            'zone_width_pct': config.izrm_settings.zone_width_pct,
             'order_sls': config.izrm_settings.order_sls
         },
         'shared_settings': {
@@ -1470,8 +1454,7 @@ def dict_to_config(config_dict: Dict[str, Any]) -> TradingConfig:
     if zrm_dict:
         if 'zone_center_price' in zrm_dict:
             config.zrm_settings.zone_center_price = zrm_dict['zone_center_price']
-        if 'zone_width_pct' in zrm_dict:
-            config.zrm_settings.zone_width_pct = zrm_dict['zone_width_pct']
+
         if 'order_tps' in zrm_dict:
             config.zrm_settings.order_tps = zrm_dict['order_tps']
         if 'trailing_stops' in zrm_dict:
@@ -1491,8 +1474,7 @@ def dict_to_config(config_dict: Dict[str, Any]) -> TradingConfig:
     if izrm_dict:
         if 'zone_center_price' in izrm_dict:
             config.izrm_settings.zone_center_price = izrm_dict['zone_center_price']
-        if 'zone_width_pct' in izrm_dict:
-            config.izrm_settings.zone_width_pct = izrm_dict['zone_width_pct']
+
         if 'order_sls' in izrm_dict:
             config.izrm_settings.order_sls = izrm_dict['order_sls']
     

@@ -38,7 +38,6 @@ def demo_trailing_stops():
         order_tps=[1.5, 2.0, 2.5],
         capital_allocation=0.1,
         zone_center_price=150.0,
-        zone_width_pct=5.0,
         trailing_trigger_pct=[3.0, 4.0, 5.0],  # New: Profit % to trigger trailing
         trailing_distance_pct=[1.0, 1.5, 2.0]  # New: Trailing stop distance %
     )

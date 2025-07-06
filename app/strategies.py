@@ -3,7 +3,7 @@
 import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import List, Optional, Dict, Tuple
+from typing import List, Optional, Dict
 from enum import Enum
 import time
 from datetime import datetime
@@ -84,6 +84,13 @@ class BaseStrategy(ABC):
         self.is_active = False
         self.cycle_start_time: Optional[datetime] = None
         self.position_direction = 'long'  # Default to long positions for most strategies
+        
+        # Zone and boundary tracking for ZRM/IZRM strategies
+        self.last_boundary_touched: Optional[str] = None  # 'upper' or 'lower'
+        self.zone_upper_boundary: Optional[float] = None
+        self.zone_lower_boundary: Optional[float] = None
+        self.net_position: float = 0.0  # Net position across all legs
+        self.last_order_action: Optional[OrderAction] = None  # Track last order type for alternating
         
         # Strategy coordination state
         self.other_strategies: Dict[StrategyType, 'BaseStrategy'] = {}
@@ -242,6 +249,7 @@ class BaseStrategy(ABC):
         self.positions.clear()
         self.pending_orders.clear()
         self.reset_trailing_stops()  # Reset trailing stops for new cycle
+        self.reset_zone_tracking()  # Reset zone tracking for new cycle
         self.logger.info(f"Starting new cycle at price {market_data.price}")
     
     def end_cycle(self, market_data: MarketData):
@@ -289,7 +297,14 @@ class BaseStrategy(ABC):
             entry_time=datetime.now()
         )
         self.positions.append(position)
-        self.logger.info(f"Added position: {position.quantity} shares at {fill_price}")
+        
+        # Update net position tracking
+        self.update_net_position(order_request.quantity, order_request.action)
+        
+        # Track last order action for alternating logic
+        self.last_order_action = order_request.action
+        
+        self.logger.info(f"Added position: {position.quantity} shares at {fill_price}, Net position: {self.net_position}")
     
     def get_total_position(self) -> float:
         """Get total position size across all legs"""
@@ -393,6 +408,52 @@ class BaseStrategy(ABC):
         
         # Then check alignment conditions
         return self.can_enter_based_on_alignment(market_data)
+    
+    def calculate_zone_boundaries(self, zone_center: float, leg_number: int) -> tuple:
+        """Calculate zone boundaries based on distance thresholds"""
+        distance_threshold = self.get_distance_threshold(leg_number)
+        upper_boundary = zone_center * (1 + distance_threshold / 100)
+        lower_boundary = zone_center * (1 - distance_threshold / 100)
+        return upper_boundary, lower_boundary
+    
+    def update_net_position(self, quantity: float, action: OrderAction):
+        """Update net position tracking"""
+        if action == OrderAction.BUY:
+            self.net_position += quantity
+        else:
+            self.net_position -= quantity
+    
+    def get_net_position(self) -> float:
+        """Get current net position"""
+        return self.net_position
+    
+    def detect_boundary_touched(self, market_data: MarketData, zone_center: float, leg_number: int) -> Optional[str]:
+        """Detect which boundary was touched and return 'upper' or 'lower'"""
+        upper_boundary, lower_boundary = self.calculate_zone_boundaries(zone_center, leg_number)
+        
+        if market_data.price >= upper_boundary:
+            return 'upper'
+        elif market_data.price <= lower_boundary:
+            return 'lower'
+        return None
+    
+    def get_alternating_action(self, boundary_touched: str) -> OrderAction:
+        """Get alternating order action based on boundary touched and last action"""
+        # For ZRM: alternate between BUY/SELL based on boundary
+        # Upper boundary touch -> SELL (hedge against further rise)
+        # Lower boundary touch -> BUY (hedge against further fall)
+        if boundary_touched == 'upper':
+            return OrderAction.SELL if self.last_order_action != OrderAction.SELL else OrderAction.BUY
+        else:  # lower boundary
+            return OrderAction.BUY if self.last_order_action != OrderAction.BUY else OrderAction.SELL
+    
+    def reset_zone_tracking(self):
+        """Reset zone and boundary tracking for new cycle"""
+        self.last_boundary_touched = None
+        self.zone_upper_boundary = None
+        self.zone_lower_boundary = None
+        self.net_position = 0.0
+        self.last_order_action = None
     
     def get_performance_stats(self) -> Dict:
         """Get strategy performance statistics"""
@@ -527,45 +588,63 @@ class ZRMStrategy(BaseStrategy):
     def __init__(self, settings):
         super().__init__(settings, StrategyType.ZRM)
         self.zone_center = settings.zone_center_price
-        self.zone_width = settings.zone_width_pct
-        
-    def get_zone_boundaries(self) -> Tuple[float, float]:
-        """Get upper and lower zone boundaries"""
-        if self.zone_center is None:
-            return 0.0, 0.0
-        
-        half_width = self.zone_center * (self.zone_width / 100) / 2
-        lower_bound = self.zone_center - half_width
-        upper_bound = self.zone_center + half_width
-        return lower_bound, upper_bound
     
     def should_enter(self, market_data: MarketData) -> bool:
-        """Enter when price is within the zone"""
+        """Enter when price matches zone center"""
         if self.is_active:
             return False
         
         if self.zone_center is None:
             self.zone_center = market_data.price
+            return True
         
-        lower_bound, upper_bound = self.get_zone_boundaries()
-        return lower_bound <= market_data.price <= upper_bound
+        return market_data.price == self.zone_center
     
     def should_add_leg(self, market_data: MarketData) -> bool:
-        """Add leg when price touches zone boundary"""
+        """Add leg based on zone boundary touches with alternating logic"""
         if not self.is_active or self.current_leg >= self.settings.max_orders:
             return False
         
-        lower_bound, upper_bound = self.get_zone_boundaries()
+        if self.zone_center is None:
+            return False
         
-        # Add leg when touching boundaries
-        return (market_data.price <= lower_bound or market_data.price >= upper_bound)
+        # Detect which boundary was touched
+        boundary_touched = self.detect_boundary_touched(market_data, self.zone_center, self.current_leg)
+        
+        if boundary_touched:
+            # Update boundary tracking
+            self.last_boundary_touched = boundary_touched
+            
+            # Update zone boundaries for this leg
+            self.zone_upper_boundary, self.zone_lower_boundary = self.calculate_zone_boundaries(
+                self.zone_center, self.current_leg
+            )
+            
+            return True
+        
+        return False
+    
+    def get_leg_order_action(self, market_data: MarketData) -> OrderAction:
+        """Get order action for current leg based on boundary touched and alternating logic"""
+        if self.last_boundary_touched:
+            return self.get_alternating_action(self.last_boundary_touched)
+        
+        # Default to BUY for first leg or when no boundary detected
+        return OrderAction.BUY
     
     def should_exit(self, market_data: MarketData) -> bool:
-        """Exit when price re-enters zone and hits take profit or trailing stop is triggered"""
+        """Exit when hitting take profit, trailing stop, or net position is profitable"""
         if not self.is_active or not self.positions:
             return False
         
-        # Check trailing stops for each position (can trigger outside zone)
+        # Calculate net position PnL
+        net_pnl = self.calculate_net_position_pnl(market_data.price)
+        
+        # Exit if net position is profitable (basic recovery achieved)
+        if net_pnl > 0:
+            return True
+        
+        # Check trailing stops for each position
         for i, position in enumerate(self.positions):
             # Calculate current profit percentage for this position
             current_profit_pct = ((market_data.price - position.avg_price) / position.avg_price) * 100
@@ -573,12 +652,6 @@ class ZRMStrategy(BaseStrategy):
             # Check if trailing stop should be triggered
             if self.update_trailing_stops(market_data, current_profit_pct, i):
                 return True
-        
-        lower_bound, upper_bound = self.get_zone_boundaries()
-        
-        # Must be back in zone for regular take profit
-        if not (lower_bound <= market_data.price <= upper_bound):
-            return False
         
         # Check take profit levels
         for i, position in enumerate(self.positions):
@@ -590,6 +663,18 @@ class ZRMStrategy(BaseStrategy):
                     return True
         
         return False
+    
+    def calculate_net_position_pnl(self, current_price: float) -> float:
+        """Calculate PnL based on net position"""
+        if not self.positions:
+            return 0.0
+        
+        total_pnl = 0.0
+        for position in self.positions:
+            position_pnl = (current_price - position.avg_price) * position.quantity
+            total_pnl += position_pnl
+        
+        return total_pnl
 
 class IZRMStrategy(BaseStrategy):
     """Inverse Zone Recovery Martingale Strategy"""
@@ -597,21 +682,10 @@ class IZRMStrategy(BaseStrategy):
     def __init__(self, settings):
         super().__init__(settings, StrategyType.IZRM)
         self.zone_center = settings.zone_center_price
-        self.zone_width = settings.zone_width_pct
         self.breakout_direction = None
     
-    def get_zone_boundaries(self) -> Tuple[float, float]:
-        """Get upper and lower zone boundaries"""
-        if self.zone_center is None:
-            return 0.0, 0.0
-        
-        half_width = self.zone_center * (self.zone_width / 100) / 2
-        lower_bound = self.zone_center - half_width
-        upper_bound = self.zone_center + half_width
-        return lower_bound, upper_bound
-    
     def should_enter(self, market_data: MarketData) -> bool:
-        """Enter when price breaks out of zone"""
+        """Enter when price moves away from zone center"""
         if self.is_active:
             return False
         
@@ -619,44 +693,70 @@ class IZRMStrategy(BaseStrategy):
             self.zone_center = market_data.price
             return False
         
-        lower_bound, upper_bound = self.get_zone_boundaries()
-        
-        # Enter on breakout
-        if market_data.price > upper_bound:
+        # Enter when price moves away from center
+        if market_data.price > self.zone_center:
             self.breakout_direction = "UP"
             return True
-        elif market_data.price < lower_bound:
+        elif market_data.price < self.zone_center:
             self.breakout_direction = "DOWN"
             return True
         
         return False
     
     def should_add_leg(self, market_data: MarketData) -> bool:
-        """Add leg when price continues in breakout direction"""
+        """Add leg based on zone boundary touches in breakout direction"""
         if not self.is_active or self.current_leg >= self.settings.max_orders:
             return False
         
-        if self.entry_price is None:
+        if self.zone_center is None:
             return False
         
-        distance_threshold = self.get_distance_threshold(self.current_leg)
+        # Detect boundary touch in breakout direction
+        boundary_touched = self.detect_boundary_touched(market_data, self.zone_center, self.current_leg)
         
+        if boundary_touched:
+            # For IZRM, only add legs in the breakout direction
+            if (self.breakout_direction == "UP" and boundary_touched == "upper") or \
+               (self.breakout_direction == "DOWN" and boundary_touched == "lower"):
+                
+                # Update boundary tracking
+                self.last_boundary_touched = boundary_touched
+                
+                # Update zone boundaries for this leg
+                self.zone_upper_boundary, self.zone_lower_boundary = self.calculate_zone_boundaries(
+                    self.zone_center, self.current_leg
+                )
+                
+                return True
+        
+        return False
+    
+    def get_leg_order_action(self, market_data: MarketData) -> OrderAction:
+        """Get order action for current leg based on breakout direction and alternating logic"""
+        if self.last_boundary_touched:
+            # For IZRM, use alternating logic but consider breakout direction
+            return self.get_alternating_action(self.last_boundary_touched)
+        
+        # Default action based on breakout direction
         if self.breakout_direction == "UP":
-            required_price = self.entry_price * (1 + distance_threshold / 100)
-            return market_data.price >= required_price
+            return OrderAction.SELL  # Sell into strength
         else:
-            required_price = self.entry_price * (1 - distance_threshold / 100)
-            return market_data.price <= required_price
+            return OrderAction.BUY   # Buy into weakness
     
     def should_exit(self, market_data: MarketData) -> bool:
-        """Exit when price reverses back into zone"""
+        """Exit when price reverses back to zone center, net position is profitable, or hits stop loss"""
         if not self.is_active or not self.positions:
             return False
         
-        lower_bound, upper_bound = self.get_zone_boundaries()
+        # Calculate net position PnL
+        net_pnl = self.calculate_net_position_pnl(market_data.price)
         
-        # Exit when back in zone
-        if lower_bound <= market_data.price <= upper_bound:
+        # Exit if net position is profitable (recovery achieved)
+        if net_pnl > 0:
+            return True
+        
+        # Exit when back at zone center (reversal)
+        if abs(market_data.price - self.zone_center) / self.zone_center < 0.001:  # Within 0.1% of center
             return True
         
         # Also check stop loss levels
@@ -674,6 +774,18 @@ class IZRMStrategy(BaseStrategy):
                         return True
         
         return False
+    
+    def calculate_net_position_pnl(self, current_price: float) -> float:
+        """Calculate PnL based on net position"""
+        if not self.positions:
+            return 0.0
+        
+        total_pnl = 0.0
+        for position in self.positions:
+            position_pnl = (current_price - position.avg_price) * position.quantity
+            total_pnl += position_pnl
+        
+        return total_pnl
 
 def create_strategy(strategy_type: StrategyType, settings: StrategySettings) -> BaseStrategy:
     """Factory function to create strategy instances"""

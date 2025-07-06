@@ -317,7 +317,6 @@ class WDMSettings(StrategySettings):
 class ZRMSettings(StrategySettings):
     """Zone Recovery Martingale settings"""
     zone_center_price: Optional[float] = None
-    zone_width_pct: float = 5.0  # 5% zone width
     order_tps: List[float] = field(default_factory=lambda: [1.0, 1.0, 1.0, 1.0, 1.0] + [1.0] * 45)  # Take profit % for 50 legs
     trailing_stops: bool = False
     trailing_trigger_pct: List[float] = field(default_factory=lambda: [3.0, 3.0, 3.0, 3.0, 3.0] + [3.0] * 45)  # Profit % to trigger trailing
@@ -330,7 +329,6 @@ class ZRMSettings(StrategySettings):
 class IZRMSettings(StrategySettings):
     """Inverse Zone Recovery Martingale settings"""
     zone_center_price: Optional[float] = None
-    zone_width_pct: float = 5.0  # 5% zone width
     order_sls: List[float] = field(default_factory=lambda: [1.0, 1.0, 1.0, 1.0, 1.0] + [1.0] * 45)  # Stop loss % for 50 legs
 
 @dataclass

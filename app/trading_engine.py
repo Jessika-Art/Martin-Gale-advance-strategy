@@ -344,17 +344,23 @@ class TradingEngine:
             self.logger.error(f"Error handling strategy entry: {e}")
     
     def _handle_strategy_add_leg(self, strategy: BaseStrategy, market_data: MarketData):
-        """Handle adding another leg to strategy"""
+        """Handle adding another leg to strategy with alternating order logic"""
         try:
             # Calculate position size for this leg
             account_balance = self.api.get_account_balance()
             position_size = strategy.calculate_position_size(strategy.current_leg, account_balance, market_data.price)
             
-            # Determine order action (same as initial for martingale)
-            if strategy.strategy_type in [StrategyType.CDM, StrategyType.ZRM]:
-                action = OrderAction.BUY
+            # Determine order action based on strategy type and boundary logic
+            if strategy.strategy_type in [StrategyType.ZRM, StrategyType.IZRM]:
+                # Use strategy-specific alternating logic for zone strategies
+                if hasattr(strategy, 'get_leg_order_action'):
+                    action = strategy.get_leg_order_action(market_data)
+                else:
+                    action = OrderAction.BUY  # Fallback
+            elif strategy.strategy_type == StrategyType.CDM:
+                action = OrderAction.BUY  # Counter-trend: always buy on dips
             else:
-                action = OrderAction.BUY
+                action = OrderAction.BUY  # Default for other strategies
             
             # Create order request
             order_request = OrderRequest(
@@ -371,7 +377,7 @@ class TradingEngine:
             if order_id:
                 self.pending_orders[order_id] = order_request
                 strategy.current_leg += 1
-                self.logger.info(f"Added leg {strategy.current_leg} for {strategy.strategy_type.value} on {market_data.symbol}")
+                self.logger.info(f"Added leg {strategy.current_leg} ({action.value}) for {strategy.strategy_type.value} on {market_data.symbol}, Boundary: {getattr(strategy, 'last_boundary_touched', 'N/A')}")
             
         except Exception as e:
             self.logger.error(f"Error adding strategy leg: {e}")
