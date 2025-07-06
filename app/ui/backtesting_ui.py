@@ -50,6 +50,10 @@ def render_backtesting_interface(config: TradingConfig):
     if 'backtest_selected_strategies' not in st.session_state:
         st.session_state.backtest_selected_strategies = []
     
+    # Initialize session state for stored backtests
+    if 'stored_backtests' not in st.session_state:
+        st.session_state.stored_backtests = {}
+    
     # Create two columns for layout
     col1, col2 = st.columns([1, 1])
     
@@ -372,7 +376,8 @@ def render_backtesting_interface(config: TradingConfig):
                         'strategies': selected_strategies,
                         'timeframe': timeframe_display,
                         'start_date': start_date,
-                        'end_date': end_date
+                        'end_date': end_date,
+                        'timestamp': datetime.now()
                     }
                     
                     st.success("✅ Backtest completed successfully!")
@@ -689,21 +694,422 @@ def render_backtesting_interface(config: TradingConfig):
                 except Exception as e:
                     st.error(f"Error preparing download: {str(e)}")
             
+            # Detailed Trades Table
+            st.markdown("---")
+            render_title_with_tooltip(
+                "📋 Detailed Trades History", 
+                "Complete list of all trades executed during the backtest with entry/exit details, P&L, and performance metrics",
+                "header"
+            )
+            
+            try:
+                # Get trades data from backtest results
+                bt_result = results['bt']
+                trades_data = bt_result._results['_trades']
+                
+                if not trades_data.empty:
+                    # Process and format trades data for display
+                    trades_display = trades_data.copy()
+                    
+                    # Format datetime columns
+                    if 'EntryTime' in trades_display.columns:
+                        trades_display['Entry Date'] = pd.to_datetime(trades_display['EntryTime']).dt.strftime('%Y-%m-%d %H:%M')
+                    if 'ExitTime' in trades_display.columns:
+                        trades_display['Exit Date'] = pd.to_datetime(trades_display['ExitTime']).dt.strftime('%Y-%m-%d %H:%M')
+                    
+                    # Format price columns
+                    if 'EntryPrice' in trades_display.columns:
+                        trades_display['Entry Price'] = trades_display['EntryPrice'].round(4)
+                    if 'ExitPrice' in trades_display.columns:
+                        trades_display['Exit Price'] = trades_display['ExitPrice'].round(4)
+                    
+                    # Format P&L and percentage columns
+                    if 'PnL' in trades_display.columns:
+                        trades_display['P&L ($)'] = trades_display['PnL'].round(2)
+                        trades_display['Result'] = trades_display['PnL'].apply(lambda x: '✅ Win' if x > 0 else '❌ Loss' if x < 0 else '➖ Break-even')
+                    
+                    if 'ReturnPct' in trades_display.columns:
+                        trades_display['Return (%)'] = (trades_display['ReturnPct'] * 100).round(2)
+                    
+                    # Calculate trade duration if both entry and exit times are available
+                    if 'EntryTime' in trades_display.columns and 'ExitTime' in trades_display.columns:
+                        duration = pd.to_datetime(trades_display['ExitTime']) - pd.to_datetime(trades_display['EntryTime'])
+                        trades_display['Duration'] = duration.apply(lambda x: f"{x.total_seconds() / 3600:.1f}h" if pd.notna(x) else 'N/A')
+                    
+                    # Add trade number
+                    trades_display['Trade #'] = range(1, len(trades_display) + 1)
+                    
+                    # Select and reorder columns for display
+                    display_columns = ['Trade #']
+                    if 'Entry Date' in trades_display.columns:
+                        display_columns.append('Entry Date')
+                    if 'Exit Date' in trades_display.columns:
+                        display_columns.append('Exit Date')
+                    if 'Duration' in trades_display.columns:
+                        display_columns.append('Duration')
+                    if 'Size' in trades_display.columns:
+                        display_columns.append('Size')
+                    if 'Entry Price' in trades_display.columns:
+                        display_columns.append('Entry Price')
+                    if 'Exit Price' in trades_display.columns:
+                        display_columns.append('Exit Price')
+                    if 'P&L ($)' in trades_display.columns:
+                        display_columns.append('P&L ($)')
+                    if 'Return (%)' in trades_display.columns:
+                        display_columns.append('Return (%)')
+                    if 'Result' in trades_display.columns:
+                        display_columns.append('Result')
+                    
+                    # Filter to only include columns that exist
+                    available_columns = [col for col in display_columns if col in trades_display.columns]
+                    
+                    if available_columns:
+                        trades_table = trades_display[available_columns]
+                        
+                        # Display summary metrics
+                        col1, col2, col3, col4 = st.columns(4)
+                        with col1:
+                            total_trades = len(trades_table)
+                            st.metric("Total Trades", total_trades)
+                        with col2:
+                            if 'P&L ($)' in trades_table.columns:
+                                winning_trades = len(trades_table[trades_table['P&L ($)'] > 0])
+                                st.metric("Winning Trades", winning_trades)
+                        with col3:
+                            if 'P&L ($)' in trades_table.columns:
+                                losing_trades = len(trades_table[trades_table['P&L ($)'] < 0])
+                                st.metric("Losing Trades", losing_trades)
+                        with col4:
+                            if 'P&L ($)' in trades_table.columns and total_trades > 0:
+                                win_rate = (winning_trades / total_trades * 100)
+                                st.metric("Win Rate", f"{win_rate:.1f}%")
+                        
+                        # Display the trades table
+                        st.markdown("**📊 All Trades:**")
+                        st.dataframe(
+                            trades_table,
+                            use_container_width=True,
+                            hide_index=True,
+                            column_config={
+                                'P&L ($)': st.column_config.NumberColumn(
+                                    'P&L ($)',
+                                    format="$%.2f"
+                                ),
+                                'Return (%)': st.column_config.NumberColumn(
+                                    'Return (%)',
+                                    format="%.2f%%"
+                                ),
+                                'Entry Price': st.column_config.NumberColumn(
+                                    'Entry Price',
+                                    format="$%.4f"
+                                ),
+                                'Exit Price': st.column_config.NumberColumn(
+                                    'Exit Price',
+                                    format="$%.4f"
+                                )
+                            }
+                        )
+                        
+                        # Download trades data
+                        if st.button("📥 Download Trades CSV", key="download_trades_csv"):
+                            trades_csv = trades_table.to_csv(index=False)
+                            st.download_button(
+                                label="💾 Download Trades Data",
+                                data=trades_csv,
+                                file_name=f"trades_history_{results['symbol']}_{results['start_date']}_{results['end_date']}.csv",
+                                mime="text/csv",
+                                key="download_trades_button"
+                            )
+                    else:
+                        st.info("📊 No trade columns available for display.")
+                else:
+                    st.info("📊 No trades were executed during this backtest.")
+                    
+            except Exception as e:
+                 st.error(f"Error displaying trades data: {str(e)}")
+                 st.info("💡 Trades table unavailable - this may occur with certain strategy configurations.")
+             
+            # Detailed Cycles Table
+            st.markdown("---")
+            render_title_with_tooltip(
+                "🔄 Detailed Cycles History", 
+                "Complete analysis of all trading cycles including investment levels, recovery patterns, and performance metrics",
+                "header"
+            )
+             
+            try:
+                # Get trades data and convert to cycles
+                bt_result = results['bt']
+                trades_data = bt_result._results['_trades']
+                
+                if not trades_data.empty:
+                    # Convert trades to cycles (simplified approach - each trade = one cycle)
+                    cycles_display_data = []
+                    cycle_id = 1
+                    
+                    for _, trade in trades_data.iterrows():
+                        if trade['Size'] > 0:  # Entry trade
+                            # Calculate cycle metrics
+                            investment = abs(trade['Size'] * trade['EntryPrice'])
+                            pnl = trade['PnL'] if 'PnL' in trade else 0
+                            
+                            # Calculate duration
+                            if 'EntryTime' in trade and 'ExitTime' in trade:
+                                entry_time = pd.to_datetime(trade['EntryTime'])
+                                exit_time = pd.to_datetime(trade['ExitTime'])
+                                duration_hours = (exit_time - entry_time).total_seconds() / 3600
+                                duration_str = f"{duration_hours:.1f}h"
+                            else:
+                                duration_str = "N/A"
+                            
+                            # Calculate ROI
+                            roi_pct = (pnl / investment * 100) if investment > 0 else 0
+                            
+                            # Determine cycle result
+                            if pnl > 0:
+                                result = "✅ Profitable"
+                                result_emoji = "✅"
+                            elif pnl < 0:
+                                result = "❌ Loss"
+                                result_emoji = "❌"
+                            else:
+                                result = "➖ Break-even"
+                                result_emoji = "➖"
+                            
+                            cycle_data = {
+                                'Cycle #': cycle_id,
+                                'Start Time': entry_time.strftime('%Y-%m-%d %H:%M') if 'EntryTime' in trade else 'N/A',
+                                'End Time': exit_time.strftime('%Y-%m-%d %H:%M') if 'ExitTime' in trade else 'N/A',
+                                'Duration': duration_str,
+                                'Strategy': results.get('strategy', 'Backtest'),
+                                'Symbol': results['symbol'],
+                                'Investment ($)': investment,
+                                'Max Investment ($)': investment,  # Simplified - same as investment for single trades
+                                'Entry Price': trade['EntryPrice'] if 'EntryPrice' in trade else 0,
+                                'Exit Price': trade['ExitPrice'] if 'ExitPrice' in trade else 0,
+                                'Position Size': abs(trade['Size']) if 'Size' in trade else 0,
+                                'Realized P&L ($)': pnl,
+                                'ROI (%)': roi_pct,
+                                'Result': result,
+                                'Status': '✅ Completed'
+                            }
+                            cycles_display_data.append(cycle_data)
+                            cycle_id += 1
+                    
+                    if cycles_display_data:
+                        cycles_df = pd.DataFrame(cycles_display_data)
+                        
+                        # Display cycle summary metrics
+                        col1, col2, col3, col4, col5 = st.columns(5)
+                        
+                        with col1:
+                            total_cycles = len(cycles_df)
+                            st.metric("Total Cycles", total_cycles)
+                        
+                        with col2:
+                            profitable_cycles = len(cycles_df[cycles_df['Realized P&L ($)'] > 0])
+                            st.metric("Profitable Cycles", profitable_cycles)
+                        
+                        with col3:
+                            losing_cycles = len(cycles_df[cycles_df['Realized P&L ($)'] < 0])
+                            st.metric("Losing Cycles", losing_cycles)
+                        
+                        with col4:
+                            if total_cycles > 0:
+                                cycle_win_rate = (profitable_cycles / total_cycles * 100)
+                                st.metric("Cycle Win Rate", f"{cycle_win_rate:.1f}%")
+                        
+                        with col5:
+                            avg_cycle_pnl = cycles_df['Realized P&L ($)'].mean()
+                            st.metric("Avg P&L per Cycle", f"${avg_cycle_pnl:.2f}")
+                        
+                        # Additional cycle metrics
+                        col6, col7, col8, col9 = st.columns(4)
+                        
+                        with col6:
+                            total_investment = cycles_df['Investment ($)'].sum()
+                            st.metric("Total Investment", f"${total_investment:,.2f}")
+                        
+                        with col7:
+                            total_pnl = cycles_df['Realized P&L ($)'].sum()
+                            st.metric("Total P&L", f"${total_pnl:.2f}")
+                        
+                        with col8:
+                            avg_duration = cycles_df['Duration'].apply(lambda x: float(x.replace('h', '')) if 'h' in str(x) else 0).mean()
+                            st.metric("Avg Duration", f"{avg_duration:.1f}h")
+                        
+                        with col9:
+                            overall_roi = (total_pnl / total_investment * 100) if total_investment > 0 else 0
+                            st.metric("Overall ROI", f"{overall_roi:.2f}%")
+                        
+                        # Display the cycles table
+                        st.markdown("**🔄 All Cycles:**")
+                        st.dataframe(
+                            cycles_df,
+                            use_container_width=True,
+                            hide_index=True,
+                            column_config={
+                                'Investment ($)': st.column_config.NumberColumn(
+                                    'Investment ($)',
+                                    format="$%.2f"
+                                ),
+                                'Max Investment ($)': st.column_config.NumberColumn(
+                                    'Max Investment ($)',
+                                    format="$%.2f"
+                                ),
+                                'Realized P&L ($)': st.column_config.NumberColumn(
+                                    'Realized P&L ($)',
+                                    format="$%.2f"
+                                ),
+                                'ROI (%)': st.column_config.NumberColumn(
+                                    'ROI (%)',
+                                    format="%.2f%%"
+                                ),
+                                'Entry Price': st.column_config.NumberColumn(
+                                    'Entry Price',
+                                    format="$%.4f"
+                                ),
+                                'Exit Price': st.column_config.NumberColumn(
+                                    'Exit Price',
+                                    format="$%.4f"
+                                ),
+                                'Position Size': st.column_config.NumberColumn(
+                                    'Position Size',
+                                    format="%.4f"
+                                )
+                            }
+                        )
+                        
+                        # Download cycles data
+                        if st.button("📥 Download Cycles CSV", key="download_cycles_csv"):
+                            cycles_csv = cycles_df.to_csv(index=False)
+                            st.download_button(
+                                label="💾 Download Cycles Data",
+                                data=cycles_csv,
+                                file_name=f"cycles_history_{results['symbol']}_{results['start_date']}_{results['end_date']}.csv",
+                                mime="text/csv",
+                                key="download_cycles_button"
+                            )
+                        
+                        # Cycle Performance Analysis
+                        st.markdown("**📊 Cycle Performance Analysis:**")
+                        
+                        # Performance distribution chart
+                        col_chart1, col_chart2 = st.columns(2)
+                        
+                        with col_chart1:
+                            # P&L Distribution
+                            import plotly.express as px
+                            fig_pnl = px.histogram(
+                                cycles_df,
+                                x='Realized P&L ($)',
+                                nbins=15,
+                                title="Cycle P&L Distribution",
+                                labels={'x': 'P&L ($)', 'y': 'Number of Cycles'}
+                            )
+                            fig_pnl.update_layout(showlegend=False, height=400)
+                            st.plotly_chart(fig_pnl, use_container_width=True)
+                        
+                        with col_chart2:
+                            # ROI Distribution
+                            fig_roi = px.histogram(
+                                cycles_df,
+                                x='ROI (%)',
+                                nbins=15,
+                                title="Cycle ROI Distribution",
+                                labels={'x': 'ROI (%)', 'y': 'Number of Cycles'}
+                            )
+                            fig_roi.update_layout(showlegend=False, height=400)
+                            st.plotly_chart(fig_roi, use_container_width=True)
+                        
+                        # Duration vs P&L scatter plot
+                        if 'Duration' in cycles_df.columns:
+                            duration_numeric = cycles_df['Duration'].apply(lambda x: float(x.replace('h', '')) if 'h' in str(x) else 0)
+                            fig_scatter = px.scatter(
+                                x=duration_numeric,
+                                y=cycles_df['Realized P&L ($)'],
+                                title="Cycle Duration vs P&L",
+                                labels={'x': 'Duration (hours)', 'y': 'P&L ($)'},
+                                color=cycles_df['Realized P&L ($)'],
+                                color_continuous_scale='RdYlGn'
+                            )
+                            fig_scatter.update_layout(height=400)
+                            st.plotly_chart(fig_scatter, use_container_width=True)
+                    
+                    else:
+                        st.info("📊 No cycles data available for display.")
+                else:
+                    st.info("📊 No trades were executed during this backtest - no cycles to analyze.")
+                    
+            except Exception as e:
+                st.error(f"Error displaying cycles data: {str(e)}")
+                st.info("💡 Cycles table unavailable - this may occur with certain strategy configurations.")
+             
+             # Save Backtest Section - Always visible when results are available
+            st.markdown("---")
+            st.markdown("**💾 Save Backtest for Comparison**")
+            
+            # Initialize save expander state if not exists
+            if 'save_expander_open' not in st.session_state:
+                st.session_state.save_expander_open = True
+            
+            with st.expander("💾 Save This Backtest", expanded=st.session_state.save_expander_open):
+                col_save1, col_save2 = st.columns([3, 1])
+                
+                with col_save1:
+                    # Generate default name based on current backtest
+                    symbol = results.get('symbol', 'UNKNOWN')
+                    start_date = results.get('start_date', 'UNKNOWN')
+                    end_date = results.get('end_date', 'UNKNOWN')
+                    
+                    # Format dates if they are datetime objects
+                    if hasattr(start_date, 'strftime'):
+                        start_str = start_date.strftime('%Y%m%d')
+                    else:
+                        start_str = str(start_date).replace('-', '')
+                    
+                    if hasattr(end_date, 'strftime'):
+                        end_str = end_date.strftime('%Y%m%d')
+                    else:
+                        end_str = str(end_date).replace('-', '')
+                    
+                    default_name = f"{symbol}_{start_str}_{end_str}"
+                    
+                    # Initialize backtest name in session state if not exists
+                    if 'current_backtest_name' not in st.session_state:
+                        st.session_state.current_backtest_name = default_name
+                    
+                    backtest_name = st.text_input(
+                        "Backtest Name:",
+                        value=st.session_state.current_backtest_name,
+                        help="Enter a unique name for this backtest to save it for comparison",
+                        key="save_backtest_name_input"
+                    )
+                    
+                    # Update session state when name changes
+                    if backtest_name != st.session_state.current_backtest_name:
+                        st.session_state.current_backtest_name = backtest_name
+                
+                with col_save2:
+                    if st.button("💾 Save Backtest", use_container_width=True, key="save_backtest_btn"):
+                        if backtest_name.strip():
+                            if backtest_name in st.session_state.stored_backtests:
+                                st.warning(f"⚠️ Backtest '{backtest_name}' already exists. Choose a different name.")
+                            else:
+                                # Store the backtest
+                                st.session_state.stored_backtests[backtest_name] = st.session_state.backtest_results.copy()
+                                st.success(f"✅ Backtest '{backtest_name}' saved successfully!")
+                                st.info(f"📊 Total saved backtests: {len(st.session_state.stored_backtests)}")
+                                # Reset the name for next backtest
+                                st.session_state.current_backtest_name = default_name
+                        else:
+                            st.error("❌ Please enter a valid backtest name.")
+            
             # Add Cycle Analysis Section
             render_cycle_analysis_section(results)
-        
-        else:
-            st.info("👆 Configure your backtest parameters and click 'Run Backtest' to see results.")
-            
-            # Show example
-            st.markdown("**💡 Example Configuration:**")
-            st.markdown("""
-            - **Strategies**: CDM (Counter Direction Martingale)
-            - **Symbol**: AAPL
-            - **Period**: Last 6 months
-            - **Timeframe**: 1 Hour
-            - **Initial Cash**: $100,000
-            """)
+    
+    # Add Backtest Comparison Section
+    render_backtest_comparison_section()
 
 def render_cycle_analysis_section(results):
     """Render cycle analysis section from backtest results"""
@@ -829,6 +1235,581 @@ def render_cycle_analysis_section(results):
     except Exception as e:
         st.error(f"Error generating cycle analysis: {str(e)}")
         st.info("💡 Cycle analysis requires completed trades with entry/exit data.")
+
+def render_backtest_comparison_section():
+    """Render backtest comparison section"""
+    st.markdown("---")
+    render_title_with_tooltip(
+        "⚖️ Backtest Comparison", 
+        "Compare multiple saved backtests side-by-side to analyze performance differences and identify optimal strategies",
+        "header"
+    )
+    
+    # Always show import/export functionality
+    with st.expander("📁 Import/Export & Manage Backtests", expanded=True):
+        # Import section
+        st.markdown("**📥 Import Backtest Results**")
+        col_import1, col_import2 = st.columns([3, 1])
+        
+        with col_import1:
+            uploaded_file = st.file_uploader(
+                "Upload backtest JSON file:",
+                type=['json'],
+                help="Upload a previously exported backtest result file",
+                key="backtest_upload"
+            )
+        
+        with col_import2:
+            if uploaded_file is not None:
+                if st.button("📥 Import", use_container_width=True, key="import_backtest_btn"):
+                    try:
+                        # Read and parse the uploaded file
+                        file_content = uploaded_file.read()
+                        backtest_data = json.loads(file_content.decode('utf-8'))
+                        
+                        # Validate the data structure
+                        required_keys = ['symbol', 'strategies', 'timeframe', 'start_date', 'end_date', 'metrics', 'timestamp']
+                        if all(key in backtest_data for key in required_keys):
+                            # Generate a unique name if needed
+                            base_name = uploaded_file.name.replace('.json', '')
+                            import_name = base_name
+                            counter = 1
+                            while import_name in st.session_state.stored_backtests:
+                                import_name = f"{base_name}_{counter}"
+                                counter += 1
+                            
+                            # Convert date strings back to datetime objects if needed
+                            if isinstance(backtest_data['start_date'], str):
+                                backtest_data['start_date'] = datetime.fromisoformat(backtest_data['start_date'])
+                            if isinstance(backtest_data['end_date'], str):
+                                backtest_data['end_date'] = datetime.fromisoformat(backtest_data['end_date'])
+                            if isinstance(backtest_data['timestamp'], str):
+                                backtest_data['timestamp'] = datetime.fromisoformat(backtest_data['timestamp'])
+                            
+                            # Store the imported backtest
+                            st.session_state.stored_backtests[import_name] = backtest_data
+                            st.success(f"✅ Successfully imported backtest as '{import_name}'!")
+                            st.rerun()
+                        else:
+                            st.error("❌ Invalid backtest file format. Missing required fields.")
+                    except json.JSONDecodeError:
+                        st.error("❌ Invalid JSON file format.")
+                    except Exception as e:
+                        st.error(f"❌ Error importing backtest: {str(e)}")
+        
+        st.markdown("---")
+        
+        # Export section
+        if st.session_state.stored_backtests:
+            st.markdown("**📤 Export Backtest Results**")
+            col_export1, col_export2 = st.columns([3, 1])
+            
+            with col_export1:
+                backtest_to_export = st.selectbox(
+                    "Select backtest to export:",
+                    list(st.session_state.stored_backtests.keys()),
+                    key="export_backtest_select"
+                )
+            
+            with col_export2:
+                if st.button("📤 Export", use_container_width=True, key="export_backtest_btn"):
+                    try:
+                        # Get the backtest data
+                        export_data = st.session_state.stored_backtests[backtest_to_export].copy()
+                        
+                        # Convert datetime objects to strings for JSON serialization
+                        if hasattr(export_data['start_date'], 'isoformat'):
+                            export_data['start_date'] = export_data['start_date'].isoformat()
+                        if hasattr(export_data['end_date'], 'isoformat'):
+                            export_data['end_date'] = export_data['end_date'].isoformat()
+                        if hasattr(export_data['timestamp'], 'isoformat'):
+                            export_data['timestamp'] = export_data['timestamp'].isoformat()
+                        
+                        # Convert strategies enum to string if needed
+                        if 'strategies' in export_data:
+                            export_data['strategies'] = [str(s) for s in export_data['strategies']]
+                        
+                        # Create JSON string
+                        json_str = json.dumps(export_data, indent=2, default=str)
+                        
+                        # Create download button
+                        st.download_button(
+                            label=f"💾 Download {backtest_to_export}.json",
+                            data=json_str,
+                            file_name=f"{backtest_to_export}.json",
+                            mime="application/json",
+                            key="download_backtest_json"
+                        )
+                        
+                        st.success(f"✅ Export ready for '{backtest_to_export}'!")
+                    except Exception as e:
+                        st.error(f"❌ Error exporting backtest: {str(e)}")
+            
+            st.markdown("---")
+        
+        # Management section
+    with st.expander("🗂️ Manage Saved Backtests", expanded=False):
+        if st.session_state.stored_backtests:
+            st.markdown("**Saved Backtests:**")
+            
+            # Display saved backtests in a table
+            backtest_data = []
+            for name, data in st.session_state.stored_backtests.items():
+                backtest_data.append({
+                    'Name': name,
+                    'Symbol': data['symbol'],
+                    'Strategies': ', '.join([s.value for s in data['strategies']]),
+                    'Timeframe': data['timeframe'],
+                    'Period': f"{data['start_date'].strftime('%Y-%m-%d')} to {data['end_date'].strftime('%Y-%m-%d')}",
+                    'Return': f"{data['metrics']['Return [%]']:.2f}%",
+                    'Saved': data['timestamp'].strftime('%Y-%m-%d %H:%M')
+                })
+            
+            backtest_df = pd.DataFrame(backtest_data)
+            st.dataframe(backtest_df, use_container_width=True)
+            
+            # Delete backtest option
+            col_del1, col_del2 = st.columns([3, 1])
+            with col_del1:
+                backtest_to_delete = st.selectbox(
+                    "Select backtest to delete:",
+                    list(st.session_state.stored_backtests.keys()),
+                    key="delete_backtest_select"
+                )
+            with col_del2:
+                if st.button("🗑️ Delete", key="delete_backtest_btn"):
+                    if backtest_to_delete in st.session_state.stored_backtests:
+                        del st.session_state.stored_backtests[backtest_to_delete]
+                        st.success(f"✅ Deleted backtest '{backtest_to_delete}'")
+                        st.rerun()
+            
+            # Clear all backtests
+            if st.button("🗑️ Clear All Backtests", type="secondary"):
+                st.session_state.stored_backtests = {}
+                st.success("✅ All backtests cleared!")
+                st.rerun()
+    
+    # Display current status
+    st.markdown(f"📊 **Available Backtests:** {len(st.session_state.stored_backtests)}")
+    
+    # Show helpful message if no backtests available
+    if not st.session_state.stored_backtests:
+        st.info("💡 No saved backtests available for comparison. You can:")
+        st.markdown("""
+        **Options to get started:**
+        1. **Import existing backtests** using the Import section above
+        2. **Run new backtests** using the configuration in the Backtesting section
+        3. **Save backtests** with descriptive names for comparison
+        """)
+        return
+    
+    # Comparison section
+    if len(st.session_state.stored_backtests) < 2:
+        st.warning("⚠️ Need at least 2 saved backtests for comparison. Import more backtests or run additional backtests.")
+        return
+    
+    st.markdown("### 📊 Select Backtests to Compare")
+    
+    # Backtest selection
+    col_select1, col_select2 = st.columns(2)
+    
+    backtest_names = list(st.session_state.stored_backtests.keys())
+    
+    with col_select1:
+        backtest1_name = st.selectbox(
+            "First Backtest:",
+            backtest_names,
+            key="comparison_backtest1"
+        )
+    
+    with col_select2:
+        backtest2_name = st.selectbox(
+            "Second Backtest:",
+            backtest_names,
+            index=1 if len(backtest_names) > 1 else 0,
+            key="comparison_backtest2"
+        )
+    
+    if backtest1_name == backtest2_name:
+        st.warning("⚠️ Please select two different backtests for comparison.")
+        return
+    
+    # Get selected backtests
+    backtest1 = st.session_state.stored_backtests[backtest1_name]
+    backtest2 = st.session_state.stored_backtests[backtest2_name]
+    
+    # Comparison tabs
+    tab1, tab2, tab3, tab4 = st.tabs(["📊 Overview", "📈 Detailed Metrics", "📋 Side-by-Side", "📊 Visual Comparison"])
+    
+    with tab1:
+        render_backtest_overview_comparison(backtest1, backtest2, backtest1_name, backtest2_name)
+    
+    with tab2:
+        render_detailed_metrics_comparison(backtest1, backtest2, backtest1_name, backtest2_name)
+    
+    with tab3:
+        render_side_by_side_comparison(backtest1, backtest2, backtest1_name, backtest2_name)
+    
+    with tab4:
+        render_visual_comparison(backtest1, backtest2, backtest1_name, backtest2_name)
+
+def render_backtest_overview_comparison(backtest1, backtest2, name1, name2):
+    """Render overview comparison of two backtests"""
+    st.markdown("### 🏆 Performance Winner Analysis")
+    
+    # Key metrics comparison
+    metrics1 = backtest1['metrics']
+    metrics2 = backtest2['metrics']
+    
+    # Determine winners
+    winners = {}
+    winners['return'] = name1 if metrics1['Return [%]'] > metrics2['Return [%]'] else name2
+    winners['sharpe'] = name1 if (metrics1.get('Sharpe Ratio', 0) or 0) > (metrics2.get('Sharpe Ratio', 0) or 0) else name2
+    winners['drawdown'] = name1 if metrics1['Max. Drawdown [%]'] < metrics2['Max. Drawdown [%]'] else name2  # Less drawdown is better
+    winners['trades'] = name1 if (metrics1.get('# Trades', 0) or 0) > (metrics2.get('# Trades', 0) or 0) else name2
+    
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        return_diff = metrics1['Return [%]'] - metrics2['Return [%]']
+        st.metric(
+            "Total Return Winner",
+            winners['return'],
+            delta=f"{abs(return_diff):.2f}% difference"
+        )
+    
+    with col2:
+        sharpe1 = metrics1.get('Sharpe Ratio', 0) or 0
+        sharpe2 = metrics2.get('Sharpe Ratio', 0) or 0
+        sharpe_diff = sharpe1 - sharpe2
+        st.metric(
+            "Sharpe Ratio Winner",
+            winners['sharpe'],
+            delta=f"{abs(sharpe_diff):.3f} difference"
+        )
+    
+    with col3:
+        dd_diff = metrics2['Max. Drawdown [%]'] - metrics1['Max. Drawdown [%]']  # Reversed for better display
+        st.metric(
+            "Lower Drawdown",
+            winners['drawdown'],
+            delta=f"{abs(dd_diff):.2f}% less drawdown"
+        )
+    
+    with col4:
+        trades1 = metrics1.get('# Trades', 0) or 0
+        trades2 = metrics2.get('# Trades', 0) or 0
+        trades_diff = trades1 - trades2
+        st.metric(
+            "More Active",
+            winners['trades'],
+            delta=f"{abs(trades_diff):.0f} more trades"
+        )
+    
+    # Overall winner
+    st.markdown("### 🎯 Overall Assessment")
+    
+    score1 = 0
+    score2 = 0
+    
+    if winners['return'] == name1: score1 += 1
+    else: score2 += 1
+    
+    if winners['sharpe'] == name1: score1 += 1
+    else: score2 += 1
+    
+    if winners['drawdown'] == name1: score1 += 1
+    else: score2 += 1
+    
+    if score1 > score2:
+        st.success(f"🏆 **Overall Winner: {name1}** (Score: {score1}/{score1+score2})")
+    elif score2 > score1:
+        st.success(f"🏆 **Overall Winner: {name2}** (Score: {score2}/{score1+score2})")
+    else:
+        st.info(f"🤝 **Tie** (Score: {score1}-{score2})")
+    
+    # Key insights
+    st.markdown("### 💡 Key Insights")
+    
+    insights = []
+    
+    if abs(return_diff) > 5:
+        insights.append(f"📈 Significant return difference: {abs(return_diff):.1f}%")
+    
+    if abs(sharpe_diff) > 0.5:
+        insights.append(f"📊 Notable risk-adjusted performance difference (Sharpe: {abs(sharpe_diff):.2f})")
+    
+    if abs(dd_diff) > 3:
+        insights.append(f"⚠️ Significant drawdown difference: {abs(dd_diff):.1f}%")
+    
+    period1 = (backtest1['end_date'] - backtest1['start_date']).days
+    period2 = (backtest2['end_date'] - backtest2['start_date']).days
+    if abs(period1 - period2) > 30:
+        insights.append(f"📅 Different testing periods: {abs(period1 - period2)} days difference")
+    
+    if backtest1['symbol'] != backtest2['symbol']:
+        insights.append(f"🎯 Different symbols: {backtest1['symbol']} vs {backtest2['symbol']}")
+    
+    if insights:
+        for insight in insights:
+            st.info(insight)
+    else:
+        st.success("✅ Both backtests show similar performance characteristics")
+
+def render_detailed_metrics_comparison(backtest1, backtest2, name1, name2):
+    """Render detailed metrics comparison"""
+    st.markdown("### 📊 Comprehensive Metrics Comparison")
+    
+    metrics1 = backtest1['metrics']
+    metrics2 = backtest2['metrics']
+    
+    # Create comparison dataframe
+    comparison_data = {
+        'Metric': [
+            'Total Return (%)', 'Annual Return (%)', 'Buy & Hold Return (%)',
+            'Max Drawdown (%)', 'Sharpe Ratio', 'Sortino Ratio', 'Calmar Ratio',
+            'Win Rate (%)', 'Profit Factor', 'Total Trades', 'Best Trade (%)',
+            'Worst Trade (%)', 'Average Trade (%)', 'Exposure Time (%)',
+            'Final Equity ($)', 'Peak Equity ($)'
+        ],
+        name1: [
+            f"{metrics1.get('Return [%]', 0):.2f}",
+            f"{metrics1.get('Return (Ann.) [%]', 0) or 0:.2f}",
+            f"{metrics1.get('Buy & Hold Return [%]', 0):.2f}",
+            f"{metrics1.get('Max. Drawdown [%]', 0):.2f}",
+            f"{metrics1.get('Sharpe Ratio', 0) or 0:.3f}",
+            f"{metrics1.get('Sortino Ratio', 0) or 0:.3f}",
+            f"{metrics1.get('Calmar Ratio', 0) or 0:.3f}",
+            f"{metrics1.get('Win Rate [%]', 0) or 0:.1f}",
+            f"{metrics1.get('Profit Factor', 0) or 0:.2f}",
+            f"{int(metrics1.get('# Trades', 0) or 0)}",
+            f"{metrics1.get('Best Trade [%]', 0) or 0:.2f}",
+            f"{metrics1.get('Worst Trade [%]', 0) or 0:.2f}",
+            f"{metrics1.get('Avg. Trade [%]', 0) or 0:.2f}",
+            f"{metrics1.get('Exposure Time [%]', 0):.1f}",
+            f"{metrics1.get('Equity Final [$]', 0):,.2f}",
+            f"{metrics1.get('Equity Peak [$]', 0):,.2f}"
+        ],
+        name2: [
+            f"{metrics2.get('Return [%]', 0):.2f}",
+            f"{metrics2.get('Return (Ann.) [%]', 0) or 0:.2f}",
+            f"{metrics2.get('Buy & Hold Return [%]', 0):.2f}",
+            f"{metrics2.get('Max. Drawdown [%]', 0):.2f}",
+            f"{metrics2.get('Sharpe Ratio', 0) or 0:.3f}",
+            f"{metrics2.get('Sortino Ratio', 0) or 0:.3f}",
+            f"{metrics2.get('Calmar Ratio', 0) or 0:.3f}",
+            f"{metrics2.get('Win Rate [%]', 0) or 0:.1f}",
+            f"{metrics2.get('Profit Factor', 0) or 0:.2f}",
+            f"{int(metrics2.get('# Trades', 0) or 0)}",
+            f"{metrics2.get('Best Trade [%]', 0) or 0:.2f}",
+            f"{metrics2.get('Worst Trade [%]', 0) or 0:.2f}",
+            f"{metrics2.get('Avg. Trade [%]', 0) or 0:.2f}",
+            f"{metrics2.get('Exposure Time [%]', 0):.1f}",
+            f"{metrics2.get('Equity Final [$]', 0):,.2f}",
+            f"{metrics2.get('Equity Peak [$]', 0):,.2f}"
+        ]
+    }
+    
+    comparison_df = pd.DataFrame(comparison_data)
+    st.dataframe(comparison_df, use_container_width=True)
+    
+    # Download comparison
+    if st.button("📥 Download Comparison CSV"):
+        csv_data = comparison_df.to_csv(index=False)
+        st.download_button(
+            label="Download Comparison Data",
+            data=csv_data,
+            file_name=f"backtest_comparison_{name1}_vs_{name2}.csv",
+            mime="text/csv"
+        )
+
+def render_side_by_side_comparison(backtest1, backtest2, name1, name2):
+    """Render side-by-side configuration and setup comparison"""
+    st.markdown("### ⚙️ Configuration Comparison")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown(f"#### 📊 {name1}")
+        st.markdown(f"**Symbol:** {backtest1['symbol']}")
+        st.markdown(f"**Strategies:** {', '.join([s.value for s in backtest1['strategies']])}")
+        st.markdown(f"**Timeframe:** {backtest1['timeframe']}")
+        st.markdown(f"**Period:** {backtest1['start_date'].strftime('%Y-%m-%d')} to {backtest1['end_date'].strftime('%Y-%m-%d')}")
+        st.markdown(f"**Duration:** {(backtest1['end_date'] - backtest1['start_date']).days} days")
+        st.markdown(f"**Saved:** {backtest1['timestamp'].strftime('%Y-%m-%d %H:%M')}")
+        
+        # Key metrics
+        st.markdown("**Key Results:**")
+        metrics1 = backtest1['metrics']
+        st.success(f"Return: {metrics1['Return [%]']:.2f}%")
+        st.info(f"Sharpe: {metrics1.get('Sharpe Ratio', 0) or 0:.3f}")
+        st.warning(f"Max DD: {metrics1['Max. Drawdown [%]']:.2f}%")
+    
+    with col2:
+        st.markdown(f"#### 📊 {name2}")
+        st.markdown(f"**Symbol:** {backtest2['symbol']}")
+        st.markdown(f"**Strategies:** {', '.join([s.value for s in backtest2['strategies']])}")
+        st.markdown(f"**Timeframe:** {backtest2['timeframe']}")
+        st.markdown(f"**Period:** {backtest2['start_date'].strftime('%Y-%m-%d')} to {backtest2['end_date'].strftime('%Y-%m-%d')}")
+        st.markdown(f"**Duration:** {(backtest2['end_date'] - backtest2['start_date']).days} days")
+        st.markdown(f"**Saved:** {backtest2['timestamp'].strftime('%Y-%m-%d %H:%M')}")
+        
+        # Key metrics
+        st.markdown("**Key Results:**")
+        metrics2 = backtest2['metrics']
+        st.success(f"Return: {metrics2['Return [%]']:.2f}%")
+        st.info(f"Sharpe: {metrics2.get('Sharpe Ratio', 0) or 0:.3f}")
+        st.warning(f"Max DD: {metrics2['Max. Drawdown [%]']:.2f}%")
+    
+    # Differences analysis
+    st.markdown("### 🔍 Key Differences")
+    
+    differences = []
+    
+    if backtest1['symbol'] != backtest2['symbol']:
+        differences.append(f"📈 **Symbol:** {backtest1['symbol']} vs {backtest2['symbol']}")
+    
+    if set([s.value for s in backtest1['strategies']]) != set([s.value for s in backtest2['strategies']]):
+        strategies1 = set([s.value for s in backtest1['strategies']])
+        strategies2 = set([s.value for s in backtest2['strategies']])
+        differences.append(f"🎯 **Strategies:** {strategies1} vs {strategies2}")
+    
+    if backtest1['timeframe'] != backtest2['timeframe']:
+        differences.append(f"⏰ **Timeframe:** {backtest1['timeframe']} vs {backtest2['timeframe']}")
+    
+    period_diff = abs((backtest1['end_date'] - backtest1['start_date']).days - (backtest2['end_date'] - backtest2['start_date']).days)
+    if period_diff > 7:
+        differences.append(f"📅 **Period Length:** {period_diff} days difference")
+    
+    if differences:
+        for diff in differences:
+            st.info(diff)
+    else:
+        st.success("✅ Both backtests use identical configurations")
+
+def render_visual_comparison(backtest1, backtest2, name1, name2):
+    """Render visual comparison charts"""
+    st.markdown("### 📊 Visual Performance Comparison")
+    
+    metrics1 = backtest1['metrics']
+    metrics2 = backtest2['metrics']
+    
+    # Create comparison charts
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        # Return comparison bar chart
+        fig_returns = go.Figure(data=[
+            go.Bar(name=name1, x=['Total Return', 'Annual Return'], 
+                   y=[metrics1['Return [%]'], metrics1.get('Return (Ann.) [%]', 0) or 0]),
+            go.Bar(name=name2, x=['Total Return', 'Annual Return'], 
+                   y=[metrics2['Return [%]'], metrics2.get('Return (Ann.) [%]', 0) or 0])
+        ])
+        fig_returns.update_layout(title="Return Comparison (%)", barmode='group')
+        st.plotly_chart(fig_returns, use_container_width=True)
+    
+    with col2:
+        # Risk metrics comparison
+        fig_risk = go.Figure(data=[
+            go.Bar(name=name1, x=['Max Drawdown', 'Sharpe Ratio'], 
+                   y=[metrics1['Max. Drawdown [%]'], (metrics1.get('Sharpe Ratio', 0) or 0) * 10]),  # Scale Sharpe for visibility
+            go.Bar(name=name2, x=['Max Drawdown', 'Sharpe Ratio'], 
+                   y=[metrics2['Max. Drawdown [%]'], (metrics2.get('Sharpe Ratio', 0) or 0) * 10])
+        ])
+        fig_risk.update_layout(title="Risk Metrics (Sharpe x10 for scale)", barmode='group')
+        st.plotly_chart(fig_risk, use_container_width=True)
+    
+    # Radar chart comparison
+    st.markdown("### 🎯 Multi-Metric Radar Comparison")
+    
+    # Normalize metrics for radar chart (0-100 scale)
+    def normalize_metric(value, min_val, max_val):
+        if max_val == min_val:
+            return 50
+        return ((value - min_val) / (max_val - min_val)) * 100
+    
+    # Get metrics for radar
+    return1 = metrics1['Return [%]']
+    return2 = metrics2['Return [%]']
+    sharpe1 = metrics1.get('Sharpe Ratio', 0) or 0
+    sharpe2 = metrics2.get('Sharpe Ratio', 0) or 0
+    dd1 = 100 - metrics1['Max. Drawdown [%]']  # Invert so higher is better
+    dd2 = 100 - metrics2['Max. Drawdown [%]']
+    trades1 = metrics1.get('# Trades', 0) or 0
+    trades2 = metrics2.get('# Trades', 0) or 0
+    winrate1 = metrics1.get('Win Rate [%]', 0) or 0
+    winrate2 = metrics2.get('Win Rate [%]', 0) or 0
+    
+    # Normalize
+    min_return, max_return = min(return1, return2), max(return1, return2)
+    min_sharpe, max_sharpe = min(sharpe1, sharpe2), max(sharpe1, sharpe2)
+    min_dd, max_dd = min(dd1, dd2), max(dd1, dd2)
+    min_trades, max_trades = min(trades1, trades2), max(trades1, trades2)
+    min_winrate, max_winrate = min(winrate1, winrate2), max(winrate1, winrate2)
+    
+    categories = ['Return', 'Sharpe Ratio', 'Low Drawdown', 'Trade Count', 'Win Rate']
+    
+    values1 = [
+        normalize_metric(return1, min_return, max_return),
+        normalize_metric(sharpe1, min_sharpe, max_sharpe),
+        normalize_metric(dd1, min_dd, max_dd),
+        normalize_metric(trades1, min_trades, max_trades),
+        normalize_metric(winrate1, min_winrate, max_winrate)
+    ]
+    
+    values2 = [
+        normalize_metric(return2, min_return, max_return),
+        normalize_metric(sharpe2, min_sharpe, max_sharpe),
+        normalize_metric(dd2, min_dd, max_dd),
+        normalize_metric(trades2, min_trades, max_trades),
+        normalize_metric(winrate2, min_winrate, max_winrate)
+    ]
+    
+    fig_radar = go.Figure()
+    
+    fig_radar.add_trace(go.Scatterpolar(
+        r=values1 + [values1[0]],  # Close the polygon
+        theta=categories + [categories[0]],
+        fill='toself',
+        name=name1,
+        line_color='blue'
+    ))
+    
+    fig_radar.add_trace(go.Scatterpolar(
+        r=values2 + [values2[0]],  # Close the polygon
+        theta=categories + [categories[0]],
+        fill='toself',
+        name=name2,
+        line_color='red'
+    ))
+    
+    fig_radar.update_layout(
+        polar=dict(
+            radialaxis=dict(
+                visible=True,
+                range=[0, 100]
+            )
+        ),
+        title="Performance Radar Comparison (Normalized 0-100)",
+        showlegend=True
+    )
+    
+    st.plotly_chart(fig_radar, use_container_width=True)
+    
+    # Summary insights
+    st.markdown("### 💡 Visual Analysis Insights")
+    
+    if abs(return1 - return2) > 5:
+        better_return = name1 if return1 > return2 else name2
+        st.info(f"📈 {better_return} shows significantly better returns")
+    
+    if abs(sharpe1 - sharpe2) > 0.3:
+        better_sharpe = name1 if sharpe1 > sharpe2 else name2
+        st.info(f"📊 {better_sharpe} demonstrates superior risk-adjusted returns")
+    
+    if abs(dd1 - dd2) > 5:
+        better_dd = name1 if dd1 > dd2 else name2
+        st.info(f"🛡️ {better_dd} shows better drawdown control")
 
 def main():
     """Main function for standalone testing"""
