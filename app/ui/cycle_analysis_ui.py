@@ -1050,8 +1050,36 @@ def render_strategy_group_comparison(cycle_df: pd.DataFrame):
         st.warning("Need at least 2 different strategies for group comparison.")
         return
     
+    # Strategy selection for comparison
+    st.markdown("**🎯 Select Strategies to Compare**")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        selected_strategies = st.multiselect(
+            "Choose strategies to compare:",
+            options=list(strategies),
+            default=list(strategies)[:min(3, len(strategies))],  # Default to first 3 strategies
+            help="Select 2 or more strategies to compare their performance"
+        )
+    
+    with col2:
+        comparison_metrics = st.multiselect(
+            "Select metrics to focus on:",
+            options=["PnL Performance", "Win Rate", "Duration", "Investment", "Risk Analysis"],
+            default=["PnL Performance", "Win Rate"],
+            help="Choose which aspects to emphasize in the comparison"
+        )
+    
+    if len(selected_strategies) < 2:
+        st.warning("Please select at least 2 strategies for comparison.")
+        return
+    
+    # Filter data for selected strategies
+    filtered_df = cycle_df[cycle_df['strategy_type'].isin(selected_strategies)]
+    
     # Strategy performance summary
-    strategy_stats = cycle_df.groupby('strategy_type').agg({
+    strategy_stats = filtered_df.groupby('strategy_type').agg({
         'realized_pnl': ['count', 'sum', 'mean', 'std', lambda x: (x > 0).sum()],
         'duration_minutes': ['mean', 'median'],
         'total_investment': ['mean', 'sum'],
@@ -1063,7 +1091,7 @@ def render_strategy_group_comparison(cycle_df: pd.DataFrame):
     strategy_stats['win_rate'] = (strategy_stats['realized_pnl_<lambda>'] / strategy_stats['realized_pnl_count'] * 100).round(1)
     
     # Display strategy comparison table
-    st.markdown("**📈 Strategy Performance Summary**")
+    st.markdown(f"**📈 Performance Comparison: {', '.join(selected_strategies)}**")
     
     display_stats = strategy_stats[[
         'realized_pnl_count', 'realized_pnl_sum', 'realized_pnl_mean', 
@@ -1077,55 +1105,202 @@ def render_strategy_group_comparison(cycle_df: pd.DataFrame):
     
     st.dataframe(display_stats, use_container_width=True)
     
-    # Strategy comparison charts
+    # Strategy ranking and insights
+    st.markdown("**🏆 Strategy Rankings**")
+    
+    ranking_col1, ranking_col2, ranking_col3 = st.columns(3)
+    
+    with ranking_col1:
+        st.markdown("**By Total PnL:**")
+        pnl_ranking = strategy_stats.sort_values('realized_pnl_sum', ascending=False)
+        for i, (strategy, row) in enumerate(pnl_ranking.iterrows(), 1):
+            emoji = "🥇" if i == 1 else "🥈" if i == 2 else "🥉" if i == 3 else f"{i}."
+            st.write(f"{emoji} {strategy}: ${row['realized_pnl_sum']:,.2f}")
+    
+    with ranking_col2:
+        st.markdown("**By Win Rate:**")
+        winrate_ranking = strategy_stats.sort_values('win_rate', ascending=False)
+        for i, (strategy, row) in enumerate(winrate_ranking.iterrows(), 1):
+            emoji = "🥇" if i == 1 else "🥈" if i == 2 else "🥉" if i == 3 else f"{i}."
+            st.write(f"{emoji} {strategy}: {row['win_rate']:.1f}%")
+    
+    with ranking_col3:
+        st.markdown("**By Avg PnL:**")
+        avg_pnl_ranking = strategy_stats.sort_values('realized_pnl_mean', ascending=False)
+        for i, (strategy, row) in enumerate(avg_pnl_ranking.iterrows(), 1):
+            emoji = "🥇" if i == 1 else "🥈" if i == 2 else "🥉" if i == 3 else f"{i}."
+            st.write(f"{emoji} {strategy}: ${row['realized_pnl_mean']:,.2f}")
+    
+    # Strategy comparison charts based on selected metrics
     st.markdown("**📊 Visual Strategy Comparison**")
     
-    chart_col1, chart_col2 = st.columns(2)
+    # Dynamic chart generation based on selected metrics
+    if "PnL Performance" in comparison_metrics:
+        chart_col1, chart_col2 = st.columns(2)
+        
+        with chart_col1:
+            # Total PnL comparison
+            fig_total_pnl = px.bar(
+                x=strategy_stats.index,
+                y=strategy_stats['realized_pnl_sum'],
+                title="Total PnL by Selected Strategies",
+                labels={'x': 'Strategy', 'y': 'Total PnL ($)'},
+                color=strategy_stats['realized_pnl_sum'],
+                color_continuous_scale='RdYlGn',
+                text=strategy_stats['realized_pnl_sum'].apply(lambda x: f'${x:,.0f}')
+            )
+            fig_total_pnl.update_traces(textposition='outside')
+            fig_total_pnl.add_hline(y=0, line_dash="dash", line_color="gray", annotation_text="Break-even")
+            st.plotly_chart(fig_total_pnl, use_container_width=True)
+        
+        with chart_col2:
+            # Average PnL comparison
+            fig_avg_pnl = px.bar(
+                x=strategy_stats.index,
+                y=strategy_stats['realized_pnl_mean'],
+                title="Average PnL by Selected Strategies",
+                labels={'x': 'Strategy', 'y': 'Average PnL ($)'},
+                color=strategy_stats['realized_pnl_mean'],
+                color_continuous_scale='RdYlGn',
+                text=strategy_stats['realized_pnl_mean'].apply(lambda x: f'${x:,.2f}')
+            )
+            fig_avg_pnl.update_traces(textposition='outside')
+            fig_avg_pnl.add_hline(y=0, line_dash="dash", line_color="gray", annotation_text="Break-even")
+            st.plotly_chart(fig_avg_pnl, use_container_width=True)
     
-    with chart_col1:
+    if "Win Rate" in comparison_metrics:
         # Win rate comparison
         fig_win_rate = px.bar(
             x=strategy_stats.index,
             y=strategy_stats['win_rate'],
-            title="Win Rate by Strategy",
+            title="Win Rate Comparison",
             labels={'x': 'Strategy', 'y': 'Win Rate (%)'},
             color=strategy_stats['win_rate'],
-            color_continuous_scale='RdYlGn'
+            color_continuous_scale='RdYlGn',
+            text=strategy_stats['win_rate'].apply(lambda x: f'{x:.1f}%')
         )
+        fig_win_rate.update_traces(textposition='outside')
         fig_win_rate.add_hline(y=50, line_dash="dash", line_color="gray", annotation_text="Break-even")
         st.plotly_chart(fig_win_rate, use_container_width=True)
     
-    with chart_col2:
-        # Average PnL comparison
-        fig_avg_pnl = px.bar(
-            x=strategy_stats.index,
-            y=strategy_stats['realized_pnl_mean'],
-            title="Average PnL by Strategy",
-            labels={'x': 'Strategy', 'y': 'Average PnL ($)'},
-            color=strategy_stats['realized_pnl_mean'],
-            color_continuous_scale='RdYlGn'
+    if "Duration" in comparison_metrics:
+        # Duration comparison
+        fig_duration = px.box(
+            filtered_df,
+            x='strategy_type',
+            y='duration_minutes',
+            title="Cycle Duration Distribution by Strategy",
+            labels={'strategy_type': 'Strategy', 'duration_minutes': 'Duration (minutes)'},
+            color='strategy_type'
         )
-        fig_avg_pnl.add_hline(y=0, line_dash="dash", line_color="gray", annotation_text="Break-even")
-        st.plotly_chart(fig_avg_pnl, use_container_width=True)
+        st.plotly_chart(fig_duration, use_container_width=True)
     
-    # Risk-return scatter plot
-    st.markdown("**⚖️ Risk-Return Analysis by Strategy**")
+    if "Investment" in comparison_metrics:
+        chart_col1, chart_col2 = st.columns(2)
+        
+        with chart_col1:
+            # Average investment comparison
+            fig_avg_investment = px.bar(
+                x=strategy_stats.index,
+                y=strategy_stats['total_investment_mean'],
+                title="Average Investment by Strategy",
+                labels={'x': 'Strategy', 'y': 'Average Investment ($)'},
+                color=strategy_stats['total_investment_mean'],
+                color_continuous_scale='Blues',
+                text=strategy_stats['total_investment_mean'].apply(lambda x: f'${x:,.0f}')
+            )
+            fig_avg_investment.update_traces(textposition='outside')
+            st.plotly_chart(fig_avg_investment, use_container_width=True)
+        
+        with chart_col2:
+            # Total investment comparison
+            fig_total_investment = px.bar(
+                x=strategy_stats.index,
+                y=strategy_stats['total_investment_sum'],
+                title="Total Investment by Strategy",
+                labels={'x': 'Strategy', 'y': 'Total Investment ($)'},
+                color=strategy_stats['total_investment_sum'],
+                color_continuous_scale='Blues',
+                text=strategy_stats['total_investment_sum'].apply(lambda x: f'${x:,.0f}')
+            )
+            fig_total_investment.update_traces(textposition='outside')
+            st.plotly_chart(fig_total_investment, use_container_width=True)
     
-    fig_risk_return = px.scatter(
-        x=strategy_stats['realized_pnl_std'],
-        y=strategy_stats['realized_pnl_mean'],
-        size=strategy_stats['realized_pnl_count'],
-        color=strategy_stats.index,
-        title="Risk vs Return by Strategy",
-        labels={'x': 'Risk (PnL Std Dev)', 'y': 'Return (Avg PnL)', 'color': 'Strategy'},
-        hover_data={'realized_pnl_count': True}
-    )
+    if "Risk Analysis" in comparison_metrics:
+        # Risk-return scatter plot
+        st.markdown("**⚖️ Risk-Return Analysis**")
+        
+        fig_risk_return = px.scatter(
+            x=strategy_stats['realized_pnl_std'],
+            y=strategy_stats['realized_pnl_mean'],
+            size=strategy_stats['realized_pnl_count'],
+            color=strategy_stats.index,
+            title="Risk vs Return by Selected Strategies",
+            labels={'x': 'Risk (PnL Std Dev)', 'y': 'Return (Avg PnL)', 'color': 'Strategy'},
+            hover_data={'realized_pnl_count': True},
+            size_max=60
+        )
+        
+        # Add quadrant lines
+        fig_risk_return.add_hline(y=0, line_dash="dash", line_color="gray", annotation_text="Break-even")
+        fig_risk_return.add_vline(x=strategy_stats['realized_pnl_std'].median(), line_dash="dash", line_color="gray", annotation_text="Median Risk")
+        
+        # Add annotations for quadrants
+        fig_risk_return.add_annotation(
+            x=strategy_stats['realized_pnl_std'].max() * 0.8,
+            y=strategy_stats['realized_pnl_mean'].max() * 0.8,
+            text="High Risk<br>High Return",
+            showarrow=False,
+            bgcolor="rgba(255,255,255,0.8)"
+        )
+        
+        fig_risk_return.add_annotation(
+            x=strategy_stats['realized_pnl_std'].min() * 1.2,
+            y=strategy_stats['realized_pnl_mean'].max() * 0.8,
+            text="Low Risk<br>High Return",
+            showarrow=False,
+            bgcolor="rgba(255,255,255,0.8)"
+        )
+        
+        st.plotly_chart(fig_risk_return, use_container_width=True)
+        
+        # Risk metrics table
+        risk_metrics = pd.DataFrame({
+            'Strategy': strategy_stats.index,
+            'Volatility ($)': strategy_stats['realized_pnl_std'].round(2),
+            'Sharpe Ratio': (strategy_stats['realized_pnl_mean'] / strategy_stats['realized_pnl_std']).round(3),
+            'Max Drawdown Risk': (strategy_stats['realized_pnl_std'] / strategy_stats['realized_pnl_mean'].abs()).round(2)
+        })
+        
+        st.markdown("**📊 Risk Metrics Comparison**")
+        st.dataframe(risk_metrics, use_container_width=True)
     
-    # Add quadrant lines
-    fig_risk_return.add_hline(y=0, line_dash="dash", line_color="gray")
-    fig_risk_return.add_vline(x=strategy_stats['realized_pnl_std'].median(), line_dash="dash", line_color="gray")
+    # Strategy performance insights
+    st.markdown("**💡 Strategy Comparison Insights**")
     
-    st.plotly_chart(fig_risk_return, use_container_width=True)
+    insights_col1, insights_col2 = st.columns(2)
+    
+    with insights_col1:
+        st.markdown("**🏆 Best Performing Strategy:**")
+        best_strategy = strategy_stats.loc[strategy_stats['realized_pnl_sum'].idxmax()]
+        st.success(f"**{strategy_stats['realized_pnl_sum'].idxmax()}**")
+        st.write(f"• Total PnL: ${best_strategy['realized_pnl_sum']:,.2f}")
+        st.write(f"• Win Rate: {best_strategy['win_rate']:.1f}%")
+        st.write(f"• Avg PnL: ${best_strategy['realized_pnl_mean']:,.2f}")
+        st.write(f"• Cycles: {best_strategy['realized_pnl_count']}")
+    
+    with insights_col2:
+        st.markdown("**📊 Most Consistent Strategy:**")
+        # Find strategy with best risk-adjusted return (highest Sharpe ratio)
+        sharpe_ratios = strategy_stats['realized_pnl_mean'] / strategy_stats['realized_pnl_std']
+        most_consistent = sharpe_ratios.idxmax()
+        consistent_strategy = strategy_stats.loc[most_consistent]
+        
+        st.info(f"**{most_consistent}**")
+        st.write(f"• Sharpe Ratio: {sharpe_ratios[most_consistent]:.3f}")
+        st.write(f"• Volatility: ${consistent_strategy['realized_pnl_std']:.2f}")
+        st.write(f"• Avg PnL: ${consistent_strategy['realized_pnl_mean']:,.2f}")
+        st.write(f"• Win Rate: {consistent_strategy['win_rate']:.1f}%")
 
 def render_quartile_comparison(cycle_df: pd.DataFrame):
     """Render performance quartile comparison"""
