@@ -268,6 +268,37 @@ class BacktestingAdapter:
                 current_price = self.data.Close[-1]
                 current_time = self.data.index[-1]
                 
+                # Check market hours if pre_after_hours is disabled
+                shared_settings = getattr(self.config, 'shared_settings', None)
+                if shared_settings and not shared_settings.pre_after_hours:
+                    # Check if current time is within market hours (9:30 AM - 4:00 PM ET)
+                    try:
+                        import pytz
+                        if hasattr(current_time, 'tz_localize'):
+                            # Convert to ET if timezone-naive
+                            if current_time.tz is None:
+                                current_time_et = current_time.tz_localize('UTC').tz_convert('US/Eastern')
+                            else:
+                                current_time_et = current_time.tz_convert('US/Eastern')
+                        else:
+                            # Assume UTC and convert to ET
+                            et_tz = pytz.timezone('US/Eastern')
+                            current_time_et = pytz.utc.localize(current_time).astimezone(et_tz)
+                        
+                        # Check if it's a weekday and within market hours
+                        if (current_time_et.weekday() >= 5 or  # Weekend
+                            current_time_et.hour < 9 or  # Before 9 AM
+                            (current_time_et.hour == 9 and current_time_et.minute < 30) or  # Before 9:30 AM
+                            current_time_et.hour >= 16):  # After 4 PM
+                            # Market is closed, skip this bar
+                            return
+                    except ImportError:
+                        # Fallback without timezone handling
+                        hour = current_time.hour
+                        if (current_time.weekday() >= 5 or  # Weekend
+                            hour < 9 or hour >= 16):  # Outside basic hours
+                            return
+                
                 # Create market data object
                 market_data = MarketData(
                     symbol=symbol,
@@ -299,6 +330,12 @@ class BacktestingAdapter:
                 
                 # Entry logic with coordination and risk management
                 if strategy.should_enter_with_coordination(market_data) and not strategy.is_active:
+                    # Check continue_trading setting - if False and strategy has completed at least one cycle, don't start new cycles
+                    shared_settings = getattr(self.config, 'shared_settings', None)
+                    if shared_settings and not shared_settings.continue_trading and strategy.total_cycles > 0:
+                        self.logger.info(f"Continue trading disabled - skipping new cycle for {strategy_type.value} on {symbol}")
+                        return
+                    
                     # Check risk management before starting new cycle
                     can_start, reason = self.risk_manager.can_start_new_cycle(strategy_type.value)
                     if not can_start:
@@ -536,6 +573,9 @@ class BacktestingAdapter:
                         if shared_settings and shared_settings.repeat_on_close and shared_settings.auto_restart_cycles:
                             # Allow immediate restart by not blocking further entries
                             self.logger.info(f"Auto-restart enabled for {strategy_type.value}, cycle completed and ready for new entry")
+                        elif shared_settings and not shared_settings.repeat_on_close:
+                            # If repeat_on_close is disabled, prevent further entries for this strategy
+                            self.logger.info(f"Repeat on close disabled for {strategy_type.value}, strategy will not restart after cycle completion")
         
         # Set class attributes
         CombinedMartingaleStrategy.config = self.config

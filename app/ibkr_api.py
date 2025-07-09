@@ -550,11 +550,44 @@ class IBKRApi(EWrapper, EClient):
             self.execution_callbacks.remove(callback)
     
     def is_market_open(self) -> bool:
-        """Check if market is open (simplified)"""
-        now = datetime.now()
-        # Simple check for US market hours (9:30 AM - 4:00 PM ET)
-        # This is a simplified version - in production, you'd want to check holidays, etc.
-        return True  # Simplified for demo
+        """Check if US market is open (9:30 AM - 4:00 PM ET)"""
+        try:
+            import pytz
+            
+            # Get current time in Eastern Time
+            et_tz = pytz.timezone('US/Eastern')
+            now_et = datetime.now(et_tz)
+            
+            # Check if it's a weekday (Monday=0, Sunday=6)
+            if now_et.weekday() >= 5:  # Saturday or Sunday
+                return False
+            
+            # Market hours: 9:30 AM - 4:00 PM ET
+            market_open = now_et.replace(hour=9, minute=30, second=0, microsecond=0)
+            market_close = now_et.replace(hour=16, minute=0, second=0, microsecond=0)
+            
+            # Check if current time is within market hours
+            is_open = market_open <= now_et <= market_close
+            
+            # TODO: Add holiday checking for more accuracy
+            # For now, this covers basic market hours
+            
+            return is_open
+            
+        except ImportError:
+            # Fallback if pytz is not available - use simplified UTC-based check
+            self.logger.warning("pytz not available, using simplified market hours check")
+            now_utc = datetime.utcnow()
+            # Approximate ET as UTC-5 (ignoring DST for simplicity)
+            # Market hours: 14:30 - 21:00 UTC (9:30 AM - 4:00 PM ET)
+            if now_utc.weekday() >= 5:  # Weekend
+                return False
+            return 14 <= now_utc.hour < 21 or (now_utc.hour == 14 and now_utc.minute >= 30)
+            
+        except Exception as e:
+            self.logger.error(f"Error checking market hours: {e}")
+            # Default to market open if there's an error
+            return True
     
     def check_connection_health(self, quick_check=False) -> bool:
         """Check if connection is healthy and attempt recovery if needed"""

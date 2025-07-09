@@ -7,3 +7,4 @@ pillow>=10.0.0
 streamlit-option-menu>=0.3.6
 streamlit-aggrid>=0.3.4
 streamlit-plotly-events>=0.0.6
+pytz>=2023.3

@@ -262,6 +262,7 @@ class TradingEngine:
                 # Check if market is open (if configured)
                 if hasattr(self.config.shared_settings, 'pre_after_hours') and not self.config.shared_settings.pre_after_hours:
                     if not self.api.is_market_open():
+                        self.logger.debug("Market is closed and pre/after hours trading is disabled - waiting...")
                         time.sleep(60)  # Check every minute
                         continue
                 
@@ -311,6 +312,11 @@ class TradingEngine:
     def _handle_strategy_entry(self, strategy: BaseStrategy, market_data: MarketData):
         """Handle strategy entry signal"""
         try:
+            # Check continue_trading setting - if False and strategy has completed at least one cycle, don't start new cycles
+            if not self.config.shared_settings.continue_trading and strategy.total_cycles > 0:
+                self.logger.info(f"Continue trading disabled - skipping new cycle for {strategy.strategy_type.value} on {market_data.symbol}")
+                return
+            
             strategy.start_cycle(market_data)
             
             # Calculate position size
@@ -417,6 +423,11 @@ class TradingEngine:
             
             # Record completed cycle
             self._record_completed_cycle(strategy, market_data)
+            
+            # Check repeat_on_close setting - if False, deactivate strategy permanently
+            if not self.config.shared_settings.repeat_on_close:
+                strategy.is_active = False
+                self.logger.info(f"Repeat on close disabled - deactivating {strategy.strategy_type.value} strategy on {market_data.symbol}")
             
         except Exception as e:
             self.logger.error(f"Error handling strategy exit: {e}")

@@ -16,3 +16,4 @@ backtesting>=0.3.3  # For backtesting trading strategies
 yfinance>=0.2.18  # For fetching historical market data
 plotly>=5.15.0  # For interactive charts in Streamlit
 streamlit>=1.28.0  # For web interface
+pytz>=2023.3  # For timezone handling in market hours

@@ -641,9 +641,9 @@
     ]
   },
   "shared_settings": {
-    "continue_trading": true,
+    "continue_trading": false,
     "pre_after_hours": false,
-    "repeat_on_close": true,
+    "repeat_on_close": false,
     "order_type": "MARKET",
     "money_management": false,
     "growth_threshold": 10000.0,
