@@ -324,17 +324,26 @@ class BacktestingAdapter:
                     )
                     
                     if position_size > 0 and available_cash >= position_size * current_price:
-                        # Execute buy order
+                        # Determine trade type based on initial_trade_type setting
+                        strategy_settings = self.config.get_strategy_settings(strategy_type)
+                        
+                        is_sell_entry = (hasattr(strategy_settings, 'initial_trade_type') and 
+                                       strategy_settings.initial_trade_type == "SELL")
+                        
+                        trade_type = TradeType.SELL if is_sell_entry else TradeType.BUY
+                        trade_action = "SELL" if is_sell_entry else "BUY"
+                        
+                        # Execute order
                         cost = position_size * current_price
                         self.strategy_cash[strategy_type] -= cost
-                        self.logger.info(f"ENTRY TRADE: {strategy_type.value} - Cost: ${cost:.2f}, Remaining cash: ${self.strategy_cash[strategy_type]:.2f}")
+                        self.logger.info(f"ENTRY TRADE: {strategy_type.value} ({trade_action}) - Cost: ${cost:.2f}, Remaining cash: ${self.strategy_cash[strategy_type]:.2f}")
                         
                         # Create trade record
                         trade = Trade(
                             trade_id=f"{cycle_id}_trade_{len(strategy.positions) + 1}",
                             timestamp=market_data.timestamp,
                             symbol=symbol,
-                            trade_type=TradeType.BUY,
+                            trade_type=trade_type,
                             quantity=position_size,
                             price=current_price,
                             order_level=strategy.current_leg + 1,
@@ -351,7 +360,7 @@ class BacktestingAdapter:
                         # Add position to strategy
                         position = Position(
                             symbol=market_data.symbol,
-                            quantity=position_size,
+                            quantity=position_size if not is_sell_entry else -position_size,  # Negative for short positions
                             avg_price=current_price,
                             current_price=current_price,
                             strategy_id=strategy_type.value,
@@ -362,7 +371,10 @@ class BacktestingAdapter:
                         strategy.current_leg += 1
                         
                         # Place order in backtesting framework
-                        self.buy(size=position_size)
+                        if is_sell_entry:
+                            self.sell(size=position_size)
+                        else:
+                            self.buy(size=position_size)
                     elif position_size > 0:
                         required_cash = position_size * current_price
                         self.logger.warning(f"ENTRY SKIPPED: {strategy_type.value} - Need: ${required_cash:.2f}, Available: ${available_cash:.2f}, Shortfall: ${required_cash - available_cash:.2f}")
@@ -383,9 +395,18 @@ class BacktestingAdapter:
                     )
                     
                     if position_size > 0 and available_cash >= position_size * current_price:
+                        # Determine trade type based on initial_trade_type setting (same as initial trade)
+                        strategy_settings = self.config.get_strategy_settings(strategy_type)
+                        
+                        is_sell_entry = (hasattr(strategy_settings, 'initial_trade_type') and 
+                                       strategy_settings.initial_trade_type == "SELL")
+                        
+                        trade_type = TradeType.SELL if is_sell_entry else TradeType.BUY
+                        trade_action = "SELL" if is_sell_entry else "BUY"
+                        
                         cost = position_size * current_price
                         self.strategy_cash[strategy_type] -= cost
-                        self.logger.info(f"LEG TRADE: {strategy_type.value} - Cost: ${cost:.2f}, Remaining cash: ${self.strategy_cash[strategy_type]:.2f}")
+                        self.logger.info(f"LEG TRADE: {strategy_type.value} ({trade_action}) - Cost: ${cost:.2f}, Remaining cash: ${self.strategy_cash[strategy_type]:.2f}")
                         
                         # Create trade record for additional leg
                         cycle_id = self.active_cycles[strategy_type]
@@ -398,7 +419,7 @@ class BacktestingAdapter:
                                 trade_id=f"{cycle_id}_trade_{len(strategy.positions) + 1}",
                                 timestamp=market_data.timestamp,
                                 symbol=symbol,
-                                trade_type=TradeType.BUY,
+                                trade_type=trade_type,
                                 quantity=position_size,
                                 price=current_price,
                                 order_level=strategy.current_leg + 1,
@@ -412,7 +433,7 @@ class BacktestingAdapter:
                         # Add position to strategy
                         position = Position(
                             symbol=market_data.symbol,
-                            quantity=position_size,
+                            quantity=position_size if not is_sell_entry else -position_size,  # Negative for short positions
                             avg_price=current_price,
                             current_price=current_price,
                             strategy_id=strategy_type.value,
@@ -423,7 +444,10 @@ class BacktestingAdapter:
                         strategy.current_leg += 1
                         
                         # Place order in backtesting framework
-                        self.buy(size=position_size)
+                        if is_sell_entry:
+                            self.sell(size=position_size)
+                        else:
+                            self.buy(size=position_size)
                     elif position_size > 0:
                         required_cash = position_size * current_price
                         self.logger.warning(f"LEG SKIPPED: {strategy_type.value} - Need: ${required_cash:.2f}, Available: ${available_cash:.2f}, Shortfall: ${required_cash - available_cash:.2f}")
@@ -432,11 +456,26 @@ class BacktestingAdapter:
                 # Exit logic
                 elif strategy.should_exit(market_data) and strategy.is_active:
                     total_quantity = sum(pos.quantity for pos in strategy.positions)
-                    if total_quantity > 0:
+                    abs_total_quantity = abs(total_quantity)
+                    
+                    if abs_total_quantity > 0:
+                        # Determine if we have long or short positions
+                        is_short_position = total_quantity < 0
+                        
                         # Calculate profit/loss
                         total_cost = sum(pos.quantity * pos.avg_price for pos in strategy.positions)
-                        total_value = total_quantity * current_price
-                        profit = total_value - total_cost
+                        if is_short_position:
+                            # For short positions: profit = entry_value - current_value
+                            total_value = abs_total_quantity * current_price
+                            profit = abs(total_cost) - total_value
+                        else:
+                            # For long positions: profit = current_value - entry_cost
+                            total_value = total_quantity * current_price
+                            profit = total_value - total_cost
+                        
+                        # Determine exit trade type (opposite of entry)
+                        exit_trade_type = TradeType.BUY if is_short_position else TradeType.SELL
+                        exit_action = "BUY" if is_short_position else "SELL"
                         
                         # Create exit trade record
                         cycle_id = self.active_cycles[strategy_type]
@@ -445,12 +484,12 @@ class BacktestingAdapter:
                                 trade_id=f"{cycle_id}_exit_trade",
                                 timestamp=market_data.timestamp,
                                 symbol=symbol,
-                                trade_type=TradeType.SELL,
-                                quantity=total_quantity,
+                                trade_type=exit_trade_type,
+                                quantity=abs_total_quantity,
                                 price=current_price,
                                 order_level=0,  # Exit trade
                                 strategy_type=strategy_type.value,
-                                commission=total_value * 0.002  # 0.2% commission
+                                commission=abs_total_quantity * current_price * 0.002  # 0.2% commission
                             )
                             
                             # Add trade to cycle
@@ -465,8 +504,14 @@ class BacktestingAdapter:
                                 self.risk_manager.register_cycle_end(cycle_id, completed_cycle.realized_pnl)
                         
                         # Update strategy cash
-                        self.strategy_cash[strategy_type] += total_value
-                        self.logger.info(f"EXIT TRADE: {strategy_type.value} - Received: ${total_value:.2f}, New cash: ${self.strategy_cash[strategy_type]:.2f}, Profit: ${profit:.2f}")
+                        if is_short_position:
+                            # For short positions, we get back the original short sale proceeds plus/minus profit
+                            self.strategy_cash[strategy_type] += abs(total_cost) + profit
+                        else:
+                            # For long positions, we get the current market value
+                            self.strategy_cash[strategy_type] += total_value
+                        
+                        self.logger.info(f"EXIT TRADE: {strategy_type.value} ({exit_action}) - Profit: ${profit:.2f}, New cash: ${self.strategy_cash[strategy_type]:.2f}")
                         
                         # Update strategy statistics
                         strategy.total_cycles += 1
@@ -475,7 +520,10 @@ class BacktestingAdapter:
                             strategy.winning_cycles += 1
                         
                         # Close all positions
-                        self.sell(size=total_quantity)
+                        if is_short_position:
+                            self.buy(size=abs_total_quantity)
+                        else:
+                            self.sell(size=abs_total_quantity)
                         
                         # Reset strategy state
                         strategy.positions.clear()

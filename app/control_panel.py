@@ -289,8 +289,7 @@ class ControlPanel:
             timeframe=trading_params["timeframe"],
             duration=trading_params.get("duration", "30 D"),
             data_type=trading_params.get("data_type", "TRADES"),
-            position_size_type=trading_params.get("position_size_type", "PERCENTAGE"),
-            position_size_value=trading_params.get("position_size_value", 5.0),
+
             ib_config=ib_config,
             shared_settings=shared_settings
         )
@@ -353,8 +352,7 @@ class ControlPanel:
             "timeframe": config.timeframe,
             "duration": config.duration,
             "data_type": config.data_type,
-            "position_size_type": config.position_size_type,
-            "position_size_value": config.position_size_value,
+
             "ib_config": asdict(config.ib_config),
             "shared_settings": asdict(config.shared_settings),
             "cdm_settings": asdict(config.cdm_settings),
@@ -390,8 +388,7 @@ class ControlPanel:
             timeframe=config_dict["timeframe"],
             duration=config_dict["duration"],
             data_type=config_dict["data_type"],
-            position_size_type=config_dict["position_size_type"],
-            position_size_value=config_dict["position_size_value"],
+
             ib_config=ib_config,
             shared_settings=shared_settings,
             cdm_settings=cdm_settings,
@@ -477,23 +474,7 @@ class ControlPanel:
             self.logger.error(f"Failed to update strategy status: {e}")
             return False
     
-    def update_position_sizing(self, sizing_type: str, value: float) -> bool:
-        """Update position sizing parameters"""
-        if not self.config:
-            self.logger.error("No configuration loaded")
-            return False
-        
-        try:
-            # Update position sizing configuration
-            self.config.position_size_type = sizing_type
-            self.config.position_size_value = value
-            
-            self.logger.info(f"Position sizing updated: {sizing_type} = {value}")
-            return True
-            
-        except Exception as e:
-            self.logger.error(f"Failed to update position sizing: {e}")
-            return False
+
     
     def start_trading(self) -> bool:
         """Start the trading engine"""

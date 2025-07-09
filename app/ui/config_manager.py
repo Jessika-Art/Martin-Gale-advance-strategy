@@ -1318,8 +1318,7 @@ def config_to_dict(config: TradingConfig) -> Dict[str, Any]:
         'timeframe': config.timeframe,
         'duration': config.duration,
         'data_type': config.data_type,
-        'position_size_type': config.position_size_type,
-        'position_size_value': config.position_size_value,
+
         'cdm_settings': {
             **settings_to_dict(config.cdm_settings),
             'order_tps': config.cdm_settings.order_tps,
@@ -1399,8 +1398,7 @@ def dict_to_config(config_dict: Dict[str, Any]) -> TradingConfig:
     config.timeframe = config_dict.get('timeframe', '1 min')
     config.duration = config_dict.get('duration', '30 D')
     config.data_type = config_dict.get('data_type', 'TRADES')
-    config.position_size_type = config_dict.get('position_size_type', 'PERCENTAGE')
-    config.position_size_value = config_dict.get('position_size_value', 5.0)
+
     
     # Strategy settings
     def update_settings(settings, settings_dict):

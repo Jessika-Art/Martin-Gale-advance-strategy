@@ -113,8 +113,7 @@ def render_backtesting_interface(config: TradingConfig):
                         config.timeframe = uploaded_trading_config.timeframe
                         config.duration = uploaded_trading_config.duration
                         config.data_type = uploaded_trading_config.data_type
-                        config.position_size_type = uploaded_trading_config.position_size_type
-                        config.position_size_value = uploaded_trading_config.position_size_value
+
                         
                         # Update strategy settings objects completely
                         config.cdm_settings = uploaded_trading_config.cdm_settings
@@ -170,8 +169,7 @@ def render_backtesting_interface(config: TradingConfig):
                             config.timeframe = uploaded_trading_config.timeframe
                             config.duration = uploaded_trading_config.duration
                             config.data_type = uploaded_trading_config.data_type
-                            config.position_size_type = uploaded_trading_config.position_size_type
-                            config.position_size_value = uploaded_trading_config.position_size_value
+
                             
                             # Update strategy settings objects completely
                             config.cdm_settings = uploaded_trading_config.cdm_settings

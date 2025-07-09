@@ -470,7 +470,7 @@
   "wdm_settings": {
     "enabled": false,
     "capital_allocation": 0.25,
-    "initial_trade_type": "BUY",
+    "initial_trade_type": "SELL",
     "symbol": "AAPL",
     "price_trigger": null,
     "max_orders": 5,
@@ -1027,7 +1027,7 @@
   "izrm_settings": {
     "enabled": false,
     "capital_allocation": 0.25,
-    "initial_trade_type": "BUY",
+    "initial_trade_type": "SELL",
     "symbol": "AAPL",
     "price_trigger": null,
     "max_orders": 5,

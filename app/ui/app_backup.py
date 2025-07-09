@@ -540,12 +540,11 @@ def render_sidebar_navigation():
         for strategy in available_strategies:
             strategy_enum = strategy_enum_map[strategy]
             current_active = strategy_enum in config.active_strategies
-            if st.checkbox(strategy_names[strategy], value=current_active, key=f"strategy_{strategy}"):
-                if strategy_enum not in config.active_strategies:
-                    config.active_strategies.append(strategy_enum)
-            else:
-                if strategy_enum in config.active_strategies:
-                    config.active_strategies.remove(strategy_enum)
+            new_active = st.checkbox(strategy_names[strategy], value=current_active, key=f"strategy_{strategy}")
+            
+            # Only update if the state changed
+            if new_active != current_active:
+                config.enable_strategy(strategy_enum, new_active)
         
         st.markdown('</div>', unsafe_allow_html=True)
         

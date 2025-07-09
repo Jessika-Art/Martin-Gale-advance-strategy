@@ -317,11 +317,15 @@ class TradingEngine:
             account_balance = self.api.get_account_balance()
             position_size = strategy.calculate_position_size(0, account_balance, market_data.price)
             
-            # Determine order action based on strategy type
-            if strategy.strategy_type in [StrategyType.CDM, StrategyType.ZRM]:
-                action = OrderAction.BUY  # Counter-trend strategies typically buy on dips
+            # Determine order action based on initial_trade_type setting
+            if hasattr(strategy.settings, 'initial_trade_type') and strategy.settings.initial_trade_type:
+                if strategy.settings.initial_trade_type.upper() == "SELL":
+                    action = OrderAction.SELL
+                else:
+                    action = OrderAction.BUY
             else:
-                action = OrderAction.BUY  # Trend-following strategies buy on momentum
+                # Fallback to default behavior
+                action = OrderAction.BUY
             
             # Create order request
             order_request = OrderRequest(
@@ -338,7 +342,7 @@ class TradingEngine:
             if order_id:
                 self.pending_orders[order_id] = order_request
                 strategy.current_leg = 1
-                self.logger.info(f"Entry order placed for {strategy.strategy_type.value} on {market_data.symbol}")
+                self.logger.info(f"Entry order placed for {strategy.strategy_type.value} on {market_data.symbol}: {action.value}")
             
         except Exception as e:
             self.logger.error(f"Error handling strategy entry: {e}")

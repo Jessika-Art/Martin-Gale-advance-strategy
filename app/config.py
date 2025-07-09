@@ -346,9 +346,7 @@ class TradingConfig:
     duration: str = "30 D"  # 30 D, 1 Y, etc.
     data_type: str = "TRADES"
     
-    # Position sizing
-    position_size_type: str = "PERCENTAGE"  # PERCENTAGE, LOTS, SHARES
-    position_size_value: float = 5.0  # 5% of account or number of lots/shares
+    # Position sizing is handled by individual strategy settings
     
     # Configuration objects
     ib_config: IBConfig = field(default_factory=IBConfig)
@@ -360,6 +358,8 @@ class TradingConfig:
     
     def get_strategy_settings(self, strategy_type: StrategyType) -> StrategySettings:
         """Get settings for a specific strategy"""
+        from copy import deepcopy
+        
         mapping = {
             StrategyType.CDM: self.cdm_settings,
             StrategyType.WDM: self.wdm_settings,
@@ -369,20 +369,31 @@ class TradingConfig:
         
         # Try direct mapping first
         if strategy_type in mapping:
-            return mapping[strategy_type]
+            # Return a deep copy to prevent shared object issues
+            return deepcopy(mapping[strategy_type])
         
         # Fallback: try to match by enum value
         for enum_key, settings in mapping.items():
             if enum_key.value == strategy_type.value:
-                return settings
+                # Return a deep copy to prevent shared object issues
+                return deepcopy(settings)
         
         # If still not found, raise a more descriptive error
         raise KeyError(f"Strategy type {strategy_type} (value: {strategy_type.value}) not found in mapping. Available: {list(mapping.keys())}")
     
     def enable_strategy(self, strategy_type: StrategyType, enabled: bool = True):
         """Enable or disable a strategy"""
-        settings = self.get_strategy_settings(strategy_type)
-        settings.enabled = enabled
+        # Get the original settings object (not a copy) for modification
+        mapping = {
+            StrategyType.CDM: self.cdm_settings,
+            StrategyType.WDM: self.wdm_settings,
+            StrategyType.ZRM: self.zrm_settings,
+            StrategyType.IZRM: self.izrm_settings
+        }
+        
+        if strategy_type in mapping:
+            settings = mapping[strategy_type]
+            settings.enabled = enabled
         
         if enabled and strategy_type not in self.active_strategies:
             self.active_strategies.append(strategy_type)
@@ -391,8 +402,17 @@ class TradingConfig:
     
     def set_ticker_for_strategy(self, strategy_type: StrategyType, ticker: str):
         """Set ticker for a specific strategy"""
-        settings = self.get_strategy_settings(strategy_type)
-        settings.symbol = ticker
+        # Get the original settings object (not a copy) for modification
+        mapping = {
+            StrategyType.CDM: self.cdm_settings,
+            StrategyType.WDM: self.wdm_settings,
+            StrategyType.ZRM: self.zrm_settings,
+            StrategyType.IZRM: self.izrm_settings
+        }
+        
+        if strategy_type in mapping:
+            settings = mapping[strategy_type]
+            settings.symbol = ticker
     
     def set_all_tickers(self, ticker: str):
         """Set the same ticker for all strategies"""
@@ -486,24 +506,33 @@ class TradingConfig:
     
     def apply_shared_settings_to_strategies(self):
         """Apply shared settings to individual strategy settings where applicable"""
+        # Get the original settings objects (not copies) for modification
+        strategy_settings_map = {
+            StrategyType.CDM: self.cdm_settings,
+            StrategyType.WDM: self.wdm_settings,
+            StrategyType.ZRM: self.zrm_settings,
+            StrategyType.IZRM: self.izrm_settings
+        }
+        
         for strategy_type in StrategyType:
-            strategy_settings = self.get_strategy_settings(strategy_type)
-            
-            # Apply global position sizing if strategy doesn't have specific settings
-            if not hasattr(strategy_settings, 'position_size_unit') or not strategy_settings.position_size_unit:
-                strategy_settings.position_size_unit = self.shared_settings.global_position_size_unit
-                strategy_settings.fixed_position_size = self.shared_settings.global_fixed_position_size
-            
-            # Apply global strategy alignment
-            strategy_settings.strategy_alignment = self.shared_settings.global_strategy_alignment
-            strategy_settings.parallel_start_mode = self.shared_settings.global_parallel_start_mode
-            strategy_settings.strategy_to_start_with = self.shared_settings.global_strategy_to_start_with
-            strategy_settings.order_number_to_start = self.shared_settings.global_order_number_to_start
-            strategy_settings.sequential_mode_strategy = self.shared_settings.global_sequential_mode_strategy
-            
-            # Apply coordination enabled flag based on global coordination settings
-            # Coordination should be disabled for single strategy execution
-            strategy_settings.other_strategies_entry_index = self.is_strategy_coordination_enabled()
+            if strategy_type in strategy_settings_map:
+                strategy_settings = strategy_settings_map[strategy_type]
+                
+                # Apply global position sizing if strategy doesn't have specific settings
+                if not hasattr(strategy_settings, 'position_size_unit') or not strategy_settings.position_size_unit:
+                    strategy_settings.position_size_unit = self.shared_settings.global_position_size_unit
+                    strategy_settings.fixed_position_size = self.shared_settings.global_fixed_position_size
+                
+                # Apply global strategy alignment
+                strategy_settings.strategy_alignment = self.shared_settings.global_strategy_alignment
+                strategy_settings.parallel_start_mode = self.shared_settings.global_parallel_start_mode
+                strategy_settings.strategy_to_start_with = self.shared_settings.global_strategy_to_start_with
+                strategy_settings.order_number_to_start = self.shared_settings.global_order_number_to_start
+                strategy_settings.sequential_mode_strategy = self.shared_settings.global_sequential_mode_strategy
+                
+                # Apply coordination enabled flag based on global coordination settings
+                # Coordination should be disabled for single strategy execution
+                strategy_settings.other_strategies_entry_index = self.is_strategy_coordination_enabled()
     
     def get_risk_limits_status(self, current_loss: float, current_drawdown_pct: float) -> Dict[str, bool]:
         """Get comprehensive risk limits status"""
@@ -554,7 +583,7 @@ def get_live_multi_ticker_config() -> TradingConfig:
         tickers=["AAPL", "TSLA", "MSFT"]
     )
     config.enable_strategy(StrategyType.CDM, True)
-    config.position_size_value = 2.0  # 2% per ticker
+    config.cdm_settings.capital_allocation = 0.02  # 2% per ticker
     return config
 
 def get_ib_bar_size(timeframe: str) -> str:
