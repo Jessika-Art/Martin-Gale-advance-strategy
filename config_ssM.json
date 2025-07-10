@@ -779,7 +779,7 @@
     "continue_trading": true,
     "pre_after_hours": false,
     "repeat_on_close": true,
-    "order_type": "LIMIT",
+    "order_type": "MARKET",
     "money_management": false,
     "growth_threshold": 10000.0,
     "increase_value": 0.1,

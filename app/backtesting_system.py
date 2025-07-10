@@ -408,10 +408,22 @@ class BacktestingAdapter:
                         strategy.current_leg += 1
                         
                         # Place order in backtesting framework
-                        if is_sell_entry:
-                            self.sell(size=position_size)
+                        # Get order type from shared settings
+                        shared_settings = getattr(self.config, 'shared_settings', None)
+                        order_type = getattr(shared_settings, 'order_type', 'MARKET') if shared_settings else 'MARKET'
+                        
+                        if order_type == 'LIMIT':
+                            # For limit orders, use current price as limit price
+                            if is_sell_entry:
+                                self.sell(size=position_size, limit=current_price)
+                            else:
+                                self.buy(size=position_size, limit=current_price)
                         else:
-                            self.buy(size=position_size)
+                            # Market orders (default behavior)
+                            if is_sell_entry:
+                                self.sell(size=position_size)
+                            else:
+                                self.buy(size=position_size)
                     elif position_size > 0:
                         required_cash = position_size * current_price
                         self.logger.warning(f"ENTRY SKIPPED: {strategy_type.value} - Need: ${required_cash:.2f}, Available: ${available_cash:.2f}, Shortfall: ${required_cash - available_cash:.2f}")
@@ -481,10 +493,22 @@ class BacktestingAdapter:
                         strategy.current_leg += 1
                         
                         # Place order in backtesting framework
-                        if is_sell_entry:
-                            self.sell(size=position_size)
+                        # Get order type from shared settings
+                        shared_settings = getattr(self.config, 'shared_settings', None)
+                        order_type = getattr(shared_settings, 'order_type', 'MARKET') if shared_settings else 'MARKET'
+                        
+                        if order_type == 'LIMIT':
+                            # For limit orders, use current price as limit price
+                            if is_sell_entry:
+                                self.sell(size=position_size, limit=current_price)
+                            else:
+                                self.buy(size=position_size, limit=current_price)
                         else:
-                            self.buy(size=position_size)
+                            # Market orders (default behavior)
+                            if is_sell_entry:
+                                self.sell(size=position_size)
+                            else:
+                                self.buy(size=position_size)
                     elif position_size > 0:
                         required_cash = position_size * current_price
                         self.logger.warning(f"LEG SKIPPED: {strategy_type.value} - Need: ${required_cash:.2f}, Available: ${available_cash:.2f}, Shortfall: ${required_cash - available_cash:.2f}")
@@ -557,10 +581,22 @@ class BacktestingAdapter:
                             strategy.winning_cycles += 1
                         
                         # Close all positions
-                        if is_short_position:
-                            self.buy(size=abs_total_quantity)
+                        # Get order type from shared settings
+                        shared_settings = getattr(self.config, 'shared_settings', None)
+                        order_type = getattr(shared_settings, 'order_type', 'MARKET') if shared_settings else 'MARKET'
+                        
+                        if order_type == 'LIMIT':
+                            # For limit orders, use current price as limit price
+                            if is_short_position:
+                                self.buy(size=abs_total_quantity, limit=current_price)
+                            else:
+                                self.sell(size=abs_total_quantity, limit=current_price)
                         else:
-                            self.sell(size=abs_total_quantity)
+                            # Market orders (default behavior)
+                            if is_short_position:
+                                self.buy(size=abs_total_quantity)
+                            else:
+                                self.sell(size=abs_total_quantity)
                         
                         # Reset strategy state
                         strategy.positions.clear()

@@ -13,7 +13,7 @@
   "cdm_settings": {
     "enabled": true,
     "capital_allocation": 0.25,
-    "initial_trade_type": "SELL",
+    "initial_trade_type": "BUY",
     "symbol": "AAPL",
     "price_trigger": null,
     "max_orders": 5,

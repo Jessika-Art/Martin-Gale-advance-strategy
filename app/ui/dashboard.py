@@ -202,12 +202,42 @@ def close_position(symbol: str, quantity: int):
         action = OrderAction.SELL if quantity > 0 else OrderAction.BUY
         close_quantity = abs(quantity)
         
+        # Get order type from shared settings
+        order_type = "MARKET"  # Default
+        limit_price = None
+        
+        # Try to get order type from trading engine config
+        if st.session_state.trading_engine and hasattr(st.session_state.trading_engine, 'config'):
+            config = st.session_state.trading_engine.config
+            if hasattr(config, 'shared_settings') and hasattr(config.shared_settings, 'order_type'):
+                order_type = config.shared_settings.order_type
+        # Try to get order type from control panel config
+        elif st.session_state.control_panel and hasattr(st.session_state.control_panel, 'config'):
+            config = st.session_state.control_panel.config
+            if hasattr(config, 'shared_settings') and hasattr(config.shared_settings, 'order_type'):
+                order_type = config.shared_settings.order_type
+        
+        # Get current market price for limit orders
+        if order_type == "LIMIT":
+            try:
+                market_data = api.get_market_data(symbol) if hasattr(api, 'get_market_data') else None
+                if market_data and hasattr(market_data, 'price'):
+                    limit_price = market_data.price
+                else:
+                    # Fallback to market order if we can't get current price
+                    order_type = "MARKET"
+                    st.warning(f"Could not get current price for {symbol}, using market order instead")
+            except Exception:
+                order_type = "MARKET"
+                st.warning(f"Could not get current price for {symbol}, using market order instead")
+        
         # Create order request to close position
         order_request = OrderRequest(
             symbol=symbol,
             action=action,
             quantity=close_quantity,
-            order_type="MKT"  # Market order for immediate execution
+            order_type=order_type,
+            limit_price=limit_price
         )
         
         # Place the order

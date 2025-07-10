@@ -333,12 +333,21 @@ class TradingEngine:
                 # Fallback to default behavior
                 action = OrderAction.BUY
             
+            # Get order type from shared settings
+            order_type = self.config.shared_settings.order_type if hasattr(self.config.shared_settings, 'order_type') else "MARKET"
+            
+            # Calculate limit price for LIMIT orders
+            limit_price = None
+            if order_type == "LIMIT":
+                limit_price = market_data.price
+            
             # Create order request
             order_request = OrderRequest(
                 symbol=market_data.symbol,
                 action=action,
                 quantity=position_size,
-                order_type="MARKET",
+                order_type=order_type,
+                limit_price=limit_price,
                 strategy_id=f"{strategy.strategy_type.value}_{market_data.symbol}",
                 leg_number=0
             )
@@ -372,12 +381,21 @@ class TradingEngine:
             else:
                 action = OrderAction.BUY  # Default for other strategies
             
+            # Get order type from shared settings
+            order_type = self.config.shared_settings.order_type if hasattr(self.config.shared_settings, 'order_type') else "MARKET"
+            
+            # Calculate limit price for LIMIT orders
+            limit_price = None
+            if order_type == "LIMIT":
+                limit_price = market_data.price
+            
             # Create order request
             order_request = OrderRequest(
                 symbol=market_data.symbol,
                 action=action,
                 quantity=position_size,
-                order_type="MARKET",
+                order_type=order_type,
+                limit_price=limit_price,
                 strategy_id=f"{strategy.strategy_type.value}_{market_data.symbol}",
                 leg_number=strategy.current_leg
             )
@@ -402,12 +420,21 @@ class TradingEngine:
                 # Determine exit action (opposite of position)
                 action = OrderAction.SELL if total_position > 0 else OrderAction.BUY
                 
+                # Get order type from shared settings
+                order_type = self.config.shared_settings.order_type if hasattr(self.config.shared_settings, 'order_type') else "MARKET"
+                
+                # Calculate limit price for LIMIT orders
+                limit_price = None
+                if order_type == "LIMIT":
+                    limit_price = market_data.price
+                
                 # Create exit order
                 order_request = OrderRequest(
                     symbol=market_data.symbol,
                     action=action,
                     quantity=abs(total_position),
-                    order_type="MARKET",
+                    order_type=order_type,
+                    limit_price=limit_price,
                     strategy_id=f"{strategy.strategy_type.value}_{market_data.symbol}",
                     leg_number=-1  # Exit order
                 )
