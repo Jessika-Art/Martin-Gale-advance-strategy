@@ -413,13 +413,10 @@ class TradingEngine:
     def _handle_strategy_exit(self, strategy: BaseStrategy, market_data: MarketData):
         """Handle strategy exit signal"""
         try:
-            # Close all positions for this strategy
-            total_position = strategy.get_total_position()
-            
-            if total_position != 0:
-                # Determine exit action (opposite of position)
-                action = OrderAction.SELL if total_position > 0 else OrderAction.BUY
-                
+            # Check if strategy has positions to close
+            if not strategy.positions:
+                self.logger.info(f"No positions to close for {strategy.strategy_type.value} on {market_data.symbol}")
+            else:
                 # Get order type from shared settings
                 order_type = self.config.shared_settings.order_type if hasattr(self.config.shared_settings, 'order_type') else "MARKET"
                 
@@ -428,22 +425,56 @@ class TradingEngine:
                 if order_type == "LIMIT":
                     limit_price = market_data.price
                 
-                # Create exit order
-                order_request = OrderRequest(
-                    symbol=market_data.symbol,
-                    action=action,
-                    quantity=abs(total_position),
-                    order_type=order_type,
-                    limit_price=limit_price,
-                    strategy_id=f"{strategy.strategy_type.value}_{market_data.symbol}",
-                    leg_number=-1  # Exit order
-                )
-                
-                # Place exit order
-                order_id = self.api.place_order(order_request)
-                if order_id:
-                    self.pending_orders[order_id] = order_request
-                    self.logger.info(f"Exit order placed for {strategy.strategy_type.value} on {market_data.symbol}")
+                # Check hold_previous setting to determine exit behavior
+                if strategy.settings.hold_previous:
+                    # Hold previous is True: Close all positions simultaneously with a single exit order
+                    total_position = strategy.get_total_position()
+                    
+                    if total_position != 0:
+                        # Determine exit action (opposite of position)
+                        action = OrderAction.SELL if total_position > 0 else OrderAction.BUY
+                        
+                        # Create single exit order for all positions
+                        order_request = OrderRequest(
+                            symbol=market_data.symbol,
+                            action=action,
+                            quantity=abs(total_position),
+                            order_type=order_type,
+                            limit_price=limit_price,
+                            strategy_id=f"{strategy.strategy_type.value}_{market_data.symbol}",
+                            leg_number=-1  # Exit order
+                        )
+                        
+                        # Place exit order
+                        order_id = self.api.place_order(order_request)
+                        if order_id:
+                            self.pending_orders[order_id] = order_request
+                            self.logger.info(f"Exit order placed for all positions in {strategy.strategy_type.value} on {market_data.symbol} (hold_previous=True)")
+                else:
+                    # Hold previous is False: Close each position individually
+                    self.logger.info(f"Closing positions individually for {strategy.strategy_type.value} on {market_data.symbol} (hold_previous=False)")
+                    
+                    for i, position in enumerate(strategy.positions):
+                        if position.quantity != 0:
+                            # Determine exit action (opposite of position)
+                            action = OrderAction.SELL if position.quantity > 0 else OrderAction.BUY
+                            
+                            # Create individual exit order for this position
+                            order_request = OrderRequest(
+                                symbol=market_data.symbol,
+                                action=action,
+                                quantity=abs(position.quantity),
+                                order_type=order_type,
+                                limit_price=limit_price,
+                                strategy_id=f"{strategy.strategy_type.value}_{market_data.symbol}",
+                                leg_number=position.leg_number  # Use original leg number for tracking
+                            )
+                            
+                            # Place individual exit order
+                            order_id = self.api.place_order(order_request)
+                            if order_id:
+                                self.pending_orders[order_id] = order_request
+                                self.logger.info(f"Individual exit order placed for leg {position.leg_number} in {strategy.strategy_type.value} on {market_data.symbol}")
             
             # End strategy cycle
             strategy.end_cycle(market_data)

@@ -272,12 +272,19 @@ class BaseStrategy(ABC):
         
         self.logger.info(f"Cycle ended. PnL: {cycle_pnl:.2f}, Total PnL: {self.total_profit:.2f}")
         
-        # Reset state
-        self.is_active = False
-        self.current_leg = 0
-        self.entry_price = None
-        
-        if not self.settings.hold_previous:
+        # Reset state - but handle hold_previous logic
+        if self.settings.hold_previous:
+            # When holding previous positions, only reset cycle-specific state
+            # but keep strategy active to allow new entries
+            self.current_leg = 0
+            self.entry_price = None
+            # Keep is_active = True and keep positions
+            self.logger.info(f"Holding {len(self.positions)} positions for next cycle")
+        else:
+            # When not holding previous, fully reset strategy
+            self.is_active = False
+            self.current_leg = 0
+            self.entry_price = None
             self.positions.clear()
     
     def update_positions_price(self, market_data: MarketData):
@@ -482,8 +489,15 @@ class CDMStrategy(BaseStrategy):
     
     def should_enter(self, market_data: MarketData) -> bool:
         """Enter when price drops to trigger level or immediately if no trigger set"""
-        if self.is_active:
+        # When hold_previous is True, allow new cycles even if strategy is active
+        if self.is_active and not self.settings.hold_previous:
             return False
+        
+        # If hold_previous is True and we're active, check if we can start a new cycle
+        if self.is_active and self.settings.hold_previous:
+            # Only allow new cycle if current_leg is 0 (cycle just ended)
+            if self.current_leg != 0:
+                return False
         
         if self.settings.price_trigger is None:
             return True  # Enter immediately
@@ -540,8 +554,15 @@ class WDMStrategy(BaseStrategy):
     
     def should_enter(self, market_data: MarketData) -> bool:
         """Enter when price rises to trigger level or immediately if no trigger set"""
-        if self.is_active:
+        # When hold_previous is True, allow new cycles even if strategy is active
+        if self.is_active and not self.settings.hold_previous:
             return False
+        
+        # If hold_previous is True and we're active, check if we can start a new cycle
+        if self.is_active and self.settings.hold_previous:
+            # Only allow new cycle if current_leg is 0 (cycle just ended)
+            if self.current_leg != 0:
+                return False
         
         if self.settings.price_trigger is None:
             return True
@@ -591,8 +612,15 @@ class ZRMStrategy(BaseStrategy):
     
     def should_enter(self, market_data: MarketData) -> bool:
         """Enter when price matches zone center"""
-        if self.is_active:
+        # When hold_previous is True, allow new cycles even if strategy is active
+        if self.is_active and not self.settings.hold_previous:
             return False
+        
+        # If hold_previous is True and we're active, check if we can start a new cycle
+        if self.is_active and self.settings.hold_previous:
+            # Only allow new cycle if current_leg is 0 (cycle just ended)
+            if self.current_leg != 0:
+                return False
         
         if self.zone_center is None:
             self.zone_center = market_data.price
@@ -686,8 +714,15 @@ class IZRMStrategy(BaseStrategy):
     
     def should_enter(self, market_data: MarketData) -> bool:
         """Enter when price moves away from zone center"""
-        if self.is_active:
+        # When hold_previous is True, allow new cycles even if strategy is active
+        if self.is_active and not self.settings.hold_previous:
             return False
+        
+        # If hold_previous is True and we're active, check if we can start a new cycle
+        if self.is_active and self.settings.hold_previous:
+            # Only allow new cycle if current_leg is 0 (cycle just ended)
+            if self.current_leg != 0:
+                return False
         
         if self.zone_center is None:
             self.zone_center = market_data.price

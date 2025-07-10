@@ -520,83 +520,163 @@ class BacktestingAdapter:
                     abs_total_quantity = abs(total_quantity)
                     
                     if abs_total_quantity > 0:
+                        # Get strategy settings to check hold_previous
+                        strategy_settings = self.config.get_strategy_settings(strategy_type)
+                        hold_previous = getattr(strategy_settings, 'hold_previous', True)
+                        
                         # Determine if we have long or short positions
                         is_short_position = total_quantity < 0
                         
-                        # Calculate profit/loss
-                        total_cost = sum(pos.quantity * pos.avg_price for pos in strategy.positions)
-                        if is_short_position:
-                            # For short positions: profit = entry_value - current_value
-                            total_value = abs_total_quantity * current_price
-                            profit = abs(total_cost) - total_value
-                        else:
-                            # For long positions: profit = current_value - entry_cost
-                            total_value = total_quantity * current_price
-                            profit = total_value - total_cost
-                        
-                        # Determine exit trade type (opposite of entry)
-                        exit_trade_type = TradeType.BUY if is_short_position else TradeType.SELL
-                        exit_action = "BUY" if is_short_position else "SELL"
-                        
-                        # Create exit trade record
                         cycle_id = self.active_cycles[strategy_type]
+                        total_profit = 0
+                        
+                        if hold_previous:
+                            # Close all positions simultaneously with a single order
+                            # Calculate profit/loss
+                            total_cost = sum(pos.quantity * pos.avg_price for pos in strategy.positions)
+                            if is_short_position:
+                                # For short positions: profit = entry_value - current_value
+                                total_value = abs_total_quantity * current_price
+                                profit = abs(total_cost) - total_value
+                            else:
+                                # For long positions: profit = current_value - entry_cost
+                                total_value = total_quantity * current_price
+                                profit = total_value - total_cost
+                            
+                            total_profit = profit
+                            
+                            # Determine exit trade type (opposite of entry)
+                            exit_trade_type = TradeType.BUY if is_short_position else TradeType.SELL
+                            exit_action = "BUY" if is_short_position else "SELL"
+                            
+                            # Create exit trade record
+                            if cycle_id:
+                                exit_trade = Trade(
+                                    trade_id=f"{cycle_id}_exit_trade",
+                                    timestamp=market_data.timestamp,
+                                    symbol=symbol,
+                                    trade_type=exit_trade_type,
+                                    quantity=abs_total_quantity,
+                                    price=current_price,
+                                    order_level=0,  # Exit trade
+                                    strategy_type=strategy_type.value,
+                                    commission=abs_total_quantity * current_price * 0.002  # 0.2% commission
+                                )
+                                
+                                # Add trade to cycle
+                                self.cycle_analyzer.add_trade_to_cycle(cycle_id, exit_trade)
+                            
+                            # Update strategy cash
+                            if is_short_position:
+                                # For short positions, we get back the original short sale proceeds plus/minus profit
+                                self.strategy_cash[strategy_type] += abs(total_cost) + profit
+                            else:
+                                # For long positions, we get the current market value
+                                self.strategy_cash[strategy_type] += total_value
+                            
+                            # Close all positions
+                            # Get order type from shared settings
+                            shared_settings = getattr(self.config, 'shared_settings', None)
+                            order_type = getattr(shared_settings, 'order_type', 'MARKET') if shared_settings else 'MARKET'
+                            
+                            if order_type == 'LIMIT':
+                                # For limit orders, use current price as limit price
+                                if is_short_position:
+                                    self.buy(size=abs_total_quantity, limit=current_price)
+                                else:
+                                    self.sell(size=abs_total_quantity, limit=current_price)
+                            else:
+                                # Market orders (default behavior)
+                                if is_short_position:
+                                    self.buy(size=abs_total_quantity)
+                                else:
+                                    self.sell(size=abs_total_quantity)
+                            
+                            self.logger.info(f"EXIT TRADE: {strategy_type.value} (hold_previous=True, {exit_action}) - Profit: ${profit:.2f}, New cash: ${self.strategy_cash[strategy_type]:.2f}")
+                        
+                        else:
+                            # Close each position individually
+                            for i, pos in enumerate(strategy.positions):
+                                pos_quantity = pos.quantity
+                                pos_avg_price = pos.avg_price
+                                pos_abs_quantity = abs(pos_quantity)
+                                pos_is_short = pos_quantity < 0
+                                
+                                # Calculate profit/loss for this position
+                                if pos_is_short:
+                                    # For short positions: profit = entry_value - current_value
+                                    pos_profit = (pos_avg_price - current_price) * pos_abs_quantity
+                                else:
+                                    # For long positions: profit = current_value - entry_cost
+                                    pos_profit = (current_price - pos_avg_price) * pos_abs_quantity
+                                
+                                total_profit += pos_profit
+                                
+                                # Determine exit trade type (opposite of position)
+                                exit_trade_type = TradeType.BUY if pos_is_short else TradeType.SELL
+                                exit_action = "BUY" if pos_is_short else "SELL"
+                                
+                                # Create exit trade record for each position
+                                if cycle_id:
+                                    exit_trade = Trade(
+                                        trade_id=f"{cycle_id}_exit_trade_{i+1}",
+                                        timestamp=market_data.timestamp,
+                                        symbol=symbol,
+                                        trade_type=exit_trade_type,
+                                        quantity=pos_abs_quantity,
+                                        price=current_price,
+                                        order_level=pos.leg_number,
+                                        strategy_type=strategy_type.value,
+                                        commission=pos_abs_quantity * current_price * 0.002  # 0.2% commission
+                                    )
+                                    
+                                    # Add trade to cycle
+                                    self.cycle_analyzer.add_trade_to_cycle(cycle_id, exit_trade)
+                                
+                                # Update strategy cash for this position
+                                if pos_is_short:
+                                    # For short positions, we get back the original short sale proceeds plus/minus profit
+                                    self.strategy_cash[strategy_type] += (pos_avg_price * pos_abs_quantity) + pos_profit
+                                else:
+                                    # For long positions, we get the current market value
+                                    self.strategy_cash[strategy_type] += pos_abs_quantity * current_price
+                                
+                                # Place individual exit order
+                                # Get order type from shared settings
+                                shared_settings = getattr(self.config, 'shared_settings', None)
+                                order_type = getattr(shared_settings, 'order_type', 'MARKET') if shared_settings else 'MARKET'
+                                
+                                if order_type == 'LIMIT':
+                                    # For limit orders, use current price as limit price
+                                    if pos_is_short:
+                                        self.buy(size=pos_abs_quantity, limit=current_price)
+                                    else:
+                                        self.sell(size=pos_abs_quantity, limit=current_price)
+                                else:
+                                    # Market orders (default behavior)
+                                    if pos_is_short:
+                                        self.buy(size=pos_abs_quantity)
+                                    else:
+                                        self.sell(size=pos_abs_quantity)
+                                
+                                self.logger.info(f"EXIT TRADE: {strategy_type.value} (hold_previous=False, Position {i+1}, {exit_action}) - Profit: ${pos_profit:.2f}")
+                            
+                            self.logger.info(f"EXIT COMPLETE: {strategy_type.value} - Total Profit: ${total_profit:.2f}, New cash: ${self.strategy_cash[strategy_type]:.2f}")
+                        
+                        # Complete the cycle
                         if cycle_id:
-                            exit_trade = Trade(
-                                trade_id=f"{cycle_id}_exit_trade",
-                                timestamp=market_data.timestamp,
-                                symbol=symbol,
-                                trade_type=exit_trade_type,
-                                quantity=abs_total_quantity,
-                                price=current_price,
-                                order_level=0,  # Exit trade
-                                strategy_type=strategy_type.value,
-                                commission=abs_total_quantity * current_price * 0.002  # 0.2% commission
-                            )
-                            
-                            # Add trade to cycle
-                            self.cycle_analyzer.add_trade_to_cycle(cycle_id, exit_trade)
-                            
-                            # Complete the cycle
-                            completed_cycle = self.cycle_analyzer.complete_cycle(cycle_id, market_data.timestamp, profit)
+                            completed_cycle = self.cycle_analyzer.complete_cycle(cycle_id, market_data.timestamp, total_profit)
                             self.active_cycles[strategy_type] = None
                             
                             # Register cycle completion with risk manager
                             if completed_cycle:
                                 self.risk_manager.register_cycle_end(cycle_id, completed_cycle.realized_pnl)
                         
-                        # Update strategy cash
-                        if is_short_position:
-                            # For short positions, we get back the original short sale proceeds plus/minus profit
-                            self.strategy_cash[strategy_type] += abs(total_cost) + profit
-                        else:
-                            # For long positions, we get the current market value
-                            self.strategy_cash[strategy_type] += total_value
-                        
-                        self.logger.info(f"EXIT TRADE: {strategy_type.value} ({exit_action}) - Profit: ${profit:.2f}, New cash: ${self.strategy_cash[strategy_type]:.2f}")
-                        
                         # Update strategy statistics
                         strategy.total_cycles += 1
-                        strategy.total_profit += profit
-                        if profit > 0:
+                        strategy.total_profit += total_profit
+                        if total_profit > 0:
                             strategy.winning_cycles += 1
-                        
-                        # Close all positions
-                        # Get order type from shared settings
-                        shared_settings = getattr(self.config, 'shared_settings', None)
-                        order_type = getattr(shared_settings, 'order_type', 'MARKET') if shared_settings else 'MARKET'
-                        
-                        if order_type == 'LIMIT':
-                            # For limit orders, use current price as limit price
-                            if is_short_position:
-                                self.buy(size=abs_total_quantity, limit=current_price)
-                            else:
-                                self.sell(size=abs_total_quantity, limit=current_price)
-                        else:
-                            # Market orders (default behavior)
-                            if is_short_position:
-                                self.buy(size=abs_total_quantity)
-                            else:
-                                self.sell(size=abs_total_quantity)
                         
                         # Reset strategy state
                         strategy.positions.clear()
