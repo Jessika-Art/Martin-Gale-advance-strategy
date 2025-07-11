@@ -136,7 +136,7 @@ class BaseStrategy(ABC):
         distance_pct = self.settings.trailing_distance_pct[min(leg_number, len(self.settings.trailing_distance_pct) - 1)]
         
         # Check if we should activate trailing stop
-        if not self.trailing_stops_active[leg_number] and current_profit_pct >= trigger_pct:
+        if not self.trailing_stops_active.get(leg_number, False) and current_profit_pct >= trigger_pct:
             self.trailing_stops_active[leg_number] = True
             self.highest_profit_prices[leg_number] = market_data.price
             # Set initial trailing stop price
@@ -147,34 +147,34 @@ class BaseStrategy(ABC):
             return False
         
         # Update trailing stop if active
-        if self.trailing_stops_active[leg_number]:
+        if self.trailing_stops_active.get(leg_number, False):
             # Update highest profit price
             if self.position_direction == 'long':
-                if market_data.price > self.highest_profit_prices[leg_number]:
+                if market_data.price > self.highest_profit_prices.get(leg_number, 0):
                     self.highest_profit_prices[leg_number] = market_data.price
                     # Update trailing stop price
                     new_stop_price = market_data.price * (1 - distance_pct / 100)
-                    self.trailing_stop_prices[leg_number] = max(self.trailing_stop_prices[leg_number], new_stop_price)
+                    self.trailing_stop_prices[leg_number] = max(self.trailing_stop_prices.get(leg_number, 0), new_stop_price)
                 
                 # Check if stop should be triggered
-                return market_data.price <= self.trailing_stop_prices[leg_number]
+                return market_data.price <= self.trailing_stop_prices.get(leg_number, 0)
             else:
-                if market_data.price < self.highest_profit_prices[leg_number]:
+                if market_data.price < self.highest_profit_prices.get(leg_number, float('inf')):
                     self.highest_profit_prices[leg_number] = market_data.price
                     # Update trailing stop price
                     new_stop_price = market_data.price * (1 + distance_pct / 100)
-                    self.trailing_stop_prices[leg_number] = min(self.trailing_stop_prices[leg_number], new_stop_price)
+                    self.trailing_stop_prices[leg_number] = min(self.trailing_stop_prices.get(leg_number, float('inf')), new_stop_price)
                 
                 # Check if stop should be triggered
-                return market_data.price >= self.trailing_stop_prices[leg_number]
+                return market_data.price >= self.trailing_stop_prices.get(leg_number, float('inf'))
         
         return False
     
     def reset_trailing_stops(self):
         """Reset all trailing stop states"""
-        self.trailing_stops_active = [False] * len(self.settings.order_sizes)
-        self.trailing_stop_prices = [0.0] * len(self.settings.order_sizes)
-        self.highest_profit_prices = [0.0] * len(self.settings.order_sizes)
+        self.trailing_stops_active = {}
+        self.trailing_stop_prices = {}
+        self.highest_profit_prices = {}
     
     def calculate_position_size(self, leg_number: int, account_balance: float, current_price: float = None) -> float:
         """Calculate position size for a given leg (returns number of shares)"""
@@ -189,17 +189,17 @@ class BaseStrategy(ABC):
         
         self.logger.info(f"Using size_multiplier={size_multiplier} for leg {leg_number}")
         
-        # Check if using fixed position sizing
-        if hasattr(self.settings, 'position_size_unit') and self.settings.position_size_unit == 'FIXED':
+        # Check if using SHARES mode with fixed position sizing
+        if hasattr(self.settings, 'position_size_unit') and self.settings.position_size_unit == 'SHARES':
             if hasattr(self.settings, 'fixed_position_size') and self.settings.fixed_position_size > 0.0:
                 # Use fixed position size with multiplier
                 shares = self.settings.fixed_position_size * size_multiplier
                 shares = max(0.001, min(shares, 100000))  # Allow fractional shares, higher max limit
-                self.logger.info(f"Fixed position sizing: Base={self.settings.fixed_position_size}, Multiplier={size_multiplier:.2f}, Shares={shares}")
+                self.logger.info(f"SHARES mode fixed position sizing: Base={self.settings.fixed_position_size}, Multiplier={size_multiplier:.2f}, Shares={shares}")
                 return float(shares)
             elif hasattr(self.settings, 'fixed_position_size') and self.settings.fixed_position_size == 0.0:
                 # Fixed Position Size is 0.0 - bypass fixed sizing and use only multiplier against capital allocation
-                self.logger.info(f"Fixed Position Size is 0.0 - using percentage-based sizing with multiplier only")
+                self.logger.info(f"SHARES mode with Fixed Position Size 0.0 - using percentage-based sizing with multiplier only")
                 # Fall through to percentage-based calculation below
         
         # Default percentage-based position sizing
@@ -505,21 +505,22 @@ class CDMStrategy(BaseStrategy):
         return market_data.price <= self.settings.price_trigger
     
     def should_add_leg(self, market_data: MarketData) -> bool:
-        """Add leg when price drops by specified distance"""
+        """Add leg when price drops by specified distance from last position"""
         if not self.is_active or self.current_leg >= self.settings.max_orders:
             return False
         
-        if self.entry_price is None:
+        if not self.positions:
             return False
         
-        # Calculate required drop percentage for next leg
+        # Calculate required drop percentage for next leg from last position price
         distance_threshold = self.get_distance_threshold(self.current_leg)
-        required_price = self.entry_price * (1 - distance_threshold / 100)
+        last_position_price = self.positions[-1].avg_price
+        required_price = last_position_price * (1 - distance_threshold / 100)
         
         return market_data.price <= required_price
     
     def should_exit(self, market_data: MarketData) -> bool:
-        """Exit when price recovers to take profit level or trailing stop is triggered"""
+        """Exit when portfolio reaches take profit based on average entry price"""
         if not self.is_active or not self.positions:
             return False
         
@@ -532,18 +533,19 @@ class CDMStrategy(BaseStrategy):
             if self.update_trailing_stops(market_data, current_profit_pct, i):
                 return True
         
-        # Check if any position hits its take profit
-        for i, position in enumerate(self.positions):
-            if hasattr(self.settings, 'order_tps') and i < len(self.settings.order_tps):
-                tp_pct = self.settings.order_tps[i]
-                tp_price = position.avg_price * (1 + tp_pct / 100)
-                
-                if market_data.price >= tp_price:
-                    return True
+        # Calculate average entry price across all positions
+        avg_entry_price = self.get_average_price()
+        
+        # Use the take profit percentage from the first position
+        if hasattr(self.settings, 'order_tps') and len(self.settings.order_tps) > 0:
+            tp_pct = self.settings.order_tps[0]
+            target_price = avg_entry_price * (1 + tp_pct / 100)
+            
+            if market_data.price >= target_price:
+                return True
         
         # Default: exit when price recovers above average entry price (reduced threshold)
-        avg_price = self.get_average_price()
-        return market_data.price >= avg_price * 1.005  # 0.5% above average (more achievable)
+        return market_data.price >= avg_entry_price * 1.005  # 0.5% above average (more achievable)
 
 class WDMStrategy(BaseStrategy):
     """With Direction Martingale Strategy"""
@@ -570,16 +572,17 @@ class WDMStrategy(BaseStrategy):
         return market_data.price >= self.settings.price_trigger
     
     def should_add_leg(self, market_data: MarketData) -> bool:
-        """Add leg when price rises by specified distance"""
+        """Add leg when price rises by specified distance from last position"""
         if not self.is_active or self.current_leg >= self.settings.max_orders:
             return False
         
-        if self.entry_price is None:
+        if not self.positions:
             return False
         
-        # Calculate required rise percentage for next leg
+        # Calculate required rise percentage for next leg from last position price
         distance_threshold = self.get_distance_threshold(self.current_leg)
-        required_price = self.entry_price * (1 + distance_threshold / 100)
+        last_position_price = self.positions[-1].avg_price
+        required_price = last_position_price * (1 + distance_threshold / 100)
         
         return market_data.price >= required_price
     
@@ -629,24 +632,31 @@ class ZRMStrategy(BaseStrategy):
         return market_data.price == self.zone_center
     
     def should_add_leg(self, market_data: MarketData) -> bool:
-        """Add leg based on zone boundary touches with alternating logic"""
+        """Add leg based on distance from last position with alternating logic"""
         if not self.is_active or self.current_leg >= self.settings.max_orders:
             return False
         
-        if self.zone_center is None:
+        if not self.positions:
             return False
         
+        # Calculate distance from last position price
+        distance_threshold = self.get_distance_threshold(self.current_leg)
+        last_position_price = self.positions[-1].avg_price
+        upper_boundary = last_position_price * (1 + distance_threshold / 100)
+        lower_boundary = last_position_price * (1 - distance_threshold / 100)
+        
         # Detect which boundary was touched
-        boundary_touched = self.detect_boundary_touched(market_data, self.zone_center, self.current_leg)
+        boundary_touched = None
+        if market_data.price >= upper_boundary:
+            boundary_touched = 'upper'
+        elif market_data.price <= lower_boundary:
+            boundary_touched = 'lower'
         
         if boundary_touched:
             # Update boundary tracking
             self.last_boundary_touched = boundary_touched
-            
-            # Update zone boundaries for this leg
-            self.zone_upper_boundary, self.zone_lower_boundary = self.calculate_zone_boundaries(
-                self.zone_center, self.current_leg
-            )
+            self.zone_upper_boundary = upper_boundary
+            self.zone_lower_boundary = lower_boundary
             
             return True
         
@@ -681,14 +691,14 @@ class ZRMStrategy(BaseStrategy):
             if self.update_trailing_stops(market_data, current_profit_pct, i):
                 return True
         
-        # Check take profit levels
-        for i, position in enumerate(self.positions):
-            if hasattr(self.settings, 'order_tps') and i < len(self.settings.order_tps):
-                tp_pct = self.settings.order_tps[i]
-                tp_price = position.avg_price * (1 + tp_pct / 100)
-                
-                if market_data.price >= tp_price:
-                    return True
+        # Check take profit levels based on average entry price
+        if hasattr(self.settings, 'order_tps') and len(self.settings.order_tps) > 0:
+            avg_entry_price = self.get_average_price()
+            tp_pct = self.settings.order_tps[0]
+            tp_price = avg_entry_price * (1 + tp_pct / 100)
+            
+            if market_data.price >= tp_price:
+                return True
         
         return False
     
