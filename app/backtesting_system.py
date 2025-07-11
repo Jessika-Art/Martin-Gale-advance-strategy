@@ -8,9 +8,10 @@ from backtesting.lib import crossover
 import logging
 import uuid
 
-from config import TradingConfig, StrategyType, StrategySettings
+from config import TradingConfig, StrategyType, StrategySettings, IBConfig, AccountType
 from strategies import CDMStrategy, WDMStrategy, ZRMStrategy, IZRMStrategy, MarketData, OrderAction, Position
 from cycle_analysis import CycleAnalyzer, Trade, TradeType, CycleAnalysisReport
+from ibkr_historical_data import IBKRDataProvider, fetch_ibkr_data
 from risk_manager import GlobalRiskManager
 
 class BacktestingAdapter:
@@ -33,7 +34,14 @@ class BacktestingAdapter:
         else:
             self.risk_manager = GlobalRiskManager()
         
-    def fetch_data(self, symbol: str, start_date: str, end_date: str, interval: str = '1h') -> pd.DataFrame:
+    def fetch_data(self, symbol: str, start_date: str, end_date: str, interval: str = '1h', use_ibkr: bool = False) -> pd.DataFrame:
+        """Fetch historical data using yfinance or IBKR"""
+        if use_ibkr:
+            return self._fetch_data_ibkr(symbol, start_date, end_date, interval)
+        else:
+            return self._fetch_data_yfinance(symbol, start_date, end_date, interval)
+    
+    def _fetch_data_yfinance(self, symbol: str, start_date: str, end_date: str, interval: str = '1h') -> pd.DataFrame:
         """Fetch historical data using yfinance"""
         try:
             # Convert interval format using config mapping
@@ -124,6 +132,61 @@ class BacktestingAdapter:
             else:
                 self.logger.error(f"Error fetching data for {symbol}: {error_msg}")
                 raise
+    
+    def _fetch_data_ibkr(self, symbol: str, start_date: str, end_date: str, interval: str = '1h') -> pd.DataFrame:
+        """Fetch historical data using Interactive Brokers"""
+        try:
+            from ibkr_historical_data import fetch_ibkr_data
+            
+            self.logger.info(f"Fetching IBKR data for {symbol} from {start_date} to {end_date} with interval {interval}")
+            
+            # Fetch data from IBKR
+            data = fetch_ibkr_data(
+                symbol=symbol,
+                start_date=start_date,
+                end_date=end_date,
+                interval=interval
+            )
+            
+            if data.empty:
+                raise ValueError(f"No IBKR data found for {symbol} from {start_date} to {end_date}")
+            
+            # Ensure required columns
+            required_columns = ['Open', 'High', 'Low', 'Close', 'Volume']
+            for col in required_columns:
+                if col not in data.columns:
+                    raise ValueError(f"Missing required column: {col}")
+            
+            # Clean data
+            data = data.dropna()
+            
+            # Validate data quality
+            if len(data) < 10:
+                raise ValueError(f"Insufficient IBKR data: only {len(data)} data points found. Need at least 10 data points for backtesting.")
+            
+            # Check for data gaps
+            if data.isnull().any().any():
+                self.logger.warning(f"IBKR data contains null values for {symbol}, cleaning...")
+                data = data.fillna(method='ffill').fillna(method='bfill')
+            
+            # Ensure data is sorted by date
+            data = data.sort_index()
+            
+            # Validate price data integrity
+            for col in ['Open', 'High', 'Low', 'Close']:
+                if (data[col] <= 0).any():
+                    raise ValueError(f"Invalid IBKR price data: {col} contains zero or negative values")
+            
+            # Additional data quality validation for unrealistic wicks
+            data = self._validate_and_clean_candle_data(data, symbol, interval)
+            
+            self.logger.info(f"Fetched and validated {len(data)} IBKR data points for {symbol} from {start_date} to {end_date}")
+            return data
+            
+        except Exception as e:
+            error_msg = str(e)
+            self.logger.error(f"Error fetching IBKR data for {symbol}: {error_msg}")
+            raise ValueError(f"IBKR data fetch failed: {error_msg}")
     
     def _validate_and_clean_candle_data(self, data: pd.DataFrame, symbol: str, interval: str) -> pd.DataFrame:
         """Validate and clean candle data to remove unrealistic wicks and anomalies"""
@@ -700,7 +763,7 @@ class BacktestingAdapter:
         return CombinedMartingaleStrategy
     
     def run_backtest(self, symbol: str, start_date: str, end_date: str, 
-                    interval: str = '1h', initial_cash: float = 100000) -> Tuple[object, Dict, CycleAnalysisReport]:
+                    interval: str = '1h', initial_cash: float = 100000, use_ibkr: bool = False) -> Tuple[object, Dict, CycleAnalysisReport]:
         """Run backtest and return results with cycle analysis"""
         try:
             # Reset cycle analyzer for new backtest
@@ -713,7 +776,7 @@ class BacktestingAdapter:
             self.risk_manager._ensure_daily_metrics(backtest_start_date)
             
             # Fetch data
-            data = self.fetch_data(symbol, start_date, end_date, interval)
+            data = self.fetch_data(symbol, start_date, end_date, interval, use_ibkr=use_ibkr)
             
             # Create strategy class
             StrategyClass = self.create_combined_strategy(symbol)

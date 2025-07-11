@@ -272,20 +272,28 @@ def render_backtesting_interface(config: TradingConfig):
         )
         timeframe = timeframe_options[timeframe_display]
         
-        # Determine date limits based on timeframe
-        # yfinance has limitations: intraday data (1m, 5m, 15m, 30m, 1h, 2h, 4h) is only available for the last 730 days
-        intraday_timeframes = ["1m", "5m", "15m", "30m", "1h", "2h", "4h"]
+        # Data Source - IBKR Only
+        use_ibkr = True
+        st.info("📊 **Data Source:** Interactive Brokers (IBKR) - Professional-grade market data")
         
-        if timeframe in intraday_timeframes:
-            # For intraday data, limit to last 700 days (safe margin within 730 day limit)
-            max_days_back = 700
-            default_days_back = 90  # Default to 3 months for intraday
-            date_help = f"⚠️ Intraday data is limited to the last {max_days_back} days by yfinance"
+        # Determine date limits based on timeframe (IBKR only)
+        # IBKR data availability based on actual API limits
+        
+        if timeframe in ["1m", "5m"]:
+            # IBKR 1-5 minute data: up to 180 days
+            max_days_back = 180
+            default_days_back = 30  # Default to 1 month for minute data
+            date_help = "IBKR provides 1-5 minute data for up to 180 days"
+        elif timeframe in ["15m", "30m", "1h", "2h", "4h"]:
+            # IBKR 15min-4hour data: up to 2 years
+            max_days_back = 730  # ~2 years
+            default_days_back = 180  # Default to 6 months
+            date_help = "IBKR provides intraday data for up to 2 years"
         else:
-            # For daily and longer timeframes, allow longer periods
-            max_days_back = 3650  # ~10 years
+            # IBKR daily and longer timeframes: up to 10+ years
+            max_days_back = 3650  # ~10 years for IBKR daily data
             default_days_back = 365  # Default to 1 year
-            date_help = "Select the date range for backtesting"
+            date_help = "IBKR provides daily data for up to 10+ years"
         
         # Calculate date limits
         max_start_date = datetime.now().date() - timedelta(days=max_days_back)
@@ -326,15 +334,23 @@ def render_backtesting_interface(config: TradingConfig):
             st.error("Start date must be before end date.")
             return
         
-        # Additional validation for yfinance limitations
+        # Additional validation for IBKR data limitations
         days_back = (datetime.now().date() - start_date).days
-        if timeframe in intraday_timeframes and days_back > 730:
-            st.error(f"⚠️ Intraday data ({timeframe_display}) is only available for the last 730 days. Your start date is {days_back} days ago. Please select a more recent start date.")
+        
+        # Validate based on specific timeframe limitations
+        if timeframe in ["1m", "5m"] and days_back > 180:
+            st.error(f"⚠️ IBKR {timeframe_display} data is only available for the last 180 days. Your start date is {days_back} days ago. Please select a more recent start date.")
+            return
+        elif timeframe in ["15m", "30m", "1h", "2h", "4h"] and days_back > 730:
+            st.error(f"⚠️ IBKR {timeframe_display} data is only available for the last 2 years (730 days). Your start date is {days_back} days ago. Please select a more recent start date.")
             return
         
-        # Show warning if approaching the limit
-        if timeframe in intraday_timeframes and days_back > 600:
-            st.warning(f"⚠️ You're requesting data from {days_back} days ago. Intraday data may be limited. If you encounter errors, try a more recent date range.")
+        # Show warnings when approaching limits
+        if timeframe in ["1m", "5m"] and days_back > 150:
+            st.warning(f"⚠️ You're requesting {timeframe_display} data from {days_back} days ago. IBKR minute data is limited to 180 days.")
+        elif timeframe in ["15m", "30m", "1h", "2h", "4h"] and days_back > 600:
+            st.warning(f"⚠️ You're requesting {timeframe_display} data from {days_back} days ago. IBKR intraday data is limited to 2 years.")
+        
         
         # Run Backtest Button
         run_backtest = st.button(
@@ -362,7 +378,8 @@ def render_backtesting_interface(config: TradingConfig):
                         start_date=start_date.strftime('%Y-%m-%d'),
                         end_date=end_date.strftime('%Y-%m-%d'),
                         interval=timeframe,
-                        initial_cash=initial_cash
+                        initial_cash=initial_cash,
+                        use_ibkr=use_ibkr
                     )
                     
                     # Store results in session state
