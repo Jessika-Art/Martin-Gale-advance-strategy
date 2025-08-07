@@ -896,12 +896,6 @@ def render_about_page():
         - **Performance Analytics**: Comprehensive performance tracking
         - **Configuration Management**: Easy strategy and parameter configuration
         - **Modern UI**: Intuitive Streamlit-based dashboard
-        
-        ## ⚠️ Risk Disclaimer
-        
-        Trading involves substantial risk and may not be suitable for all investors. 
-        Past performance is not indicative of future results. Please ensure you understand 
-        the risks involved and consider seeking independent financial advice.
         """, unsafe_allow_html=True)
     
     with col2:

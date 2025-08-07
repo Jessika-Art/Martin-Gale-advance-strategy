@@ -189,18 +189,59 @@ class BaseStrategy(ABC):
         
         self.logger.info(f"Using size_multiplier={size_multiplier} for leg {leg_number}")
         
-        # Check if using SHARES mode with fixed position sizing
-        if hasattr(self.settings, 'position_size_unit') and self.settings.position_size_unit == 'SHARES':
-            if hasattr(self.settings, 'fixed_position_size') and self.settings.fixed_position_size > 0.0:
-                # Use fixed position size with multiplier
-                shares = self.settings.fixed_position_size * size_multiplier
-                shares = max(0.001, min(shares, 100000))  # Allow fractional shares, higher max limit
-                self.logger.info(f"SHARES mode fixed position sizing: Base={self.settings.fixed_position_size}, Multiplier={size_multiplier:.2f}, Shares={shares}")
-                return float(shares)
-            elif hasattr(self.settings, 'fixed_position_size') and self.settings.fixed_position_size == 0.0:
-                # Fixed Position Size is 0.0 - bypass fixed sizing and use only multiplier against capital allocation
-                self.logger.info(f"SHARES mode with Fixed Position Size 0.0 - using percentage-based sizing with multiplier only")
-                # Fall through to percentage-based calculation below
+        # Check position size unit and handle accordingly
+        if hasattr(self.settings, 'position_size_unit') and self.settings.position_size_unit:
+            if self.settings.position_size_unit == 'SHARES':
+                if hasattr(self.settings, 'fixed_position_size') and self.settings.fixed_position_size > 0.0:
+                    # Use fixed position size with multiplier
+                    shares = self.settings.fixed_position_size * size_multiplier
+                    shares = max(0.001, min(shares, 100000))  # Allow fractional shares, higher max limit
+                    self.logger.info(f"SHARES mode fixed position sizing: Base={self.settings.fixed_position_size}, Multiplier={size_multiplier:.2f}, Shares={shares}")
+                    return float(shares)
+                elif hasattr(self.settings, 'fixed_position_size') and self.settings.fixed_position_size == 0.0:
+                    # Fixed Position Size is 0.0 - bypass fixed sizing and use only multiplier against capital allocation
+                    self.logger.info(f"SHARES mode with Fixed Position Size 0.0 - using percentage-based sizing with multiplier only")
+                    # Fall through to percentage-based calculation below
+            
+            elif self.settings.position_size_unit == 'USD':
+                if hasattr(self.settings, 'fixed_position_size') and self.settings.fixed_position_size > 0.0:
+                    # Use fixed USD amount with multiplier, convert to shares
+                    if current_price and current_price > 0:
+                        usd_amount = self.settings.fixed_position_size * size_multiplier
+                        shares = usd_amount / current_price
+                        shares = max(0.001, min(shares, 100000))  # Apply safety limits
+                        self.logger.info(f"USD mode fixed position sizing: Base=${self.settings.fixed_position_size}, Multiplier={size_multiplier:.2f}, USD Amount=${usd_amount:.2f}, Price=${current_price:.2f}, Shares={shares:.6f}")
+                        return float(shares)
+                    else:
+                        # Fallback when no price available
+                        fallback_shares = min(100.0, self.settings.fixed_position_size / 100.0)
+                        self.logger.warning(f"USD mode: No current price available. Using fallback: {fallback_shares} shares (assuming $100/share)")
+                        return fallback_shares
+                elif hasattr(self.settings, 'fixed_position_size') and self.settings.fixed_position_size == 0.0:
+                    # Fixed Position Size is 0.0 - use percentage-based sizing with capital allocation
+                    self.logger.info(f"USD mode with Fixed Position Size 0.0 - using percentage-based sizing with multiplier")
+                    # Fall through to percentage-based calculation below
+            
+            elif self.settings.position_size_unit == 'PERCENTAGE':
+                if hasattr(self.settings, 'fixed_position_size') and self.settings.fixed_position_size > 0.0:
+                    # Use fixed percentage of account balance with multiplier
+                    if current_price and current_price > 0:
+                        percentage = self.settings.fixed_position_size / 100.0  # Convert percentage to decimal
+                        usd_amount = account_balance * percentage * size_multiplier
+                        shares = usd_amount / current_price
+                        shares = max(0.001, min(shares, 100000))  # Apply safety limits
+                        self.logger.info(f"PERCENTAGE mode fixed position sizing: Base={self.settings.fixed_position_size}%, Multiplier={size_multiplier:.2f}, USD Amount=${usd_amount:.2f}, Price=${current_price:.2f}, Shares={shares:.6f}")
+                        return float(shares)
+                    else:
+                        # Fallback when no price available
+                        percentage = self.settings.fixed_position_size / 100.0
+                        fallback_shares = min(100.0, (account_balance * percentage) / 100.0)
+                        self.logger.warning(f"PERCENTAGE mode: No current price available. Using fallback: {fallback_shares} shares (assuming $100/share)")
+                        return fallback_shares
+                elif hasattr(self.settings, 'fixed_position_size') and self.settings.fixed_position_size == 0.0:
+                    # Fixed Position Size is 0.0 - use capital allocation instead
+                    self.logger.info(f"PERCENTAGE mode with Fixed Position Size 0.0 - using capital allocation with multiplier")
+                    # Fall through to percentage-based calculation below
         
         # Default percentage-based position sizing
         base_allocation = self.settings.capital_allocation
